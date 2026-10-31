@@ -1,0 +1,47 @@
+{
+  "name": "reflectworld",
+  "private": true,
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc --build && (find packages/*/dist -name 'tsconfig.tsbuildinfo' -delete 2>/dev/null || true) && node scripts/bundle-assets.js",
+    "clean": "tsc --build --clean && (find packages/*/dist -name __tests__ -type d -exec rm -rf {} + 2>/dev/null || true)",
+    "setup": "node packages/reflectworld/dist/src/cli/index.js setup",
+    "start": "node packages/reflectworld/dist/src/cli/index.js start --dev",
+    "release": "npm run build && node scripts/release.js",
+    "benchmark:setup": "bash eval/benchmark/bootstrap.sh",
+    "benchmark:setup:linux": "bash eval/benchmark/bootstrap.sh",
+    "benchmark:run": "bash eval/benchmark/pipeline/run.sh",
+    "dashboard:demo": "tsx packages/host/src/demo-server.ts",
+    "dashboard:main": "tsx packages/host/src/server.ts",
+    "demo:start": "npm run dashboard:demo",
+    "lint": "eslint .",
+    "typecheck": "tsc --build && tsc --noEmit -p tsconfig.eval.json",
+    "typecheck:eval": "tsc --noEmit -p tsconfig.eval.json",
+    "test": "vitest run",
+    "test:watch": "vitest --watch"
+  },
+  "overrides": {
+    "onnxruntime-node": {
+      "adm-zip": "0.6.0"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "dts-bundle-generator": "^9.0.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^10.5.0",
+    "globals": "^17.6.0",
+    "jpeg-js": "^0.4.4",
+    "onnxruntime-node": "^1.24.3",
+    "tsx": "^4.23.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.61.0",
+    "vitest": "^3.0.0"
+  }
+}

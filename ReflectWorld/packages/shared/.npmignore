@@ -1,0 +1,13 @@
+dist/tsconfig.tsbuildinfo
+tsconfig.json
+src/
+*.ts
+!dist/**
+__tests__/
+*.test.*
+*.spec.*
+**/__pycache__/
+**/*.pyc
+**/tests/
+**/.pytest_cache/
+**/.venv/

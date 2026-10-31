@@ -1,0 +1,322 @@
+================================================================================
+CORTEX HLD - QUICK REFERENCE CARD (For Defense)
+================================================================================
+Keep this in front of you during presentation
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         HLD BLOCK QUICK GUIDE                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+BLOCK 1: INPUT LAYER (Top)
+  What: Video sources
+  Where: Camera, files, uploads
+  Simple: "Where the video comes from"
+
+BLOCK 2: CAPTURE & INGESTION (Top-Right)  
+  What: Breaking video into frames
+  Process: FFmpeg extracts frames
+  Simple: "Converting video to 30 photos/second"
+
+BLOCK 3: SEGMENTATION (Left-Middle)
+  What: Finding important moments
+  Detects: Motion, scene changes, speech
+  Simple: "Finding interesting chapters in the movie"
+
+BLOCK 4: WORKING MEMORY & CONTEXT (Left)
+  What: Temporary knowledge
+  Contains: Current state, history, rules, location info
+  Simple: "Remember what we know about NOW"
+
+BLOCK 5: PERCEPTION PIPELINE (Center - BIG)
+  Level 0: Simple AI understanding (fast)
+  Level 1: Detailed detection + re-ID (accurate)
+  Simple: "Analyzing and understanding what's in the video"
+
+BLOCK 6: ENTITY RESOLUTION (Center-Right)
+  What: Recognizing people
+  Checks: Is this someone we've seen before?
+  Simple: "Face recognition - who are they?"
+
+BLOCK 7: MEMORY SYSTEM (Right)
+  What: Long-term storage
+  Stores: All observations and facts
+  Simple: "Saving everything we learn"
+
+BLOCK 8: RETRIEVAL & AGENT (Right-Lower)
+  What: Answering questions
+  Searches: Find relevant memories
+  Simple: "Finding answers in our memory"
+
+BLOCK 9: EXTERNAL SERVICES (Bottom-Center)
+  What: Cloud AI
+  Uses: ChatGPT, Claude, Gemini, Embeddings
+  Simple: "Calling cloud AI for complex reasoning"
+
+BLOCK 10: USER INTERFACES (Bottom)
+  Dashboard, API, WebSocket, OpenClaw
+  Simple: "Different ways users can use CORTEX"
+
+BLOCK 11: USERS (Very Bottom)
+  End users, AI agents
+  Simple: "People using the system"
+
+================================================================================
+FLOW MEMORY TRICK
+================================================================================
+
+Think of it as a RESTAURANT:
+
+🎥 INPUT      = Customer walks in with food
+📹 CAPTURE    = Chef prepares ingredients  
+📊 SEGMENT    = Select best ingredients
+🧠 WORKING    = Check recipe and pantry
+🤖 PERCEPTION = Cook the dish
+👤 ENTITY     = Recognize: Is this regular customer?
+💾 MEMORY     = Write recipe in cookbook
+❓ RETRIEVAL  = Someone asks "What did we make yesterday?"
+☁️ EXTERNAL   = Call famous chef for advice
+👥 UI         = Serve food to customers
+👨‍🍳 USERS     = Customers eating
+
+================================================================================
+ONE-SENTENCE EXPLANATIONS (If stuck)
+================================================================================
+
+Input Layer:       "Video sources like cameras and files"
+Capture:           "Breaking video into individual frames"
+Segmentation:      "Finding interesting moments in video"
+Working Memory:    "Information we need right now"
+Perception L0:     "Simple fast AI understanding"
+Perception L1:     "Complex detailed AI analysis with 4 models"
+Re-ID:             "Recognizing if it's someone we saw before"
+Entity Resolution: "Turning detections into recognized people"
+Memory System:     "Database that stores everything"
+Consolidation:     "Converting observations into learned facts"
+Retrieval:         "Finding information when asked"
+QA Agent:          "Answering user questions"
+External Services: "Cloud AI for complex tasks"
+User Interfaces:   "Ways users interact with system"
+
+================================================================================
+COLORS IN HLD DIAGRAM
+================================================================================
+
+🔵 BLUE      = Input/Output sections
+🟣 PURPLE    = Processing & perception
+🟢 GREEN     = Capture & ingestion
+🟡 BEIGE     = Segmentation & retrieval
+🔴 PINK      = Entity resolution
+🟤 BROWN     = Memory & databases
+
+================================================================================
+IF ASKED ABOUT SPECIFIC BLOCKS
+================================================================================
+
+"What's happening in Perception Pipeline?"
+→ "Four AI models work together:
+   1. YOLO detects all objects
+   2. RetinaFace finds faces
+   3. RTMPose finds body positions
+   4. Speech-to-Text converts audio
+   Then we ask ChatGPT to make sense of it all"
+
+"What's the difference between Level 0 and Level 1?"
+→ "Level 0 is fast and simple - like asking a friend about photos.
+   Level 1 is detailed and accurate - using 4 specialized AI models.
+   Level 0 = speed, Level 1 = accuracy"
+
+"What's entity resolution?"
+→ "It's how we recognize people.
+   We create a unique fingerprint of each person's face.
+   If we see the same fingerprint again, we say 'It's the same person!'"
+
+"How does memory work?"
+→ "We store observations (raw data) AND facts (learned knowledge).
+   Observation: 'Person appeared today at 2 PM'
+   Fact: 'This person is a regular visitor'
+   We can search and retrieve information instantly"
+
+"What's consolidation?"
+→ "Learning from observations.
+   After seeing someone 5 times, we learn: 'This is a regular'
+   Instead of treating them as unknown person each time"
+
+================================================================================
+TRICKY TERMS EXPLAINED SIMPLY
+================================================================================
+
+Embeddings:
+"Converting something into a unique number code"
+Example: Face → [0.234, -0.891, 0.456] = Face fingerprint
+
+Vector Database (Qdrant):
+"Database that stores number codes and can find similar codes fast"
+Example: Store all face codes, search for similar faces instantly
+
+Re-ID:
+"Recognition ID" = Can we recognize if it's the same person?
+
+Semantic:
+"Meaningful understanding" = Not just detecting, but understanding meaning
+
+Episodic:
+"Event-based" = Recording what happened when (episode 1, episode 2)
+
+Consolidation:
+"Summarizing and learning" = Converting observations into knowledge
+
+VLM:
+"Vision Language Model" = AI that understands images and language
+Examples: ChatGPT, Claude, Gemini
+
+Perception:
+"Understanding what's in the image"
+
+Real-time:
+"Happening now, not delayed"
+
+Local-first:
+"Runs on your device, not in cloud"
+
+================================================================================
+HAND GESTURES & POINTER TIPS
+================================================================================
+
+When explaining INPUT LAYER:
+→ Point to top of diagram
+→ Gesture like opening a video: "Video comes from here"
+
+When explaining CAPTURE:
+→ Trace path downward: "Video breaks into individual frames"
+→ Count on fingers: "30 frames every second"
+
+When explaining SEGMENTATION:
+→ Use hand to show filtering: "Interesting parts vs boring parts"
+→ Point to beige boxes: "Look for these markers"
+
+When explaining PERCEPTION:
+→ Move hand across the large purple box: "Big analysis happens here"
+→ Point to Level 0 and Level 1: "Simple way OR detailed way"
+
+When explaining ENTITY RESOLUTION:
+→ Point to pink box: "Who is this person?"
+→ Make connection gesture: "Linking to database of known people"
+
+When explaining MEMORY:
+→ Draw circle motion: "Information goes in, gets organized, stored"
+→ Point to right side: "Everything stays here"
+
+When explaining RETRIEVAL:
+→ Gesture searching: "User asks question, we search memory"
+→ Point downward to users: "Answer goes back to user"
+
+================================================================================
+COMMON MISTAKES TO AVOID
+================================================================================
+
+❌ DON'T: "This is complex AI stuff"
+✅ DO: "We use AI to understand video like humans do"
+
+❌ DON'T: "Qdrant vector embeddings with cosine similarity"
+✅ DO: "Database that stores face fingerprints and finds similar ones"
+
+❌ DON'T: Explain every technical detail
+✅ DO: Explain purpose and benefit
+
+❌ DON'T: Talk too fast through Perception section
+✅ DO: Slow down, these are the 4 key models
+
+❌ DON'T: Skip explaining how users actually use it
+✅ DO: Show dashboard example or API use
+
+❌ DON'T: Make it sound like magic
+✅ DO: Explain the step-by-step logic
+
+================================================================================
+PRACTICE FLOW (3 MINUTE VERSION)
+================================================================================
+
+1. INPUT [15 sec]: "Video comes from camera or file"
+2. CAPTURE [15 sec]: "FFmpeg breaks it into frames"  
+3. SEGMENT [20 sec]: "Find interesting moments"
+4. PERCEPTION [60 sec]: "Analyze: objects, faces, bodies, speech, AI understanding"
+5. RE-ID [20 sec]: "Recognize people"
+6. MEMORY [20 sec]: "Save everything"
+7. RETRIEVAL [20 sec]: "Answer questions"
+8. OUTPUT [10 sec]: "Dashboard shows results"
+
+Total: ~3 minutes. Then answer questions.
+
+================================================================================
+IF RUNNING OUT OF TIME
+================================================================================
+
+MINIMUM EXPLANATION (90 seconds):
+"Video comes in → We find interesting moments → Analyze with AI →
+Recognize people → Store everything → Answer user questions"
+
+ESSENTIAL BLOCKS ONLY:
+1. Input (what we get)
+2. Perception (what we analyze)
+3. Entity Resolution (who we recognize)
+4. Memory (what we remember)
+5. Retrieval (how we answer)
+6. Outputs (what user sees)
+
+SKIP IF SHORT ON TIME:
+- Technical details of each model
+- Specific model names if not asked
+- Cloud services details
+- Database architecture details
+
+================================================================================
+MEMORIZE THESE 5 POINTS
+================================================================================
+
+1️⃣ "CORTEX understands video like humans - seeing, remembering, learning"
+
+2️⃣ "Unlike cameras that just record, we analyze EVERY part"
+
+3️⃣ "We recognize people and remember them forever"
+
+4️⃣ "Users don't watch hours of video - we answer their questions"
+
+5️⃣ "Everything runs locally on regular computers - privacy first"
+
+================================================================================
+CONFIDENCE BOOSTERS
+================================================================================
+
+If committee asks about something you're unsure:
+
+"Good question! Let me explain that specifically..."
+[Points to relevant block]
+"This block handles X by doing Y"
+
+Or:
+
+"That's a great technical detail. In simple terms, [give simple answer]"
+
+Or:
+
+"Let me show you in the architecture diagram..."
+[Point to diagram, buy time to think]
+
+Remember: YOU built the system, YOU know it better than committee!
+Even if they ask tricky questions, you can point to the code/architecture.
+
+================================================================================
+ENERGY MANAGEMENT
+================================================================================
+
+⏰ 0-2 min:   INTRO & BIG PICTURE - High energy
+⏰ 2-8 min:   TECHNICAL BLOCKS - Steady, clear
+⏰ 8-12 min:  BENEFITS & FEATURES - Build excitement
+⏰ 12-15 min: WRAP UP - Strong finish
+⏰ 15+ min:   Q&A - Show expertise
+
+Don't be boring in blocks 2-3. Use analogies. Vary your speaking pace.
+Point at diagram. Make eye contact. You've got this! 💪
+
+================================================================================

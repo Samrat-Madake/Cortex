@@ -1,0 +1,17 @@
+{
+  "//": "Standing typecheck for eval/ (benchmark + video-runner). eval/ is not part of the packages tsc --build graph and runs via vitest/esbuild, so this config type-checks it directly. module/moduleResolution mirror how esbuild runs eval (ESM, bundler resolution).",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "composite": false,
+    "rootDir": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"],
+    "skipLibCheck": true
+  },
+  "include": ["eval/**/*.ts", "tests/agent-qa-*.test.ts"]
+}

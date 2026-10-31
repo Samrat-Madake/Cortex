@@ -1,0 +1,30 @@
+{
+  "id": "reflectworld-mem",
+  "name": "ReflectWorld Memory",
+  "description": "Search and manage ReflectWorld video memories — episodic, semantic, and procedural",
+  "version": "0.1.0",
+  "skills": ["./skills"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "baseUrl": {
+        "type": "string",
+        "description": "ReflectWorld API base URL (default: http://localhost:8219)"
+      },
+      "timeoutMs": {
+        "type": "number",
+        "description": "HTTP request timeout in ms (default: 10000)"
+      },
+      "defaultCameraId": {
+        "type": "string",
+        "description": "Default camera_id for all requests"
+      },
+      "defaultSearchMemoryType": {
+        "type": "string",
+        "enum": ["episodic", "semantic", "procedural", "all"],
+        "description": "Default memory type for searches (default: all)"
+      }
+    }
+  }
+}

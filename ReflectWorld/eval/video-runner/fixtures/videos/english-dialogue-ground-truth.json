@@ -1,0 +1,74 @@
+{
+  "video": "english-dialogue-test.mp4",
+  "source": "Internet Archive — 1989 Vancouver cable TV interview with David Carradine (last part), trimmed to first 90s. https://archive.org/details/1989-Vancouver-cable-tv-interview-with-david-carradine",
+  "duration_sec": 90.0,
+  "description": "Real interview conversation between David Carradine and a TV host. Carradine discusses his approach to the Woody Guthrie film 'Bound for Glory', studying songs, and working with director Hal Ashby. Natural conversational speech with pauses, filler words, and turn-taking.",
+  "speech_segments": [
+    {
+      "start_sec": 0.8,
+      "end_sec": 8.0,
+      "speaker": "carradine",
+      "text": "that I learned about twenty-four songs of his. Um. We did fourteen in the picture."
+    },
+    {
+      "start_sec": 9.5,
+      "end_sec": 19.0,
+      "speaker": "carradine",
+      "text": "Um. After all the study, it really turned out all I was really trying to do was find a way to talk."
+    },
+    {
+      "start_sec": 20.6,
+      "end_sec": 34.6,
+      "speaker": "carradine",
+      "text": "Because the story could have been about anybody, you, me, anybody out there. It was, you know, a guy who had a hard time in his youth and went out to try to seek his fortune."
+    },
+    {
+      "start_sec": 35.8,
+      "end_sec": 46.3,
+      "speaker": "carradine",
+      "text": "Wasn't the greatest guy in the world. No, not at all so. But you know, we had a difficult marriage and definitely a difficult life."
+    },
+    {
+      "start_sec": 46.8,
+      "end_sec": 62.7,
+      "speaker": "carradine",
+      "text": "And he had something he stood up for and some things he fell down over. You know, and the movie basically was arguments with his wife, uh, jumping on and off trains, having fights, and uh, singing songs."
+    },
+    {
+      "start_sec": 63.4,
+      "end_sec": 78.3,
+      "speaker": "carradine",
+      "text": "That's really what it was about. The monitoring and all the study, and it definitely helped. But the study was not what was important about it. What was important about it was throwing myself into it."
+    },
+    {
+      "start_sec": 79.3,
+      "end_sec": 82.5,
+      "speaker": "host",
+      "text": "Then how was Ashby? How was Ashby?"
+    },
+    {
+      "start_sec": 84.1,
+      "end_sec": 90.0,
+      "speaker": "carradine",
+      "text": "He might be the best director I've ever worked with. I'm not sure. It's either him or Walter Hill, and I can never quite decide."
+    }
+  ],
+  "silence_segments": [
+    {
+      "start_sec": 8.0,
+      "end_sec": 9.5,
+      "description": "Brief pause between thoughts"
+    },
+    {
+      "start_sec": 19.0,
+      "end_sec": 20.6,
+      "description": "Pause before new thought"
+    },
+    {
+      "start_sec": 82.5,
+      "end_sec": 84.1,
+      "description": "Turn-taking pause between host question and Carradine's response"
+    }
+  ],
+  "notes": "Ground truth transcribed independently by listening to the audio. Filler words (um, uh, you know) are included as spoken. Speaker identification based on voice characteristics and conversational context (host asks questions, Carradine gives extended answers about Bound for Glory). Audio quality is vintage 1989 TV broadcast with some background noise."
+}

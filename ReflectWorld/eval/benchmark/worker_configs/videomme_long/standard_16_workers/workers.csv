@@ -1,0 +1,19 @@
+# idx,offset,limit,port,gpu
+# GPU uses `auto` by default so the public template is not tied to one host.
+# Replace `auto` with a local CUDA device ID when you need deterministic placement.
+01,0,54,8501,auto
+02,54,60,8511,auto
+03,114,54,8521,auto
+04,168,60,8531,auto
+05,228,57,8541,auto
+06,285,54,8551,auto
+07,339,54,8561,auto
+08,393,54,8571,auto
+09,447,57,8581,auto
+10,504,54,8591,auto
+11,558,54,8601,auto
+12,612,60,8611,auto
+13,672,51,8621,auto
+14,723,66,8631,auto
+15,789,54,8641,auto
+16,843,57,8651,auto

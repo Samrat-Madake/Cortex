@@ -1,0 +1,17 @@
+# Dependencies for ReflectWorld model conversion scripts.
+# Tested with the versions below; newer patch releases should be fine.
+
+# --- retinaface (export_retinaface.py) ---
+torch>=2.2
+torchvision>=0.17
+
+# --- yolo26 (export_yolo26.py) ---
+ultralytics>=8.4
+
+# --- shared: export + verification ---
+onnx>=1.16
+onnxruntime>=1.18
+numpy>=1.26
+
+# --- clip-reid (export_clipreid.py, optional / default-disabled) ---
+gdown>=5.0            # clip-reid: fetch Market-1501 weights from Google Drive

@@ -1,0 +1,86 @@
+================================================================================
+REFLECTWORLD - LEVEL 0 RUN GUIDE (MANUAL TERMINAL SETUP)
+================================================================================
+This guide allows you to run each component in its own terminal window
+so you can see live logs, API calls, Qdrant vectors, and video perception.
+================================================================================
+
+PREREQUISITES (ALREADY CONFIGURED):
+ - Gemini API key is configured in: ReflectWorld\.env
+ - Qdrant binary is located at: C:\qdrant\qdrant.exe
+ - Python virtual environment is set up at: services\mem\.venv
+ - Binaries (ffmpeg, go2rtc, silero_vad) are placed in: C:\Users\DELL\.reflectworld\bin
+
+--------------------------------------------------------------------------------
+STEP 1: START QDRANT VECTOR DATABASE (Terminal 1)
+--------------------------------------------------------------------------------
+Open PowerShell Terminal 1 and run:
+
+    cd C:\qdrant
+    .\qdrant.exe
+
+What you will see in the terminal:
+ - "Qdrant HTTP listening on 6333"
+ - "Access web UI at http://localhost:6333/dashboard"
+ - Keep this terminal open!
+
+(You can check the database in your browser at: http://localhost:6333/dashboard)
+
+
+--------------------------------------------------------------------------------
+STEP 2: START PYTHON MEMORY SERVICE (Terminal 2)
+--------------------------------------------------------------------------------
+Open PowerShell Terminal 2 and run:
+
+    cd "c:\Users\DELL\Desktop\Mega Project folder\ReflectWorld\services\mem"
+    .\.venv\Scripts\Activate.ps1
+    python -m uvicorn src.main:app --host 127.0.0.1 --port 8219
+
+What you will see in the terminal:
+ - "Initializing ReflectWorld Memory service"
+ - Qdrant collections loading (episodic_trace, semantic_context, etc.)
+ - "Uvicorn running on http://127.0.0.1:8219"
+ - Keep this terminal open! Live vector operations and LLM memory indexing
+   will print here as videos are processed.
+
+
+--------------------------------------------------------------------------------
+STEP 3: START REFLECTWORLD ORCHESTRATOR & DASHBOARD (Terminal 3)
+--------------------------------------------------------------------------------
+Open PowerShell Terminal 3 and run:
+
+    cd "c:\Users\DELL\Desktop\Mega Project folder\ReflectWorld"
+    node packages/reflectworld/dist/src/cli/index.js start --dev
+
+What you will see in the terminal:
+ - System self-check verifying: Gemini VLM, Qdrant, Memory Service, ffmpeg, go2rtc
+ - "All services started successfully."
+ - "ReflectWorld running at http://localhost:3210"
+ - Keep this terminal open! Keyframe extractions, scene changes, and Gemini VLM
+   responses will stream here in real time.
+
+
+--------------------------------------------------------------------------------
+STEP 4: OPEN DASHBOARD & TEST YOUR VIDEO
+--------------------------------------------------------------------------------
+1. Open your browser and go to:
+       http://localhost:3210
+
+2. Click "Add Source" and upload your downloaded test video (.mp4).
+
+3. Watch the terminals:
+   - Terminal 3 shows: ffmpeg extracting frames & Gemini VLM analyzing scenes.
+   - Terminal 2 shows: memories being synthesized and saved into Qdrant.
+   - Terminal 1 shows: Qdrant vector indexing calls.
+
+4. On the Dashboard:
+   - Live moments and visual summaries will appear on the timeline.
+   - Click the bottom-right Chat button and ask:
+       "What happened in this video?"
+       "What was the sequence of events?"
+       "Who or what appeared?"
+
+================================================================================
+STOPPING SERVICES:
+Press Ctrl + C in each of the 3 terminal windows when you want to stop.
+================================================================================

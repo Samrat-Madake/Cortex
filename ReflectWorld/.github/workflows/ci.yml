@@ -1,0 +1,36 @@
+# GitHub Actions CI.
+# Fast, offline TypeScript checks for main and pull requests:
+# no API keys, prepared binaries, live streams, Python wheels, Qdrant, or spatial assets.
+# Python (services/mem) checks stay local: `cd services/mem && uv run pytest`.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  typescript:
+    name: lint · typecheck · test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      # Skip all install scripts: onnxruntime-node / sherpa-onnx-node are optional
+      # native peers whose postinstall binary download fails in CI. Type
+      # declarations still resolve and vitest mocks the native paths.
+      - run: npm ci --ignore-scripts --include=optional
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npx vitest run --reporter=dot

@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "packages/cam" },
+    { "path": "packages/percept" },
+    { "path": "packages/mem" },
+    { "path": "packages/reflectworld" },
+    { "path": "scripts" }
+  ]
+}

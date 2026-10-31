@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lmms-memory-plugin"
+version = "0.1.0"
+description = "Memory pipeline bridge backend for lmms-eval"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.entry-points."lmms_eval.models"]
+memory_api = "lmms_memory_plugin.manifest:get_manifests"
+
+[tool.setuptools.packages.find]
+include = ["lmms_memory_plugin*"]
