@@ -60,6 +60,14 @@ flowchart LR
 
 ---
 
+### [New Machine Setup & Getting Started Guide](file:///c:/Users/DELL/Desktop/Mega Project folder/docs/05_GETTING_STARTED_NEW_SETUP.md)
+> *Zero-to-running onboarding handbook for fresh clone on any Windows, macOS, or Linux machine.*
+- **Level 0 (Zero-GPU Cloud VLM)**: Complete installation and running instructions across 3 monitoring terminals.
+- **Level 1 (Local Edge ONNX Inference)**: CUDA, ONNX models download, and native runtime acceleration setup.
+- **Step-by-step troubleshooting**: Fixes for common errors (FFmpeg vfr flags, Gemini 3.1 models, port conflicts).
+
+---
+
 ## Quick Reference: Running the System
 
 ```bash
