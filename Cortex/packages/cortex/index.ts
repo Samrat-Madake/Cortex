@@ -2573,7 +2573,7 @@ ${req.prompt}`;
         }
 
         req.emit?.({ type: "status", message: "Composing answer..." });
-        const prompt = `You are the lightweight Reflect.World Dashboard assistant.
+        const prompt = `You are the lightweight Cortex Dashboard assistant.
 Answer questions using ONLY the dashboard context and memory tool results below.
 If the answer is not in the context, say that the dashboard does not have enough information yet.
 You are a warm, observant video-understanding assistant, not a generic chatbot and not a raw log summarizer.

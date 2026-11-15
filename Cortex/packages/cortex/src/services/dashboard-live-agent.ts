@@ -522,7 +522,7 @@ class GoogleLiveAgentSession {
 
   private async executeReflect(question: string, currentContext?: string): Promise<Record<string, unknown>> {
     const dashboardChat = this.deps.options.getDashboardChat();
-    if (!dashboardChat) return { ok: false, error: "Reflect.World chat is not configured" };
+    if (!dashboardChat) return { ok: false, error: "Cortex chat is not configured" };
     const rateLimit = this.deps.options.consumeChatRateLimit(this.deps.req, this.deps.scope);
     if (!rateLimit.ok) {
       return { ok: false, error: `Too many voice questions. Try again in ${rateLimit.retryAfterSec}s.` };
@@ -547,7 +547,7 @@ class GoogleLiveAgentSession {
       return { ok: true, answer: result.answer ?? "" };
     } catch (err) {
       this.log("execute_exception", { error: err instanceof Error ? err.message : String(err) });
-      return { ok: false, error: err instanceof Error ? err.message : "Reflect.World chat failed" };
+      return { ok: false, error: err instanceof Error ? err.message : "Cortex chat failed" };
     }
   }
 
@@ -648,7 +648,7 @@ export function buildGoogleLiveSetupMessage(config: { model: string; voiceName?:
       tools: [{
         functionDeclarations: [{
           name: "execute",
-          description: "Ask Reflect.World video memory and dashboard state. Use this for all questions about past observed video, recent events, known people/entities, objects, safety risks, source status, or analysis progress.",
+          description: "Ask Cortex video memory and dashboard state. Use this for all questions about past observed video, recent events, known people/entities, objects, safety risks, source status, or analysis progress.",
           parameters: {
             type: "object",
             properties: {
@@ -696,7 +696,7 @@ export function hasReliableLiveInputTranscript(text: string): boolean {
 
 function extractQuestion(args: Record<string, unknown> | undefined, fallback: string): string {
   const question = typeof args?.question === "string" ? args.question.trim() : "";
-  return (question || fallback || "Answer the user's question using Reflect.World video memory.").slice(0, 2000);
+  return (question || fallback || "Answer the user's question using Cortex video memory.").slice(0, 2000);
 }
 
 function extractCurrentContext(args: Record<string, unknown> | undefined): string | undefined {
@@ -705,7 +705,7 @@ function extractCurrentContext(args: Record<string, unknown> | undefined): strin
 }
 
 function liveAgentSystemPrompt(): string {
-  return `You are a real-time voice interface for Reflect.World.
+  return `You are a real-time voice interface for Cortex.
 
 Reply in the same language as the user's current voice or text input. If the user's language is unclear, use the dominant language of the current conversation. If the user explicitly asks for another language, follow that request.
 
@@ -713,7 +713,7 @@ Keep every spoken response brief, natural, and useful. Prefer one sentence. Use 
 
 You cannot see the current video stream directly. You do not analyze camera frames yourself. You have no long-term memory of your own.
 
-You have exactly ONE tool: execute. This tool connects to Reflect.World, a video memory assistant. It can answer questions about previously observed video, recent events, detected people/entities, objects, safety risks, sources/cameras, and dashboard analysis state.
+You have exactly ONE tool: execute. This tool connects to Cortex, a video memory assistant. It can answer questions about previously observed video, recent events, detected people/entities, objects, safety risks, sources/cameras, and dashboard analysis state.
 
 Always call execute for questions about:
 - What happened recently
@@ -725,7 +725,7 @@ Always call execute for questions about:
 - Recent activity summaries
 - Whether video analysis/source/stream processing is working
 
-Do not answer video-memory questions from your own knowledge. Reflect.World is the source of truth.
+Do not answer video-memory questions from your own knowledge. Cortex is the source of truth.
 
 Before calling execute, say one very short acknowledgment in the user's language, then call the tool. Do not use a fixed-language acknowledgment.
 

@@ -41,12 +41,12 @@ export function TopBar({
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <img
           src="/logo.png"
-          alt="Reflect.World logo"
+          alt="Cortex logo"
           style={{ width: "auto", height: 28, flexShrink: 0, objectFit: "contain" }}
         />
         <div style={{ display: "flex", alignItems: "baseline" }}>
           <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.35px", color: tokens.text.primary }}>
-            Reflect.World
+            Cortex
           </span>
         </div>
       </div>
