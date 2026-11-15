@@ -1,6 +1,6 @@
-# ReflectWorld Feature Deep Dive & Implementation Manual
+# Cortex Feature Deep Dive & Implementation Manual
 
-Welcome to **Phase 4** of the ReflectWorld architectural documentation suite. This document delivers an algorithmic, mathematical, and code-level deep dive into the five core capabilities that power ReflectWorld's continuous spatial-temporal episodic memory:
+Welcome to **Phase 4** of the Cortex architectural documentation suite. This document delivers an algorithmic, mathematical, and code-level deep dive into the five core capabilities that power Cortex's continuous spatial-temporal episodic memory:
 
 1. [Active Adaptive Segmentation & Dynamic Keyframe Selection](#1-active-adaptive-segmentation--dynamic-keyframe-selection)
 2. [Dual-Tier Perception Engine (Level 0 vs Level 1)](#2-dual-tier-perception-engine-level-0-vs-level-1)
@@ -16,7 +16,7 @@ Welcome to **Phase 4** of the ReflectWorld architectural documentation suite. Th
 ### 1.1 The Challenge of Continuous Ingestion
 Standard video AI systems attempt to analyze continuous live video either by evaluating every frame (computationally prohibitive, saturating GPUs and network bandwidth) or by rigid time slicing (e.g., cutting every 10 seconds). Rigid slicing creates severe boundary clipping errors: sentences get severed mid-syllable, and action sequences get split across arbitrary segment borders.
 
-ReflectWorld implements **Active Adaptive Boundary Slicing**, an adaptive multi-modal segmentation technique that detects natural cognitive transitions across both audio dialogue and visual motion streams simultaneously.
+Cortex implements **Active Adaptive Boundary Slicing**, an adaptive multi-modal segmentation technique that detects natural cognitive transitions across both audio dialogue and visual motion streams simultaneously.
 
 ```mermaid
 flowchart TD
@@ -71,7 +71,7 @@ $$\mathcal{D}_{\text{scene}}(t_1, t_2) = \alpha \cdot \frac{1}{HW}\sum_{x=1}^{W}
 
 ### 1.3 Tri-Keyframe Dynamic Extraction Strategy
 
-Rather than sending 900 frames for a 30-second segment, ReflectWorld extracts three high-information anchor frames:
+Rather than sending 900 frames for a 30-second segment, Cortex extracts three high-information anchor frames:
 
 | Frame Type | Temporal Position | Selection Formula | Cognitive Purpose |
 | :--- | :--- | :--- | :--- |
@@ -79,13 +79,13 @@ Rather than sending 900 frames for a 30-second segment, ReflectWorld extracts th
 | **Peak Kinetic Frame** ($F_{\text{peak}}$) | $t \in (t_{\text{start}}, t_{\text{end}})$ | $\operatorname{argmax}_{t} \left(\sum |\nabla I(x,y,t)|\right)$ | Captures the pivotal action (e.g., reaching for a cup, turning a knob, gesturing). |
 | **Closing Frame** ($F_{\text{end}}$) | $t \in [t_{\text{end}} - 0.5\text{s}, t_{\text{end}}]$ | Last frame preceding boundary cut | Encodes state change resolution (e.g., cup moved, object placed, person departed). |
 
-*Implementation Reference:* [`packages/cam/src/adaptive-segmenter.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/cam/src/adaptive-segmenter.ts) and [`packages/cam/src/local-file-media-source.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/cam/src/local-file-media-source.ts).
+*Implementation Reference:* [`packages/cam/src/adaptive-segmenter.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/cam/src/adaptive-segmenter.ts) and [`packages/cam/src/local-file-media-source.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/cam/src/local-file-media-source.ts).
 
 ---
 
 ## 2. Dual-Tier Perception Engine (Level 0 vs Level 1)
 
-ReflectWorld solves the hardware barrier problem through a **bimodal perception architecture**.
+Cortex solves the hardware barrier problem through a **bimodal perception architecture**.
 
 ```mermaid
 graph TB
@@ -134,7 +134,7 @@ graph TB
 In Level 0 mode, the system runs on commodity laptops without dedicated GPUs or pre-compiled C++ ONNX bindings. 
 
 #### Frame Optimization & Token Budgeting
-To maintain low latency and eliminate Cloud API 503 rate drops, frames pass through [`dynamic-resizer.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/percept/src/dynamic-resizer.ts):
+To maintain low latency and eliminate Cloud API 503 rate drops, frames pass through [`dynamic-resizer.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/percept/src/dynamic-resizer.ts):
 - Downscaled to max dimension $1024\,\text{px}$ preserving aspect ratio.
 - Converted to progressive JPEG at quality $82\%$.
 - Converted to inline base64 data blobs: `data:image/jpeg;base64,...`.
@@ -184,13 +184,13 @@ For production edge devices (NVIDIA Jetson, workstations with RTX GPUs, Apple Si
 | **ArcFace-MBF (w600k)** | 512-Dimensional Facial Metric Embedding | $112 \times 112$ | $1.9\,\text{ms}$ | $3.5\,\text{ms}$ |
 | **RTMPose-m** | 17-Keypoint Body Pose & Action Recognition | $256 \times 192$ | $4.1\,\text{ms}$ | $7.2\,\text{ms}$ |
 
-*Implementation Reference:* [`packages/percept/src/perception-service.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/percept/src/perception-service.ts).
+*Implementation Reference:* [`packages/percept/src/perception-service.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/percept/src/perception-service.ts).
 
 ---
 
 ## 3. Cross-Temporal Entity Resolution & Tracking (Re-ID)
 
-When an actor leaves the camera frame and reappears 20 minutes later under different lighting, or walks between two distinct camera zones, standard object trackers assign a new tracking ID (`Track_01` $\to$ `Track_98`). ReflectWorld's **Cross-Temporal Entity Resolver** solves this identity fragmentation.
+When an actor leaves the camera frame and reappears 20 minutes later under different lighting, or walks between two distinct camera zones, standard object trackers assign a new tracking ID (`Track_01` $\to$ `Track_98`). Cortex's **Cross-Temporal Entity Resolver** solves this identity fragmentation.
 
 ```mermaid
 sequenceDiagram
@@ -228,7 +228,7 @@ sequenceDiagram
 
 ### 3.1 Mathematical Scoring Function for Entity Continuity
 
-When resolving an identity across scenes without clear frontal facial captures, ReflectWorld computes an ensemble identity continuity score $\mathcal{S}_{\text{identity}}(E_{\text{obs}}, E_{\text{cand}})$:
+When resolving an identity across scenes without clear frontal facial captures, Cortex computes an ensemble identity continuity score $\mathcal{S}_{\text{identity}}(E_{\text{obs}}, E_{\text{cand}})$:
 
 $$\mathcal{S}_{\text{identity}} = w_1 \cdot \cos(\mathbf{v}_{\text{face}}, \mathbf{v}_{\text{cand\_face}}) + w_2 \cdot \cos(\mathbf{v}_{\text{desc}}, \mathbf{v}_{\text{cand\_desc}}) + w_3 \cdot \exp\left(-\frac{\Delta t}{\tau_{\text{decay}}}\right) \cdot \mathbb{I}(\text{loc}_{\text{obs}} = \text{loc}_{\text{cand}})$$
 
@@ -239,13 +239,13 @@ Where:
 - $\tau_{\text{decay}} = 1800\,\text{s}$ (30-minute spatial-temporal decay parameter).
 - $w_1 = 0.60, w_2 = 0.30, w_3 = 0.10$ are dynamic weights normalized by feature availability.
 
-*Implementation Reference:* [`packages/percept/src/identity-resolver.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/percept/src/identity-resolver.ts).
+*Implementation Reference:* [`packages/percept/src/identity-resolver.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/percept/src/identity-resolver.ts).
 
 ---
 
 ## 4. 9-Tier Hierarchical Vector Memory & Consolidation Engine
 
-ReflectWorld structures world memories into three cognitive layers across **9 specialized vector collections** inside Qdrant:
+Cortex structures world memories into three cognitive layers across **9 specialized vector collections** inside Qdrant:
 
 ```mermaid
 graph TD
@@ -305,7 +305,7 @@ Output: New schema record inserted into episodic_schema
 
 ### 4.2 Mathematical Forgetting & Recency-Adjusted Ranking
 
-Memories in ReflectWorld do not simply vanish; they undergo biological-inspired temporal attenuation. When retrieving memory traces, candidate points are scored using a hybrid relevance function:
+Memories in Cortex do not simply vanish; they undergo biological-inspired temporal attenuation. When retrieving memory traces, candidate points are scored using a hybrid relevance function:
 
 $$\text{FinalScore}(M) = \mathcal{S}_{\text{vector}}(\mathbf{q}, \mathbf{m}) \times \left( \lambda_{\text{salience}} \cdot \mathcal{A}(M) + (1 - \lambda_{\text{salience}}) \cdot \exp\left( -\frac{t_{\text{now}} - t_M}{\tau_{\text{retention}}} \right) \right)$$
 
@@ -314,13 +314,13 @@ Where:
 - $\mathcal{A}(M) \in [0.1, 1.0]$ is the intrinsic salience score assigned during perception (e.g., loud collisions, emotional expressions, safety hazards receive $\mathcal{A} \approx 1.0$).
 - $\tau_{\text{retention}} = 7\,\text{days}$ for raw traces; $\tau_{\text{retention}} = 180\,\text{days}$ for consolidated schemas.
 
-*Implementation Reference:* [`services/mem/src/database.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/services/mem/src/database.py) and [`services/mem/src/retrieval.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/services/mem/src/retrieval.py).
+*Implementation Reference:* [`services/mem/src/database.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/services/mem/src/database.py) and [`services/mem/src/retrieval.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/services/mem/src/retrieval.py).
 
 ---
 
 ## 5. Multi-Modal Retrieval & Evidence-Grounded Synthesis
 
-When a user asks: *"Where did I place my car keys after returning from the supermarket?"*, standard RAG systems fail because they match keywords rather than reasoning across temporal state changes. ReflectWorld deploys a **Multi-Stage Temporal Expansion Retrieval** pipeline.
+When a user asks: *"Where did I place my car keys after returning from the supermarket?"*, standard RAG systems fail because they match keywords rather than reasoning across temporal state changes. Cortex deploys a **Multi-Stage Temporal Expansion Retrieval** pipeline.
 
 ```mermaid
 sequenceDiagram
@@ -354,7 +354,7 @@ sequenceDiagram
 
 ### 5.1 Verification Against Hallucinations
 
-ReflectWorld answers are strictly grounded in retrieved vector payloads. If the vector retrieval similarity falls below the threshold $\theta_{\text{ground}} = 0.48$, the engine reports:
+Cortex answers are strictly grounded in retrieved vector payloads. If the vector retrieval similarity falls below the threshold $\theta_{\text{ground}} = 0.48$, the engine reports:
 
 ```json
 {
@@ -375,17 +375,17 @@ The table below maps each feature from ingestion to final retrieval directly to 
 
 | Feature Phase | Functional Responsibility | Primary Source File Link | Key Functions / Classes |
 | :--- | :--- | :--- | :--- |
-| **Ingestion** | Video demuxing, RTSP/file ingestion | [`local-file-media-source.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/cam/src/local-file-media-source.ts) | `LocalFileMediaSource.start()`, `spawnFFmpeg()` |
-| **Segmentation** | Voice pause cuts, motion energy delta | [`adaptive-segmenter.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/cam/src/adaptive-segmenter.ts) | `evaluateBoundary()`, `computeMotionEnergy()` |
-| **Perception L0** | Cloud VLM extraction, token resize | [`vlm-provider.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/percept/src/vlm-provider.ts) | `analyzeSegment()`, `buildVisionPrompt()` |
-| **Perception L1** | ONNX edge models (YOLO, RetinaFace) | [`perception-service.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/percept/src/perception-service.ts) | `runInference()`, `detectEntities()` |
-| **Identity** | Face tracking, ArcFace cosine matching | [`identity-resolver.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/percept/src/identity-resolver.ts) | `resolveEntity()`, `clusterIdentities()` |
-| **IPC Bridge** | TypeScript $\to$ Python HTTP memory client | [`client.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/mem/src/client.ts) | `MemoryClient.writeTrace()`, `recallMemories()` |
-| **Vector Storage** | 9-Collection schemas & Qdrant operations | [`database.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/services/mem/src/database.py) | `init_collections()`, `upsert_trace()`, `search()` |
-| **Consolidation** | Macro-event clustering & schema synthesis | [`consolidation.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/services/mem/src/consolidation.py) | `consolidate_window()`, `synthesize_schema()` |
-| **Retrieval** | Grounded recall & temporal window expand | [`retrieval.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/services/mem/src/retrieval.py) | `hybrid_search()`, `expand_temporal_window()` |
-| **Orchestration** | Microservice lifecycle & graceful shutdown | [`index.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/ReflectWorld/packages/host/src/index.ts) | `ServiceHost.register()`, `startAll()` |
+| **Ingestion** | Video demuxing, RTSP/file ingestion | [`local-file-media-source.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/cam/src/local-file-media-source.ts) | `LocalFileMediaSource.start()`, `spawnFFmpeg()` |
+| **Segmentation** | Voice pause cuts, motion energy delta | [`adaptive-segmenter.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/cam/src/adaptive-segmenter.ts) | `evaluateBoundary()`, `computeMotionEnergy()` |
+| **Perception L0** | Cloud VLM extraction, token resize | [`vlm-provider.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/percept/src/vlm-provider.ts) | `analyzeSegment()`, `buildVisionPrompt()` |
+| **Perception L1** | ONNX edge models (YOLO, RetinaFace) | [`perception-service.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/percept/src/perception-service.ts) | `runInference()`, `detectEntities()` |
+| **Identity** | Face tracking, ArcFace cosine matching | [`identity-resolver.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/percept/src/identity-resolver.ts) | `resolveEntity()`, `clusterIdentities()` |
+| **IPC Bridge** | TypeScript $\to$ Python HTTP memory client | [`client.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/mem/src/client.ts) | `MemoryClient.writeTrace()`, `recallMemories()` |
+| **Vector Storage** | 9-Collection schemas & Qdrant operations | [`database.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/services/mem/src/database.py) | `init_collections()`, `upsert_trace()`, `search()` |
+| **Consolidation** | Macro-event clustering & schema synthesis | [`consolidation.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/services/mem/src/consolidation.py) | `consolidate_window()`, `synthesize_schema()` |
+| **Retrieval** | Grounded recall & temporal window expand | [`retrieval.py`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/services/mem/src/retrieval.py) | `hybrid_search()`, `expand_temporal_window()` |
+| **Orchestration** | Microservice lifecycle & graceful shutdown | [`index.ts`](file:///c:/Users/DELL/Desktop/Mega Project folder/Cortex/packages/host/src/index.ts) | `ServiceHost.register()`, `startAll()` |
 
 ---
 
-*This completes Phase 4 of the ReflectWorld Master Documentation Suite. Proceed to [`docs/README.md`](file:///c:/Users/DELL/Desktop/Mega Project folder/docs/README.md) for master navigational index across all phases.*
+*This completes Phase 4 of the Cortex Master Documentation Suite. Proceed to [`docs/README.md`](file:///c:/Users/DELL/Desktop/Mega Project folder/docs/README.md) for master navigational index across all phases.*
