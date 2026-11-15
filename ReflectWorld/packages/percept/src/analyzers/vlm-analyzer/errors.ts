@@ -1,4 +1,4 @@
-import type { LlmCallRecord, LlmTokenUsage } from "@reflectworld/shared";
+import type { LlmCallRecord, LlmTokenUsage } from "@cortex/shared";
 
 export class VlmAnalysisError extends Error {
   archive?: Record<string, unknown>;

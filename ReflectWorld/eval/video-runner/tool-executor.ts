@@ -1,22 +1,22 @@
 /**
  * ToolExecutor — maps SimAgent/OpenClaw test-double tool call JSON to
- * MiniHost callTool() or, for legacy E2E coverage, ReflectWorld Python HTTP API calls.
+ * MiniHost callTool() or, for legacy E2E coverage, Cortex Python HTTP API calls.
  *
- * In E2E, this simulates OpenClaw invoking ReflectWorld tools after receiving a
+ * In E2E, this simulates OpenClaw invoking Cortex tools after receiving a
  * segment policy consultation.
  *
  * Two execution paths:
  * 1. Plugin tools (cam/perception/memory) → MiniHost.callTool() (same surface OpenClaw uses)
- * 2. Legacy reflectworld_mem actions → direct HTTP to ReflectWorld Python service
+ * 2. Legacy cortex_mem actions → direct HTTP to Cortex Python service
  */
 
 import type { MiniHost } from "../../packages/host/src/mini-host.js";
 import type { ToolCall } from "./sim-agent.js";
 
 // Lazy getter: top-level const freezes the value at module-import time, but
-// e2e-runner.ts sets process.env.REFLECTWORLD_ENDPOINT AFTER its imports
+// e2e-runner.ts sets process.env.CORTEX_ENDPOINT AFTER its imports
 // resolve. Read on each call so the chosen E2E port is actually picked up.
-const memUrl = () => process.env.REFLECTWORLD_ENDPOINT ?? "http://127.0.0.1:8219";
+const memUrl = () => process.env.CORTEX_ENDPOINT ?? "http://127.0.0.1:8219";
 
 export interface ToolResult {
   success: boolean;
@@ -32,7 +32,7 @@ export interface ToolResult {
  * This is the test-side stand-in for an OpenClaw tool invocation.
  *
  * @param call - Tool call suggested by SimAgent acting as an OpenClaw test double
- * @param host - MiniHost instance with loaded ReflectWorld plugin
+ * @param host - MiniHost instance with loaded Cortex plugin
  */
 export async function executeTool(call: ToolCall, host: MiniHost): Promise<ToolResult> {
   const start = Date.now();
@@ -48,17 +48,17 @@ export async function executeTool(call: ToolCall, host: MiniHost): Promise<ToolR
     let data: unknown;
 
     switch (runtimeTool) {
-      case "reflectworld_memory":
-      case "reflectworld_cam":
-      case "reflectworld_perception": {
+      case "cortex_memory":
+      case "cortex_cam":
+      case "cortex_perception": {
         // Route through MiniHost — same code path as production
         const result = await host.callTool(runtimeTool, params);
         data = typeof result === "string" ? tryParseJson(result) : result;
         break;
       }
 
-      case "reflectworld_mem": {
-        // Direct HTTP to ReflectWorld Python service
+      case "cortex_mem": {
+        // Direct HTTP to Cortex Python service
         data = await callMemApi(params);
         break;
       }
@@ -91,7 +91,7 @@ export async function executeTool(call: ToolCall, host: MiniHost): Promise<ToolR
   }
 }
 
-// ── ReflectWorld Python API ──
+// ── Cortex Python API ──
 
 async function callMemApi(params: Record<string, unknown>): Promise<unknown> {
   const action = params.action as string;
@@ -167,6 +167,6 @@ function tryParseJson(text: string): unknown {
 }
 
 function resolveRuntimeToolName(tool: string): string {
-  if (tool === "reflectworld_cam") return "reflectworld_cam";
+  if (tool === "cortex_cam") return "cortex_cam";
   return tool;
 }

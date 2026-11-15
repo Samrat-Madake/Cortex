@@ -1,10 +1,10 @@
 // packages/percept/src/frame-analyzer.ts
-// DO NOT import from @reflectworld/cam — circular dependency. Import from @reflectworld/shared instead.
+// DO NOT import from @cortex/cam — circular dependency. Import from @cortex/shared instead.
 import type { ModelRouter } from "./providers/model-router.js";
-import type { FrameDetection } from "@reflectworld/shared";
+import type { FrameDetection } from "@cortex/shared";
 
 // Re-export so consumers can import from percept
-export type { FrameDetection } from "@reflectworld/shared";
+export type { FrameDetection } from "@cortex/shared";
 
 /** Minimal frame shape accepted by FrameAnalyzer (base64-encoded JPEG/PNG). */
 interface FrameInput {

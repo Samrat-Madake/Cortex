@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# ReflectWorld Benchmark Setup — one script to prepare everything for benchmark runs.
+# Cortex Benchmark Setup — one script to prepare everything for benchmark runs.
 #
 # Prerequisites: Node.js >= 22, npm install already done in repo root.
 #
 # What this script does:
-#   1. Verify reflectworld setup is complete (binaries + models + Python mem service)
+#   1. Verify cortex setup is complete (binaries + models + Python mem service)
 #   2. Create conda env "lmms-bench" with Python 3.11 + lmms-eval + memory_api plugin
 #   3. Install onnxruntime-node (CPU/CoreML/CUDA backend selected at runtime)
 #   4. Configure .env with benchmark-specific defaults
@@ -34,12 +34,12 @@ die()  { printf "${RED}✗${RST} %s\n" "$*" >&2; exit 1; }
 
 # ── Options ──
 CONDA_ENV="${CONDA_ENV:-lmms-bench}"
-MODELS_DIR="${REFLECTWORLD_MODELS_DIR:-$HOME/.reflectworld/models}"
-STATE_DIR="${REFLECTWORLD_STATE_DIR:-$HOME/.reflectworld}"
+MODELS_DIR="${CORTEX_MODELS_DIR:-$HOME/.cortex/models}"
+STATE_DIR="${CORTEX_STATE_DIR:-$HOME/.cortex}"
 ENV_FILE="$REPO_ROOT/.env"
 CPU_ONLY=0
 SKIP_CONDA=0
-SKIP_REFLECTWORLD_SETUP=0
+SKIP_CORTEX_SETUP=0
 
 usage() {
   cat <<'EOF'
@@ -47,11 +47,11 @@ Usage: bash eval/benchmark/setup.sh [options]
 
 Options:
   --conda-env NAME       Conda env name (default: lmms-bench)
-  --models-dir PATH      Model directory (default: ~/.reflectworld/models)
+  --models-dir PATH      Model directory (default: ~/.cortex/models)
   --env-file PATH        Env file path (default: ./.env)
   --cpu-only             Do not require CUDA even if nvidia-smi is present
   --skip-conda           Skip conda env creation (use existing env)
-  --skip-reflectworld-setup Skip reflectworld setup step (assume already done)
+  --skip-cortex-setup Skip cortex setup step (assume already done)
   -h, --help             Show this help
 EOF
 }
@@ -63,7 +63,7 @@ while [ $# -gt 0 ]; do
     --env-file)         ENV_FILE="${2:-}"; shift 2 ;;
     --cpu-only)         CPU_ONLY=1; shift ;;
     --skip-conda)       SKIP_CONDA=1; shift ;;
-    --skip-reflectworld-setup) SKIP_REFLECTWORLD_SETUP=1; shift ;;
+    --skip-cortex-setup) SKIP_CORTEX_SETUP=1; shift ;;
     -h|--help)          usage; exit 0 ;;
     *)                  die "unknown option: $1" ;;
   esac
@@ -81,37 +81,37 @@ missing_env_value() {
 }
 
 echo ""
-echo "  ReflectWorld Benchmark Setup"
+echo "  Cortex Benchmark Setup"
 echo ""
 echo "  Repo:       $REPO_ROOT"
 echo "  Conda env:  $CONDA_ENV"
 echo "  Models:     $MODELS_DIR"
 echo "  State:      $STATE_DIR"
 
-# ── Step 1: ReflectWorld core setup ──
-step "Step 1/5: ReflectWorld core setup"
+# ── Step 1: Cortex core setup ──
+step "Step 1/5: Cortex core setup"
 
-if [ "$SKIP_REFLECTWORLD_SETUP" -eq 1 ]; then
-  warn "Skipped (--skip-reflectworld-setup)"
+if [ "$SKIP_CORTEX_SETUP" -eq 1 ]; then
+  warn "Skipped (--skip-cortex-setup)"
 elif [ -f "$STATE_DIR/.setup.json" ]; then
   SETUP_VER="$(node -p "JSON.parse(require('fs').readFileSync('$STATE_DIR/.setup.json','utf8')).version" 2>/dev/null || echo "unknown")"
-  ok "ReflectWorld already set up (version: $SETUP_VER)"
+  ok "Cortex already set up (version: $SETUP_VER)"
 
   # Check if Level 1 — benchmark needs local models
   SETUP_LEVEL="$(node -p "JSON.parse(require('fs').readFileSync('$STATE_DIR/.setup.json','utf8')).level" 2>/dev/null || echo "-1")"
   if [ "$SETUP_LEVEL" -lt 1 ]; then
     warn "Current setup is Level $SETUP_LEVEL. Benchmark needs Level 1 for local models."
-    warn "Running: npx tsx packages/reflectworld/src/cli/index.ts setup --level 1 --yes --accept-model-licenses"
-    npx tsx packages/reflectworld/src/cli/index.ts setup --level 1 --yes --accept-model-licenses
+    warn "Running: npx tsx packages/cortex/src/cli/index.ts setup --level 1 --yes --accept-model-licenses"
+    npx tsx packages/cortex/src/cli/index.ts setup --level 1 --yes --accept-model-licenses
   fi
 else
-  echo "    Running ReflectWorld setup (Level 1)..."
-  npx tsx packages/reflectworld/src/cli/index.ts setup --level 1 --yes --accept-model-licenses
+  echo "    Running Cortex setup (Level 1)..."
+  npx tsx packages/cortex/src/cli/index.ts setup --level 1 --yes --accept-model-licenses
 fi
 
 # Verify key binaries
 for bin in qdrant go2rtc ffmpeg; do
-  [ -f "$STATE_DIR/bin/$bin" ] || die "Missing binary: $STATE_DIR/bin/$bin — run reflectworld setup first"
+  [ -f "$STATE_DIR/bin/$bin" ] || die "Missing binary: $STATE_DIR/bin/$bin — run cortex setup first"
 done
 ok "Binaries verified (qdrant, go2rtc, ffmpeg)"
 
@@ -224,9 +224,9 @@ fi
 
 mkdir -p "$MODELS_DIR"
 ensure_env_value "STUBS_ONLY" "false"
-ensure_env_value "REFLECTWORLD_MODELS_DIR" "$MODELS_DIR"
+ensure_env_value "CORTEX_MODELS_DIR" "$MODELS_DIR"
 ensure_env_value "STT_MODEL_DIR" "$MODELS_DIR/sherpa-onnx-moonshine-tiny-en-int8"
-ensure_env_value "BENCH_REFLECTWORLD_PORT" "18219"
+ensure_env_value "BENCH_CORTEX_PORT" "18219"
 
 MISSING_KEYS=0
 for key in VLM_API_KEY VLM_BASE_URL EMBEDDER_API_KEY; do

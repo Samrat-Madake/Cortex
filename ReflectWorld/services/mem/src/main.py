@@ -1,4 +1,4 @@
-"""FastAPI application for the ReflectWorld memory service.
+"""FastAPI application for the Cortex memory service.
 
 All endpoints are async and delegate to AsyncMemoryManager.
 Startup event builds config, creates components, and injects them.
@@ -47,11 +47,11 @@ from src.runtime_health import RuntimeHealthReporter
 
 def setup_logging(config: MemConfig) -> str:
     """Configure structured logging with RotatingFileHandler."""
-    log_dir = config.log_path or str(Path.home() / ".reflectworld" / "logs")
+    log_dir = config.log_path or str(Path.home() / ".cortex" / "logs")
     os.makedirs(log_dir, exist_ok=True)
 
     log_file = os.path.join(
-        log_dir, f"reflectworld_memory_server_{datetime.now().strftime('%Y%m%d')}.log"
+        log_dir, f"cortex_memory_server_{datetime.now().strftime('%Y%m%d')}.log"
     )
 
     formatter = logging.Formatter(
@@ -105,7 +105,7 @@ def notify_monitor(event_type: str, data: dict[str, Any]) -> None:
             httpx.post(
                 config.monitor_webhook_url,
                 json={"type": event_type, "data": data},
-                headers={"X-ReflectWorld-Internal-Token": config.internal_webhook_token}
+                headers={"X-Cortex-Internal-Token": config.internal_webhook_token}
                 if config.internal_webhook_token
                 else None,
                 timeout=2.0,
@@ -142,8 +142,8 @@ def notify_memory_result(result: dict[str, Any], metadata: dict[str, Any]) -> No
 # ---------------------------------------------------------------------------
 
 app = FastAPI(
-    title="ReflectWorld Memory API Server",
-    description="ReflectWorld memory service for multimodal visual memory management",
+    title="Cortex Memory API Server",
+    description="Cortex memory service for multimodal visual memory management",
     version="1.1.0",
 )
 
@@ -153,7 +153,7 @@ async def startup() -> None:
     """Build all components and inject into AsyncMemoryManager."""
     global async_manager, reid, runtime_health
 
-    logger.info("Initializing ReflectWorld Memory service")
+    logger.info("Initializing Cortex Memory service")
 
     try:
         runtime_health = RuntimeHealthReporter(
@@ -175,7 +175,7 @@ async def startup() -> None:
         on_background_memory_result=notify_memory_result,
         on_runtime_health=health_observer,
     )
-    logger.info("ReflectWorld Memory initialized successfully")
+    logger.info("Cortex Memory initialized successfully")
 
 
 @app.on_event("shutdown")
@@ -732,7 +732,7 @@ async def health_check() -> dict[str, Any]:
     return {
         "status": "healthy",
         "version": "1.1.0",
-        "service": "ReflectWorld Memory",
+        "service": "Cortex Memory",
         "collection_prefix": config.collection_prefix,
         "memory_types": [
             "episodic_trace", "episodic_entity", "episodic_schema",
@@ -753,7 +753,7 @@ async def get_status() -> dict[str, Any]:
     return {
         "status": "healthy" if is_initialized else "not_initialized",
         "version": "1.1.0",
-        "service": "ReflectWorld Memory",
+        "service": "Cortex Memory",
         "memory_types": [
             "episodic_trace", "episodic_entity", "episodic_schema",
             "episodic_visual", "semantic_entity", "semantic_context",

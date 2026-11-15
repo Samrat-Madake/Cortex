@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 RUNNER="$REPO_ROOT/eval/benchmark/run-benchmark-worker.sh"
-RUN_ROOT="${RUN_ROOT:-$HOME/.reflectworld/benchmark_results}"
+RUN_ROOT="${RUN_ROOT:-$HOME/.cortex/benchmark_results}"
 DEFAULT_WORKER_LAYOUT_FILE="$REPO_ROOT/eval/benchmark/worker_configs/videomme_long/standard_16_workers/workers.csv"
 WORKER_LAYOUT_FILE="${WORKER_LAYOUT_FILE:-$DEFAULT_WORKER_LAYOUT_FILE}"
 TASK="videomme_long"
@@ -42,7 +42,7 @@ Actions:
   stop                   Stop processes for this snapshot and standard worker ports.
 
 Required:
-  --snapshot-version ID  Result snapshot directory name under ~/.reflectworld/benchmark_results.
+  --snapshot-version ID  Result snapshot directory name under ~/.cortex/benchmark_results.
 
 Options:
   --qa-run-version ID    QA run version. Default: same as snapshot version.
@@ -206,7 +206,7 @@ wait_for_self_check() {
   while true; do
     server_log="$(server_log_from_launch_log "$log")"
     if [ -n "$server_log" ] && [ -f "$server_log" ]; then
-      if grep -q 'ReflectWorld Pipeline Self-Check' "$server_log"; then
+      if grep -q 'Cortex Pipeline Self-Check' "$server_log"; then
         if rg -q '\[ERROR\]|fatal=[1-9]|cpu_models=|loaded with cpu EP|CUDA EP failed' "$server_log"; then
           warn "worker $idx self-check/model log contains ERROR/fatal/CPU fallback"
           tail -120 "$server_log" >&2 || true

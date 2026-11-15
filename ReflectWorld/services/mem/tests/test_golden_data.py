@@ -11,7 +11,7 @@ import pytest
 
 GOLDEN_DIR = Path(
     os.environ.get(
-        "REFLECTWORLD_MEM_GOLDEN_DIR",
+        "CORTEX_MEM_GOLDEN_DIR",
         Path(__file__).resolve().parent / "fixtures" / "golden-data",
     )
 )
@@ -19,7 +19,7 @@ GOLDEN_DIR = Path(
 pytestmark = pytest.mark.skipif(
     not GOLDEN_DIR.exists(),
     reason=(
-        "golden data not found; set REFLECTWORLD_MEM_GOLDEN_DIR or place data under "
+        "golden data not found; set CORTEX_MEM_GOLDEN_DIR or place data under "
         "services/mem/tests/fixtures/golden-data"
     ),
 )
@@ -33,7 +33,7 @@ def test_health_response_structure():
     }
     assert required_keys.issubset(golden.keys())
     assert golden["status"] == "healthy"
-    assert golden["service"] == "ReflectWorld Memory"
+    assert golden["service"] == "Cortex Memory"
     assert "episodic_trace" in golden["memory_types"]
     assert "reid_entity" in golden["reid_collections"]
 

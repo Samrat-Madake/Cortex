@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { extractSignals } from "../vc-types/signal-extractor.js";
-import type { PerceptionResult, Segment, MotionHint } from "@reflectworld/shared";
+import type { PerceptionResult, Segment, MotionHint } from "@cortex/shared";
 import type { SegmentSignals } from "../vc-types/types.js";
 
 function makeSegment(overrides?: { _motion_hint?: MotionHint }): Segment {

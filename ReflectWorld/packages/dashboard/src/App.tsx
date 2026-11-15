@@ -29,7 +29,7 @@ import { getDashboardSession } from "./session";
 import { dashboardAuthHeaders } from "./session";
 import { resolveDashboardChatReply } from "./chat-response";
 
-const SELECTED_SOURCE_STORAGE_KEY = "reflectworld.dashboard.selected_source.v1";
+const SELECTED_SOURCE_STORAGE_KEY = "cortex.dashboard.selected_source.v1";
 const ALL_SOURCES_CHAT_KEY = "__all_sources__";
 
 function loadSelectedSource(): string | null {
@@ -739,7 +739,7 @@ export function App() {
       if (!resp.ok || data.ok !== true) {
         throw new Error(data.error ?? `POST /api/dashboard/clear failed: ${resp.status}`);
       }
-      window.localStorage.removeItem("reflectworld.entity.aliases.v1");
+      window.localStorage.removeItem("cortex.entity.aliases.v1");
       window.sessionStorage.removeItem(SELECTED_SOURCE_STORAGE_KEY);
       window.location.reload();
     } catch (err) {

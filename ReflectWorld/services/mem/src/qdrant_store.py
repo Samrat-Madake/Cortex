@@ -39,7 +39,7 @@ COLLECTION_SPECS: dict[str, int] = {
 
 
 class QdrantStore:
-    """Manages 9 Qdrant collections for ReflectWorld memory storage.
+    """Manages 9 Qdrant collections for Cortex memory storage.
 
     Handles collection lifecycle (create, recreate on dim mismatch),
     payload indexing, CRUD operations, vector search, and filtered scroll.

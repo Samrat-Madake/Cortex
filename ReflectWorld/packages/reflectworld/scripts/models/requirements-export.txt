@@ -1,4 +1,4 @@
-# Dependencies for ReflectWorld model conversion scripts.
+# Dependencies for Cortex model conversion scripts.
 # Tested with the versions below; newer patch releases should be fine.
 
 # --- retinaface (export_retinaface.py) ---

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { monitorBus, writeStderr } from "@reflectworld/shared";
+import { monitorBus, writeStderr } from "@cortex/shared";
 import type {
   ActiveSourceStatus,
   DashboardBoundingBox,
@@ -12,7 +12,7 @@ import type {
   FrameDetection,
   MonitorEvent,
   Segment,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 import { projectDialogueEvents } from "../dialogue-events.js";
 import type { PipelineLogEntry, PipelineStore } from "../store.js";
 import {

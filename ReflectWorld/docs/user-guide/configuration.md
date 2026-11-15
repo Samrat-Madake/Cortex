@@ -1,17 +1,17 @@
 # Configuration Guide
 
-> Scenario-oriented configuration examples for ReflectWorld. For the complete
+> Scenario-oriented configuration examples for Cortex. For the complete
 > key-by-key contract, see [reference/configuration.md](../reference/configuration.md).
 
 ---
 
 ## TL;DR
 
-- ReflectWorld has **two runtime shapes**, and they use different configuration
+- Cortex has **two runtime shapes**, and they use different configuration
   entry points:
-  - **Standalone** (`reflectworld start`) reads the repository **`.env`**.
+  - **Standalone** (`cortex start`) reads the repository **`.env`**.
   - **OpenClaw plugin mode** does **not** read `.env`; use
-    `npx @reflectworld/reflectworld configure`.
+    `npx @cortex/cortex configure`.
 - Level 0 only needs one **VLM provider**. Configure an **embedder** if you need
   semantic memory retrieval; Gemini always needs a separate embedder.
 - The default mode is local single-user trusted mode. Public or shared
@@ -24,7 +24,7 @@
 
 | | Standalone | OpenClaw plugin |
 |---|---|---|
-| Startup | `npx @reflectworld/reflectworld start` | Loaded as an OpenClaw plugin |
+| Startup | `npx @cortex/cortex start` | Loaded as an OpenClaw plugin |
 | Config entry point | Repository **`.env`** through `dotenv` | `configure` writes OpenClaw `pluginConfig` |
 | Does `.env` apply? | Yes | No |
 | How changes take effect | Restart `start` | `configure` validates and restarts the gateway |
@@ -41,7 +41,7 @@ noted where relevant. The high-level runtime shape is summarized in the
 
 ## 2. Configure VLM and LLM Providers
 
-ReflectWorld uses three model categories:
+Cortex uses three model categories:
 
 - **VLM** for multi-frame and single-frame visual analysis. This is required.
 - **LLM** for text compression and narrative summaries. By default it reuses VLM
@@ -79,9 +79,9 @@ LLM_MODEL=<gemini-text-model>
 Gemini does not provide an OpenAI-compatible embeddings endpoint. If semantic
 memory retrieval is enabled, configure a separate OpenAI-compatible embedder.
 
-**Plugin mode**: run `npx @reflectworld/reflectworld configure` and fill the VLM
+**Plugin mode**: run `npx @cortex/cortex configure` and fill the VLM
 provider, model, lite model, key, base URL, and LLM model. The command writes to
-`plugins.entries.reflectworld.config.perception.vlm_*` and restarts the gateway.
+`plugins.entries.cortex.config.perception.vlm_*` and restarts the gateway.
 
 ---
 
@@ -118,7 +118,7 @@ forces an independent embedder. Independent embedder settings are written under
 
 ## 4. Security Boundary: Local Trusted vs Public Deployment
 
-ReflectWorld defaults to local single-user trusted use. This optimizes the
+Cortex defaults to local single-user trusted use. This optimizes the
 one-command experience, but the defaults should not be exposed directly to the
 internet or a shared LAN.
 
@@ -144,21 +144,21 @@ use.
 
 ### Dashboard and Tool Protection in Public Mode
 
-`DASHBOARD_MULTI_USER=true` or `REFLECTWORLD_PUBLIC_MODE=true` enables stricter
+`DASHBOARD_MULTI_USER=true` or `CORTEX_PUBLIC_MODE=true` enables stricter
 Dashboard behavior: WebSocket Origin checks, connection limits, and chat rate
 limits. The broad CLI tool API also requires an admin token in public mode.
 
 ```bash
 DASHBOARD_MULTI_USER=true
-REFLECTWORLD_PUBLIC_MODE=true
+CORTEX_PUBLIC_MODE=true
 DASHBOARD_ADMIN_TOKEN=<strong-token>
 
 DASHBOARD_WS_ALLOWED_ORIGINS=https://demo.example.com
 DASHBOARD_MAX_WS_CONNECTIONS=100
 DASHBOARD_CHAT_RATE_LIMIT_PER_MIN=20
 
-REFLECTWORLD_TOOL_API_RESTRICTED=true
-REFLECTWORLD_TOOL_API_TOKEN=<strong-token>
+CORTEX_TOOL_API_RESTRICTED=true
+CORTEX_TOOL_API_TOKEN=<strong-token>
 ```
 
 Local single-user mode leaves these restrictions off to preserve the simple
@@ -173,9 +173,9 @@ also exposed, enable global strict validation:
 
 ```bash
 DASHBOARD_MULTI_USER=true
-REFLECTWORLD_SOURCE_SECURITY_STRICT=true
+CORTEX_SOURCE_SECURITY_STRICT=true
 # or
-REFLECTWORLD_PUBLIC_MODE=true
+CORTEX_PUBLIC_MODE=true
 ```
 
 Strict mode allows `phone`, `webcam`, `https`, `rtsp`, and `rtsps` by default,
@@ -191,17 +191,17 @@ and rejects:
 Trusted LAN deployments can opt in to private sources:
 
 ```bash
-REFLECTWORLD_ALLOW_PRIVATE_SOURCE=true
-REFLECTWORLD_ALLOW_INSECURE_HTTP_SOURCE=true
-REFLECTWORLD_ALLOW_LOCAL_SOURCE=true
+CORTEX_ALLOW_PRIVATE_SOURCE=true
+CORTEX_ALLOW_INSECURE_HTTP_SOURCE=true
+CORTEX_ALLOW_LOCAL_SOURCE=true
 ```
 
 Use these only on trusted local machines or trusted LANs. Uploaded video
 analysis uses an internal local-file authorization path and does not require
-`REFLECTWORLD_ALLOW_LOCAL_SOURCE`.
+`CORTEX_ALLOW_LOCAL_SOURCE`.
 
-If `REFLECTWORLD_PUBLIC_MODE=true` is combined with
-`REFLECTWORLD_ALLOW_PRIVATE_SOURCE=true` or `REFLECTWORLD_ALLOW_LOCAL_SOURCE=true`,
+If `CORTEX_PUBLIC_MODE=true` is combined with
+`CORTEX_ALLOW_PRIVATE_SOURCE=true` or `CORTEX_ALLOW_LOCAL_SOURCE=true`,
 startup prints a warning but does not block the configuration. A hosted public
 demo should not enable these escape hatches. For stronger defense against DNS
 rebinding, also block private and metadata ranges at the container or firewall
@@ -253,25 +253,25 @@ Common ports:
 ```bash
 PORT=3210
 QDRANT_PORT=6333
-REFLECTWORLD_MEM_PORT=8219
+CORTEX_MEM_PORT=8219
 GO2RTC_API_PORT=1984
 ```
 
 Directories:
 
 ```bash
-REFLECTWORLD_HOME=~/.reflectworld
-REFLECTWORLD_STATE_DIR=./.reflectworld-state
+CORTEX_HOME=~/.cortex
+CORTEX_STATE_DIR=./.cortex-state
 ```
 
-Use the ReflectWorld directory variables for all installs and deployments.
-Public configuration should use only `REFLECTWORLD_*` variables and
-ReflectWorld directory names.
+Use the Cortex directory variables for all installs and deployments.
+Public configuration should use only `CORTEX_*` variables and
+Cortex directory names.
 
 Run a second instance with isolated state:
 
 ```bash
-PORT=3211 QDRANT_PORT=6334 npx @reflectworld/reflectworld start
+PORT=3211 QDRANT_PORT=6334 npx @cortex/cortex start
 ```
 
 Choose distinct ports for concurrent instances. The memory-service launcher can

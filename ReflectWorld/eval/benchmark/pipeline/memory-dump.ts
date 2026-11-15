@@ -1,9 +1,9 @@
 // eval/benchmark/pipeline/memory-dump.ts
 import {
-  ReflectWorldClient,
+  CortexClient,
   flattenMemoriesResponse,
   type MemoryItem,
-} from "@reflectworld/mem";
+} from "@cortex/mem";
 
 export interface MemoryDump {
   episodic_trace: MemoryItem[];
@@ -30,7 +30,7 @@ type DumpCollectionKey = typeof MEMORY_TYPES[number];
  * Queries each collection separately so results are cleanly bucketed.
  */
 export async function dumpMemories(
-  client: ReflectWorldClient,
+  client: CortexClient,
   cameraId: string,
   userId?: string,
 ): Promise<MemoryDump> {

@@ -1,5 +1,5 @@
 import { relative, resolve } from "node:path";
-import type { ActiveSourceStatus } from "@reflectworld/shared";
+import type { ActiveSourceStatus } from "@cortex/shared";
 import type { PipelineStore } from "../store.js";
 import type { AnalysisStatusItem, AnalysisStatusSnapshot, DashboardSessionScope } from "./dashboard-common.js";
 import type { Go2rtcStreamHealth } from "./dashboard-live-proxy.js";

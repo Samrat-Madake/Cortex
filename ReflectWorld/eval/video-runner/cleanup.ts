@@ -1,5 +1,5 @@
 /**
- * Cleanup reflectworld_test_* Qdrant collections and e2e-* go2rtc streams.
+ * Cleanup cortex_test_* Qdrant collections and e2e-* go2rtc streams.
  * Called at startup (clear residue) and in finally block (cleanup after test).
  */
 
@@ -10,7 +10,7 @@ const logger = {
 
 const QDRANT_URL = process.env.QDRANT_URL ?? "http://localhost:6333";
 const GO2RTC_URL = process.env.GO2RTC_URL ?? "http://localhost:1984";
-const COLLECTION_PREFIX = "reflectworld_test";
+const COLLECTION_PREFIX = "cortex_test";
 const STREAM_PREFIX = "e2e-";
 
 export interface CleanupOptions {

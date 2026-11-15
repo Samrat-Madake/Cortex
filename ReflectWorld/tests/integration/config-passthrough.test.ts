@@ -10,20 +10,20 @@ import { createServer } from "node:http";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveCliConfig } from "../../packages/reflectworld/src/cli/config.js";
-import { buildCamConfig, resolveGo2rtcEndpoint } from "../../packages/reflectworld/src/config-helpers.js";
-import { DashboardServer } from "../../packages/reflectworld/src/services/dashboard-server.js";
+import { resolveCliConfig } from "../../packages/cortex/src/cli/config.js";
+import { buildCamConfig, resolveGo2rtcEndpoint } from "../../packages/cortex/src/config-helpers.js";
+import { DashboardServer } from "../../packages/cortex/src/services/dashboard-server.js";
 
 // ─── Environment isolation ───────────────────────────────────────────
 
 const ENV_KEYS = [
-  "REFLECTWORLD_HOME",
-  "REFLECTWORLD_STATE_DIR",
-  "REFLECTWORLD_MODELS_DIR",
+  "CORTEX_HOME",
+  "CORTEX_STATE_DIR",
+  "CORTEX_MODELS_DIR",
   "PORT",
   "QDRANT_PORT",
   "QDRANT_GRPC_PORT",
-  "REFLECTWORLD_MEM_PORT",
+  "CORTEX_MEM_PORT",
   "GO2RTC_API_PORT",
   "GO2RTC_RTSP_PORT",
   "GO2RTC_WEBRTC_PORT",
@@ -130,7 +130,7 @@ describe("resolveCliConfig", () => {
 
   it("writes resolved values back to process.env", () => {
     resolveCliConfig(["--home-dir", "/tmp/test-home", "--port", "4444"]);
-    expect(process.env.REFLECTWORLD_HOME).toBe("/tmp/test-home");
+    expect(process.env.CORTEX_HOME).toBe("/tmp/test-home");
     expect(process.env.PORT).toBe("4444");
     expect(process.env.GO2RTC_API_PORT).toBe("1984"); // default written back
   });
@@ -145,8 +145,8 @@ describe("resolveCliConfig", () => {
     const cfg = resolveCliConfig(["--dev"]);
     expect(cfg.dev).toBe(true);
     expect(cfg.pythonSourceDir).toMatch(/services\/mem$/);
-    // In dev mode, pythonSourceDir must NOT be under ~/.reflectworld
-    expect(cfg.pythonSourceDir).not.toContain(".reflectworld");
+    // In dev mode, pythonSourceDir must NOT be under ~/.cortex
+    expect(cfg.pythonSourceDir).not.toContain(".cortex");
   });
 
   it("non-dev pythonSourceDir is under homeDir", () => {
@@ -167,7 +167,7 @@ describe("resolveCliConfig", () => {
 
 // ═════════════════════════════════════════════════════════════════════
 // Gap 1: eye/cam config merge — tests real buildCamConfig + resolveGo2rtcEndpoint
-// from packages/reflectworld/src/config-helpers.ts (same code index.ts imports)
+// from packages/cortex/src/config-helpers.ts (same code index.ts imports)
 // ═════════════════════════════════════════════════════════════════════
 
 describe("eye/cam config merge", () => {
@@ -439,7 +439,7 @@ describe("DashboardServer /api/dashboard/runtime", () => {
   });
 
   it("lists and serves legacy upload directories as read-only upload videos", async () => {
-    const root = mkdtempSync(join(tmpdir(), "reflectworld-dashboard-"));
+    const root = mkdtempSync(join(tmpdir(), "cortex-dashboard-"));
     tempDirs.push(root);
     const uploadsDir = join(root, "current");
     const legacyUploadsDir = join(root, "legacy");

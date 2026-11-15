@@ -30,21 +30,21 @@ describe("resolveModelPlan — level gating", () => {
 
 describe("resolveModelPlan — conditional gates", () => {
   it("body-reid gate pulls in clip-reid and rtmpose when enabled", () => {
-    const plan = names(1, { REFLECTWORLD_BODY_REID_ENABLED: "true" });
+    const plan = names(1, { CORTEX_BODY_REID_ENABLED: "true" });
     expect(plan).toContain("clip-reid-vitb.onnx");
     expect(plan).toContain("rtmpose-s.onnx");
   });
 
   it("body-reid models stay out when the gate value is not exactly 'true'", () => {
-    expect(names(1, { REFLECTWORLD_BODY_REID_ENABLED: "false" })).not.toContain("clip-reid-vitb.onnx");
-    expect(names(1, { REFLECTWORLD_BODY_REID_ENABLED: "1" })).not.toContain("clip-reid-vitb.onnx");
+    expect(names(1, { CORTEX_BODY_REID_ENABLED: "false" })).not.toContain("clip-reid-vitb.onnx");
+    expect(names(1, { CORTEX_BODY_REID_ENABLED: "1" })).not.toContain("clip-reid-vitb.onnx");
     expect(names(1, {})).not.toContain("rtmpose-s.onnx");
   });
 
   it("body-reid gate does NOT pull optional models into Level 0 (no L0 pollution)", () => {
     // Optional body models sit at level 1 with a gate, so a Level-0 install stays clean
     // even when the body-reid toggle is on — matching the L0 "no extra download" promise.
-    const plan = names(0, { REFLECTWORLD_BODY_REID_ENABLED: "true" });
+    const plan = names(0, { CORTEX_BODY_REID_ENABLED: "true" });
     expect(plan).toEqual(["silero_vad.onnx"]);
     expect(plan).not.toContain("clip-reid-vitb.onnx");
     expect(plan).not.toContain("rtmpose-s.onnx");

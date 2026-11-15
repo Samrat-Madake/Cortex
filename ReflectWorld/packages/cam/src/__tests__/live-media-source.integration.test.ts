@@ -49,7 +49,7 @@ describe("LiveMediaSource ffmpeg integration", () => {
   const ffmpegBin = resolvedFfmpegBin ?? "ffmpeg";
 
   runIfFfmpeg("retries as video-only when the input has no audio stream", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-live-media-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-live-media-"));
     const videoPath = join(dir, "no-audio.mp4");
     try {
       createVideoOnly(ffmpegBin, videoPath, 2);

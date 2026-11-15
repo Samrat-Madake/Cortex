@@ -2,10 +2,10 @@
 import { Type, type Static } from "@sinclair/typebox";
 
 /**
- * Flat object schema for reflectworld_memory tool.
+ * Flat object schema for cortex_memory tool.
  * OpenClaw does not support anyOf/oneOf/allOf in tool schemas.
  */
-export const ReflectWorldMemoryToolSchema = Type.Object({
+export const CortexMemoryToolSchema = Type.Object({
   action: Type.Unsafe<string>(
     Type.String({
       description: "Action to perform: search, get, delete, add_note, get_history, set_identity, get_narrative",
@@ -19,7 +19,7 @@ export const ReflectWorldMemoryToolSchema = Type.Object({
   ),
   camera_id: Type.Optional(
     Type.String({
-      description: "The camera source name to query. Use the exact name from reflectworld_cam list_sources (e.g. 'my phone camera'). Required for all actions — ReflectWorld rejects requests without camera_id.",
+      description: "The camera source name to query. Use the exact name from cortex_cam list_sources (e.g. 'my phone camera'). Required for all actions — Cortex rejects requests without camera_id.",
     }),
   ),
   mode: Type.Optional(
@@ -90,7 +90,7 @@ export const ReflectWorldMemoryToolSchema = Type.Object({
   ),
 });
 
-export type ReflectWorldMemoryToolInput = Static<typeof ReflectWorldMemoryToolSchema>;
+export type CortexMemoryToolInput = Static<typeof CortexMemoryToolSchema>;
 
 // Legacy types used by index.ts
 export interface SearchAction {

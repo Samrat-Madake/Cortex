@@ -7,36 +7,36 @@ import { homedir } from "node:os";
 import { MiniHost } from "./mini-host.js";
 import { attachMonitorWs } from "./ws-server.js";
 import { serveStatic } from "./static-server.js";
-import reflectworldPlugin from "@reflectworld/reflectworld";
-import { resolveReflectWorldHome } from "@reflectworld/shared";
+import cortexPlugin from "@cortex/cortex";
+import { resolveCortexHome } from "@cortex/shared";
 import { VlmAnalyzer } from "../../percept/src/analyzers/vlm-analyzer.js";
 import { resolveVlmCallProfile } from "../../percept/src/vlm-call-profiles.js";
 import {
   buildVisionControllerConsultationPrompt,
   parseVisionControllerConsultationResponse,
-} from "../../reflectworld/src/vision-controller/consultation.js";
+} from "../../cortex/src/vision-controller/consultation.js";
 
 const __hostDir = dirname(fileURLToPath(import.meta.url));
 const DASHBOARD_DIST = resolve(__hostDir, "../../dashboard/dist");
 
 const HOME = process.env.HOME ?? homedir();
-const DEMO_HOME_DIR = process.env.REFLECTWORLD_DEMO_HOME_DIR ?? process.env.REFLECTWORLD_HOME ?? resolveReflectWorldHome();
-const DEMO_STATE_DIR = process.env.REFLECTWORLD_DEMO_STATE_DIR ?? join(HOME, ".reflectworld-demo");
-const DEMO_NAME = process.env.REFLECTWORLD_DEMO_NAME ?? "dashboard-demo";
-const PORT = parseInt(process.env.PORT ?? process.env.REFLECTWORLD_DEMO_HOST_PORT ?? "3214", 10);
-const HOST_LISTEN_ADDR = process.env.REFLECTWORLD_DEMO_HOST_LISTEN_ADDR ?? process.env.HOST_LISTEN_ADDR ?? "";
-const DASHBOARD_PORT = parseInt(process.env.DASHBOARD_PORT ?? process.env.DASHBOARD_PORT ?? process.env.REFLECTWORLD_DEMO_DASHBOARD_PORT ?? "3213", 10);
-const MEM_PORT = parseInt(process.env.REFLECTWORLD_DEMO_MEM_PORT ?? "48219", 10);
-const QDRANT_PORT = parseInt(process.env.REFLECTWORLD_DEMO_QDRANT_PORT ?? "46333", 10);
-const QDRANT_GRPC_PORT = parseInt(process.env.REFLECTWORLD_DEMO_QDRANT_GRPC_PORT ?? String(QDRANT_PORT + 1), 10);
-const GO2RTC_API_PORT = parseInt(process.env.GO2RTC_API_PORT ?? process.env.REFLECTWORLD_DEMO_GO2RTC_API_PORT ?? "21984", 10);
-const GO2RTC_RTSP_PORT = parseInt(process.env.GO2RTC_RTSP_PORT ?? process.env.REFLECTWORLD_DEMO_GO2RTC_RTSP_PORT ?? "28554", 10);
+const DEMO_HOME_DIR = process.env.CORTEX_DEMO_HOME_DIR ?? process.env.CORTEX_HOME ?? resolveCortexHome();
+const DEMO_STATE_DIR = process.env.CORTEX_DEMO_STATE_DIR ?? join(HOME, ".cortex-demo");
+const DEMO_NAME = process.env.CORTEX_DEMO_NAME ?? "dashboard-demo";
+const PORT = parseInt(process.env.PORT ?? process.env.CORTEX_DEMO_HOST_PORT ?? "3214", 10);
+const HOST_LISTEN_ADDR = process.env.CORTEX_DEMO_HOST_LISTEN_ADDR ?? process.env.HOST_LISTEN_ADDR ?? "";
+const DASHBOARD_PORT = parseInt(process.env.DASHBOARD_PORT ?? process.env.DASHBOARD_PORT ?? process.env.CORTEX_DEMO_DASHBOARD_PORT ?? "3213", 10);
+const MEM_PORT = parseInt(process.env.CORTEX_DEMO_MEM_PORT ?? "48219", 10);
+const QDRANT_PORT = parseInt(process.env.CORTEX_DEMO_QDRANT_PORT ?? "46333", 10);
+const QDRANT_GRPC_PORT = parseInt(process.env.CORTEX_DEMO_QDRANT_GRPC_PORT ?? String(QDRANT_PORT + 1), 10);
+const GO2RTC_API_PORT = parseInt(process.env.GO2RTC_API_PORT ?? process.env.CORTEX_DEMO_GO2RTC_API_PORT ?? "21984", 10);
+const GO2RTC_RTSP_PORT = parseInt(process.env.GO2RTC_RTSP_PORT ?? process.env.CORTEX_DEMO_GO2RTC_RTSP_PORT ?? "28554", 10);
 const MEM_SOURCE_DIR = resolve(__hostDir, "../../../services/mem");
 
 process.env.DASHBOARD_PORT = String(DASHBOARD_PORT);
-process.env.REFLECTWORLD_HOME = DEMO_HOME_DIR;
-process.env.REFLECTWORLD_STATE_DIR = DEMO_STATE_DIR;
-process.env.REFLECTWORLD_MODELS_DIR ??= join(DEMO_HOME_DIR, "models");
+process.env.CORTEX_HOME = DEMO_HOME_DIR;
+process.env.CORTEX_STATE_DIR = DEMO_STATE_DIR;
+process.env.CORTEX_MODELS_DIR ??= join(DEMO_HOME_DIR, "models");
 
 function createBenchmarkStyleConsultationDispatcher() {
   const agentProviderEnv = process.env.QA_PROVIDER ?? process.env.AGENT_PROVIDER ?? process.env.VLM_PROVIDER;
@@ -96,7 +96,7 @@ function createBenchmarkStyleConsultationDispatcher() {
 const host = new MiniHost({
   stateDir: DEMO_STATE_DIR,
   pluginConfigs: {
-    reflectworld: {
+    cortex: {
       _homeDir: DEMO_HOME_DIR,
       _stateDir: DEMO_STATE_DIR,
       _ports: {
@@ -145,7 +145,7 @@ const host = new MiniHost({
   },
 });
 
-console.log("\n  Booting ReflectWorld Demo...\n");
+console.log("\n  Booting Cortex Demo...\n");
 console.log(`  Demo name:    ${DEMO_NAME}`);
 console.log(`  Host port:    ${HOST_LISTEN_ADDR ? `${HOST_LISTEN_ADDR}:` : ""}${PORT}`);
 console.log(`  Dashboard port: ${DASHBOARD_PORT}`);
@@ -154,7 +154,7 @@ console.log(`  Qdrant:       ${QDRANT_PORT}/${QDRANT_GRPC_PORT}`);
 console.log(`  Home dir:     ${DEMO_HOME_DIR}`);
 console.log(`  State dir:    ${DEMO_STATE_DIR}\n`);
 
-await host.loadPlugin(reflectworldPlugin);
+await host.loadPlugin(cortexPlugin);
 await host.startServices();
 
 const server = createServer(async (req, res) => {
@@ -178,8 +178,8 @@ const server = createServer(async (req, res) => {
         tools: host.listTools().length,
         mode: "demo",
         dashboard_port: DASHBOARD_PORT,
-        mem_port: parseInt((process.env.REFLECTWORLD_URL ?? `http://127.0.0.1:${MEM_PORT}`).split(":").pop() ?? String(MEM_PORT), 10),
-        mem_url: process.env.REFLECTWORLD_URL ?? `http://127.0.0.1:${MEM_PORT}`,
+        mem_port: parseInt((process.env.CORTEX_URL ?? `http://127.0.0.1:${MEM_PORT}`).split(":").pop() ?? String(MEM_PORT), 10),
+        mem_url: process.env.CORTEX_URL ?? `http://127.0.0.1:${MEM_PORT}`,
         qdrant_port: QDRANT_PORT,
         state_dir: DEMO_STATE_DIR,
       });
@@ -190,7 +190,7 @@ const server = createServer(async (req, res) => {
     }
 
     if (url.pathname === "/api/monitor/inject" && method === "POST") {
-      const { monitorBus } = await import("@reflectworld/shared");
+      const { monitorBus } = await import("@cortex/shared");
       const body = await readBody(req);
       const events = JSON.parse(body || "[]");
       const list = Array.isArray(events) ? events : [events];
@@ -276,7 +276,7 @@ function readBody(req: import("node:http").IncomingMessage): Promise<string> {
 attachMonitorWs(server);
 
 const onListen = () => {
-  console.log(`\n  ReflectWorld demo ready on http://localhost:${PORT}`);
+  console.log(`\n  Cortex demo ready on http://localhost:${PORT}`);
   console.log(`  Dashboard: http://localhost:${DASHBOARD_PORT}`);
   console.log(`  Mode: isolated dashboard demo`);
   console.log(`  Tools: ${host.listTools().map(t => t.name).join(", ")}`);

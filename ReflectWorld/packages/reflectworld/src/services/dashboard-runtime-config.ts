@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { monitorBus } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
 import {
   VALID_CONFIG_KEYS,
   validateConfigValue,
@@ -80,7 +80,7 @@ export class DashboardRuntimeConfigController {
       const previous = this.config[key as RuntimeConfigKey];
       this.config[key as RuntimeConfigKey] = value;
 
-      monitorBus.publish("system:config_changed" as import("@reflectworld/shared").MonitorEventType, {
+      monitorBus.publish("system:config_changed" as import("@cortex/shared").MonitorEventType, {
         key,
         value,
         previous,

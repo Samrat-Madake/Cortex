@@ -1,4 +1,4 @@
-import type { LlmCallContext, PerceptionResult, Segment } from "@reflectworld/shared";
+import type { LlmCallContext, PerceptionResult, Segment } from "@cortex/shared";
 import type { ElevenLabsStt } from "../analyzers/elevenlabs-stt.js";
 import type { SttAnalyzer } from "../analyzers/stt-analyzer.js";
 import type { MemoryReIdPort } from "../analyzers/unified-reid-matcher.js";
@@ -160,7 +160,7 @@ export interface PipelineDeps {
   memory?: PipelineMemory;
   /** Long-term behavior memory write mode. Default observer preserves existing fire-and-forget behavior. */
   memoryHistoryMode?: "observer" | "strict";
-  /** Optional post-processor for notifications + logging (wired by reflectworld plugin). */
+  /** Optional post-processor for notifications + logging (wired by cortex plugin). */
   postProcessor?: PostProcessor;
   /** Optional generic logging/archive settings. */
   logging?: PipelineLoggingConfig;

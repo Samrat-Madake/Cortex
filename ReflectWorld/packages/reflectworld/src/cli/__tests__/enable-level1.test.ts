@@ -11,9 +11,9 @@ describe("runEnableLevel1", () => {
   let packageDir: string;
 
   beforeEach(() => {
-    packageDir = mkdtempSync(join(tmpdir(), "reflectworld-enable-level1-"));
+    packageDir = mkdtempSync(join(tmpdir(), "cortex-enable-level1-"));
     writeFileSync(join(packageDir, "package.json"), JSON.stringify({
-      name: "reflectworld-consumer",
+      name: "cortex-consumer",
       version: "1.0.0",
     }, null, 2) + "\n");
     vi.mocked(execFileSync).mockReturnValue(`${packageDir}\n`);
@@ -45,7 +45,7 @@ describe("runEnableLevel1", () => {
   });
 
   it("accepts a package directory reached through a symbolic link", async () => {
-    const aliasRoot = mkdtempSync(join(tmpdir(), "reflectworld-enable-level1-alias-"));
+    const aliasRoot = mkdtempSync(join(tmpdir(), "cortex-enable-level1-alias-"));
     const packageAlias = join(aliasRoot, "project");
     try {
       symlinkSync(packageDir, packageAlias, process.platform === "win32" ? "junction" : "dir");
@@ -67,7 +67,7 @@ describe("runEnableLevel1", () => {
 
   it("persists the security override and native dependencies in the target project", async () => {
     writeFileSync(join(packageDir, "package.json"), JSON.stringify({
-      name: "reflectworld-consumer",
+      name: "cortex-consumer",
       version: "1.0.0",
       overrides: {
         ws: "8.18.0",
@@ -95,7 +95,7 @@ describe("runEnableLevel1", () => {
 
   it("does not replace an existing adm-zip override", async () => {
     writeFileSync(join(packageDir, "package.json"), JSON.stringify({
-      name: "reflectworld-consumer",
+      name: "cortex-consumer",
       overrides: { "onnxruntime-node": { "adm-zip": "0.5.16" } },
     }, null, 2) + "\n");
 
@@ -119,18 +119,18 @@ describe("runEnableLevel1", () => {
   });
 
   it("writes the override at the npm root while saving dependencies to a workspace", async () => {
-    const workspaceRoot = mkdtempSync(join(tmpdir(), "reflectworld-workspace-"));
+    const workspaceRoot = mkdtempSync(join(tmpdir(), "cortex-workspace-"));
     const workspacePackage = join(workspaceRoot, "packages", "app");
     try {
       writeFileSync(join(workspaceRoot, "package.json"), JSON.stringify({
-        name: "reflectworld-workspace",
+        name: "cortex-workspace",
         private: true,
         workspaces: ["packages/*"],
         overrides: { ws: "8.18.0" },
       }, null, 2) + "\n");
       mkdirSync(workspacePackage, { recursive: true });
       writeFileSync(join(workspacePackage, "package.json"), JSON.stringify({
-        name: "reflectworld-app",
+        name: "cortex-app",
         version: "1.0.0",
       }, null, 2) + "\n");
       vi.mocked(execFileSync).mockReturnValue(`${workspaceRoot}\n`);
@@ -159,18 +159,18 @@ describe("runEnableLevel1", () => {
   });
 
   it("restores both workspace manifests when npm install fails", async () => {
-    const workspaceRoot = mkdtempSync(join(tmpdir(), "reflectworld-workspace-rollback-"));
+    const workspaceRoot = mkdtempSync(join(tmpdir(), "cortex-workspace-rollback-"));
     const workspacePackage = join(workspaceRoot, "packages", "app");
     mkdirSync(workspacePackage, { recursive: true });
     const rootPackageJsonPath = join(workspaceRoot, "package.json");
     const workspacePackageJsonPath = join(workspacePackage, "package.json");
     writeFileSync(rootPackageJsonPath, JSON.stringify({
-      name: "reflectworld-workspace",
+      name: "cortex-workspace",
       private: true,
       workspaces: ["packages/*"],
     }, null, 2) + "\n");
     writeFileSync(workspacePackageJsonPath, JSON.stringify({
-      name: "reflectworld-app",
+      name: "cortex-app",
       version: "1.0.0",
     }, null, 2) + "\n");
     const rootBefore = readFileSync(rootPackageJsonPath, "utf8");

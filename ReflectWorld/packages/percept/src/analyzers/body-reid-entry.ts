@@ -4,12 +4,12 @@
 // Gallery updates and new entity creation are handled in SP-6 (post-VLM),
 // consistent with the face ReID write boundary.
 
-import type { Frame, BoundingBox } from "@reflectworld/shared";
+import type { Frame, BoundingBox } from "@cortex/shared";
 import type { PoseProvider, ReidProvider } from "../providers/types.js";
 import { scoreBodyCompleteness } from "./body-completeness.js";
 import { computeBodyDiversity } from "./body-pose-diversity.js";
 import { BODY_REID_MATCH_THRESHOLD } from "../thresholds.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 /** Maximum person entries to run body ReID on per segment. */
 const MAX_BODY_REID_PER_SEGMENT = 8;

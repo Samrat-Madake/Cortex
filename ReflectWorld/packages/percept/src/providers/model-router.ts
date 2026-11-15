@@ -4,7 +4,7 @@ import type {
 } from "./types.js";
 import type { ModelId } from "../models/model-manifest.js";
 import { LEVEL_REQUIREMENTS } from "../models/model-manifest.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 /**
  * Central registry and router for model providers.

@@ -1,4 +1,4 @@
-import { normalizeSecretInput } from "@reflectworld/shared";
+import { normalizeSecretInput } from "@cortex/shared";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -15,16 +15,16 @@ const PERCEPTION_ENV_MAP: Record<string, string> = {
   vlm_max_retries: "VLM_MAX_RETRIES",
   vlm_retry_base_delay_ms: "VLM_RETRY_BASE_DELAY_MS",
   vlm_retry_max_delay_ms: "VLM_RETRY_MAX_DELAY_MS",
-  source_concurrency: "REFLECTWORLD_PERCEPTION_SOURCE_CONCURRENCY",
-  max_queued_per_source: "REFLECTWORLD_PERCEPTION_MAX_QUEUED_PER_SOURCE",
-  live_backlog_skip_after_ms: "REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS",
-  local_file_pacing: "REFLECTWORLD_LOCAL_FILE_PACING",
-  runtime_mode: "REFLECTWORLD_PERCEPTION_RUNTIME_MODE",
+  source_concurrency: "CORTEX_PERCEPTION_SOURCE_CONCURRENCY",
+  max_queued_per_source: "CORTEX_PERCEPTION_MAX_QUEUED_PER_SOURCE",
+  live_backlog_skip_after_ms: "CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS",
+  local_file_pacing: "CORTEX_LOCAL_FILE_PACING",
+  runtime_mode: "CORTEX_PERCEPTION_RUNTIME_MODE",
   working_memory_event_timeout_sec: "WORKING_MEMORY_EVENT_TIMEOUT_SEC",
   working_memory_max_event_segments: "WORKING_MEMORY_MAX_EVENT_SEGMENTS",
   stubs_only: "STUBS_ONLY",
-  required_level: "REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL",
-  models_dir: "REFLECTWORLD_MODELS_DIR",
+  required_level: "CORTEX_PERCEPTION_REQUIRED_LEVEL",
+  models_dir: "CORTEX_MODELS_DIR",
   scene_description: "SCENE_DESCRIPTION",
   stt_provider: "STT_PROVIDER",
   stt_model_dir: "STT_MODEL_DIR",
@@ -59,7 +59,7 @@ function applyEnvMap(src: Record<string, unknown> | undefined, map: Record<strin
     const raw = src[key];
     if (raw === undefined || raw === null) continue;
     if (SECRET_FIELDS.has(key)) {
-      const value = normalizeSecretInput(raw, "reflectworld");
+      const value = normalizeSecretInput(raw, "cortex");
       if (value !== undefined) {
         process.env[envName] = value;
         sanitized[key] = value;
@@ -77,11 +77,11 @@ function applyEnvMap(src: Record<string, unknown> | undefined, map: Record<strin
  * Single bridge point from all-in-one pluginConfig to process.env.
  *
  * TS perception receives pluginConfig too, while Python mem only sees env via
- * ReflectWorldService.envVars(); writing configured fields here keeps both paths aligned.
+ * CortexService.envVars(); writing configured fields here keeps both paths aligned.
  * SecretInput fields are also normalized in the returned config so SecretRef
  * objects do not override the resolved env strings during zod parsing.
  * memory.collection_name is intentionally excluded because it already flows through
- * index.ts -> ReflectWorldService -> COLLECTION_PREFIX.
+ * index.ts -> CortexService -> COLLECTION_PREFIX.
  */
 export function bridgePluginConfigToEnv(config: Record<string, unknown>): Record<string, unknown> {
   const sanitized = { ...config };

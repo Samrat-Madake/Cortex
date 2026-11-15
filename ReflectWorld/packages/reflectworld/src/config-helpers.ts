@@ -1,4 +1,4 @@
-export interface ReflectWorldPortOverlay {
+export interface CortexPortOverlay {
   qdrant?: number;
   qdrantGrpc?: number;
   mem?: number;
@@ -18,7 +18,7 @@ export interface ReflectWorldPortOverlay {
 export function buildCamConfig(
   eye: Record<string, unknown> | undefined,
   cam: Record<string, unknown> | undefined,
-  ports: ReflectWorldPortOverlay,
+  ports: CortexPortOverlay,
 ): Record<string, unknown> {
   return {
     ...(eye ?? {}),

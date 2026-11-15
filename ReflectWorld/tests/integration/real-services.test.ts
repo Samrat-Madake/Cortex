@@ -3,13 +3,13 @@
  *
  * Requires running:
  *   - Qdrant on localhost:6335
- *   - ReflectWorld on localhost:8219
+ *   - Cortex on localhost:8219
  *
- * Tests verify actual data flows through ReflectWorld memory.
+ * Tests verify actual data flows through Cortex memory.
  * VLM (Gemini) is still mocked since it requires a paid API key.
  */
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import type { Segment, PerceptionResult } from "@reflectworld/shared";
+import type { Segment, PerceptionResult } from "@cortex/shared";
 
 // ── Cam ──
 import { CamPipeline } from "../../packages/cam/src/pipeline.js";
@@ -24,10 +24,10 @@ import type { VlmOutput } from "../../packages/percept/src/types.js";
 import type { VlmSegmentAnalysis } from "../../packages/percept/src/analyzers/vlm-analyzer.js";
 
 // ── Memory ──
-import { ReflectWorldClient } from "../../packages/mem/src/client.js";
+import { CortexClient } from "../../packages/mem/src/client.js";
 
 // ── Config ──
-const REFLECTWORLD_URL = "http://localhost:8219";
+const CORTEX_URL = "http://localhost:8219";
 const QDRANT_URL = "http://localhost:6335";
 
 /** Tiny 1x1 white JPEG in base64. */
@@ -88,26 +88,26 @@ async function isServiceUp(url: string): Promise<boolean> {
 // Test Suite
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("Real Services Integration: Cam → Perception → ReflectWorld", () => {
-  let memoryClient: ReflectWorldClient;
+describe("Real Services Integration: Cam → Perception → Cortex", () => {
+  let memoryClient: CortexClient;
   let perceptionDeps: PerceptionDeps;
   let servicesAvailable = false;
 
   beforeAll(async () => {
-    const [qdrantUp, reflectworldUp] = await Promise.all([
+    const [qdrantUp, cortexUp] = await Promise.all([
       isServiceUp(`${QDRANT_URL}/healthz`),
-      isServiceUp(`${REFLECTWORLD_URL}/health`),
+      isServiceUp(`${CORTEX_URL}/health`),
     ]);
 
-    servicesAvailable = qdrantUp && reflectworldUp;
+    servicesAvailable = qdrantUp && cortexUp;
     if (!servicesAvailable) {
       console.warn(
-        `[SKIP] Real services not available: Qdrant=${qdrantUp}, ReflectWorld=${reflectworldUp}`,
+        `[SKIP] Real services not available: Qdrant=${qdrantUp}, Cortex=${cortexUp}`,
       );
       return;
     }
 
-    memoryClient = new ReflectWorldClient({ baseUrl: REFLECTWORLD_URL, timeoutMs: 30_000 });
+    memoryClient = new CortexClient({ baseUrl: CORTEX_URL, timeoutMs: 30_000 });
 
     perceptionDeps = {
       workingMemory: new WorkingMemoryManager({ event_timeout_sec: 300 }),
@@ -117,8 +117,8 @@ describe("Real Services Integration: Cam → Perception → ReflectWorld", () =>
     };
   });
 
-  // ── Scenario 1: Perception → ReflectWorld storage + search ──
-  it("end-to-end: Perception analyzes → ReflectWorld stores → search finds it", async () => {
+  // ── Scenario 1: Perception → Cortex storage + search ──
+  it("end-to-end: Perception analyzes → Cortex stores → search finds it", async () => {
     if (!servicesAvailable) return;
 
     const testCameraId = `cam_e2e_${Date.now().toString(36)}`;
@@ -144,7 +144,7 @@ describe("Real Services Integration: Cam → Perception → ReflectWorld", () =>
     expect(result.perception_memory.summary).toContain("delivery person");
     expect(result.camera_id).toBe(testCameraId);
 
-    // Store to ReflectWorld (real HTTP call)
+    // Store to Cortex (real HTTP call)
     const addResponse = await memoryClient.add({
       video_data: {
         summary: result.perception_memory.summary,
@@ -156,7 +156,7 @@ describe("Real Services Integration: Cam → Perception → ReflectWorld", () =>
     expect(addResponse.results).toBeDefined();
     expect(addResponse.results.length).toBeGreaterThan(0);
 
-    // Search ReflectWorld (real HTTP call)
+    // Search Cortex (real HTTP call)
     const searchResponse = await memoryClient.search({
       query: "delivery package front door",
       camera_id: testCameraId,
@@ -167,8 +167,8 @@ describe("Real Services Integration: Cam → Perception → ReflectWorld", () =>
     expect(allResults.length).toBeGreaterThan(0);
   }, 60_000);
 
-  // ── Scenario 2: ReflectWorld health check ──
-  it("ReflectWorld: health check returns expected structure", async () => {
+  // ── Scenario 2: Cortex health check ──
+  it("Cortex: health check returns expected structure", async () => {
     if (!servicesAvailable) return;
 
     const health = await memoryClient.health();

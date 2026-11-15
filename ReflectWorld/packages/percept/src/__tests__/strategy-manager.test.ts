@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { StrategyManager } from "../strategy-manager.js";
 import type { ModelRouter } from "../providers/model-router.js";
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 
 function makeSegment(mode: Segment["mode"], frameCount: number, cameraId = "cam_test"): Segment {
   const frames = Array.from({ length: frameCount }, (_, i) => ({

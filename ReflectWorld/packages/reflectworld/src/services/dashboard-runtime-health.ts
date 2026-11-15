@@ -3,7 +3,7 @@ import type {
   RuntimeHealthObservation,
   RuntimeHealthScope,
   RuntimeHealthStatus,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 
 const MAX_RECENT_ERRORS = 50;
 const RECENT_ERROR_TTL_MS = 60 * 60_000;

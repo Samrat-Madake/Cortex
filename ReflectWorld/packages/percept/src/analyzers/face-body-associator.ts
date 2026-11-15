@@ -1,5 +1,5 @@
 // packages/percept/src/analyzers/face-body-associator.ts
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 import type { FaceDetection } from "../types.js";
 
 export interface FaceBodyAssociation {

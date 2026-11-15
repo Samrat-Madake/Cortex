@@ -65,7 +65,7 @@ async function main(): Promise<void> {
 
   const ffmpegBin = resolveFfmpegBin();
   const ffprobeBin = resolveFfprobeBin(undefined, ffmpegBin);
-  const tempDir = mkdtempSync(join(tmpdir(), "reflectworld-benchmark-fingerprint-"));
+  const tempDir = mkdtempSync(join(tmpdir(), "cortex-benchmark-fingerprint-"));
   const audioPath = join(tempDir, "audio.pcm");
   const extractedAudio: { buffer: Buffer; startPtsMs: number } | null = await extractAudio(videoPath, audioPath, maxDurationSec, ffmpegBin, ffprobeBin);
   const audioBuffer = extractedAudio?.buffer ?? null;

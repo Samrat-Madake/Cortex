@@ -3,7 +3,7 @@
 This reference is for integrators and contributors. It covers two HTTP surfaces:
 
 1. The **mem service**: a Python FastAPI service under `services/mem`, responsible for memory storage, retrieval, and ReID vector management.
-2. The **dashboard / host HTTP API**: the unified TypeScript HTTP server started by `npx @reflectworld/reflectworld start`, defaulting to `http://localhost:3210`. It serves the UI, tool calls, source management, memory proxying, media, and WebSockets.
+2. The **dashboard / host HTTP API**: the unified TypeScript HTTP server started by `npx @cortex/cortex start`, defaulting to `http://localhost:3210`. It serves the UI, tool calls, source management, memory proxying, media, and WebSockets.
 
 This page documents the current interface contract. Mutation, proxy, chat, and webhook endpoints require a session or token in multi-user mode; single-user local mode remains open by default.
 
@@ -16,7 +16,7 @@ prefer the HTTP endpoints unless you are contributing to the Dashboard itself.
 ## Mem Service HTTP API
 
 - Process: Python FastAPI, source in `services/mem/src/main.py`; request models in `services/mem/src/models.py`.
-- Default listen address: `127.0.0.1:8219`, with the port injected by the host through `REFLECTWORLD_MEM_PORT`.
+- Default listen address: `127.0.0.1:8219`, with the port injected by the host through `CORTEX_MEM_PORT`.
 - Authentication assumption: the mem service binds to loopback and is called internally by the TypeScript host over `127.0.0.1`. Public or multi-machine deployments should add shared-token middleware. Current source has no auth middleware, so this document assumes deployment on a trusted local network.
 - Multimodal memory model: 9 Qdrant collections organized by time scale and abstraction level: `episodic_trace`, `episodic_entity`, `episodic_schema`, `episodic_visual`, `semantic_entity`, `semantic_context`, `procedural`, plus ReID collections `reid_entity` and `reid_face`.
 - Scope identifiers: most reads and writes filter by `user_id`, the memory isolation key, with optional `camera_id`, `entity_id`, `video_id`, and similar identifiers.
@@ -266,9 +266,9 @@ Response: the same fields as `/health`, plus `initialized` boolean. When not ini
 
 ## Dashboard / Host HTTP API
 
-- Process topology: `npx @reflectworld/reflectworld start` creates one Node.js HTTP server in `packages/reflectworld/src/cli/start.ts`, defaulting to `http://localhost:3210`.
+- Process topology: `npx @cortex/cortex start` creates one Node.js HTTP server in `packages/cortex/src/cli/start.ts`, defaulting to `http://localhost:3210`.
   - The top-level server directly handles `/api/health`, `/api/tools`, and `/api/tool/:name`.
-  - All other paths are delegated to `DashboardServer` in `packages/reflectworld/src/services/dashboard-server.ts` through its `registerHandler` callback. This includes UI, source management, memory proxying, media, and WebSockets.
+  - All other paths are delegated to `DashboardServer` in `packages/cortex/src/services/dashboard-server.ts` through its `registerHandler` callback. This includes UI, source management, memory proxying, media, and WebSockets.
 - CORS: both top-level and dashboard paths set `Access-Control-Allow-Origin: *` for local usability. Public deployments should tighten this.
 - Auth model: the dashboard server has a dashboard session mechanism using `session_id` and `user_id`, passed by cookie or `x-dashboard-session-id` / `x-dashboard-user-id` header, query, or body.
   - Single-user local mode, with `sessionConfig.enabled=false`, is the default. `requireDashboardSession` allows requests without a session for the trusted local experience.
@@ -281,7 +281,7 @@ Response: the same fields as `/health`, plus `initialized` boolean. When not ini
 |---|---|---|---|
 | `/api/health` | GET | Startup health state, including `starting`, `ready`, or `degraded`, registered tool count, and child service status. `ready` returns 200; `starting` returns 503. | public |
 | `/api/tools` | GET | Lists all registered tools as `{ tools: [...] }`. | public |
-| `/api/tool/:toolName` | POST | Invokes a registered tool with the request body as tool arguments. This is a local agent convenience surface for cam, percept, memory, and broad tools. | Trusted local open. When `REFLECTWORLD_PUBLIC_MODE=true` or `REFLECTWORLD_TOOL_API_RESTRICTED=true`, it requires an admin token. POST body default limit is 1 MB. |
+| `/api/tool/:toolName` | POST | Invokes a registered tool with the request body as tool arguments. This is a local agent convenience surface for cam, percept, memory, and broad tools. | Trusted local open. When `CORTEX_PUBLIC_MODE=true` or `CORTEX_TOOL_API_RESTRICTED=true`, it requires an admin token. POST body default limit is 1 MB. |
 
 ### Dashboard Sessions
 
@@ -334,7 +334,7 @@ These endpoints proxy go2rtc through the same origin to avoid browser cross-orig
 
 ### Source And Analysis Management
 
-The following endpoints are mutations. Multi-user mode requires a session and returns 401 without one; single-user mode remains open. The `source` field on `/api/streams/analyze` and `/api/sources` is an SSRF and arbitrary-file-read boundary. Source security validation runs before `cam add_source`. Trusted single-user local mode stays easy by default; dashboard session requests, `REFLECTWORLD_SOURCE_SECURITY_STRICT=true`, or `REFLECTWORLD_PUBLIC_MODE=true` enable strict mode with scheme allowlist, DNS private/loopback rejection, and local file path rejection by default. See [configuration](./configuration.md) for the full environment variable list.
+The following endpoints are mutations. Multi-user mode requires a session and returns 401 without one; single-user mode remains open. The `source` field on `/api/streams/analyze` and `/api/sources` is an SSRF and arbitrary-file-read boundary. Source security validation runs before `cam add_source`. Trusted single-user local mode stays easy by default; dashboard session requests, `CORTEX_SOURCE_SECURITY_STRICT=true`, or `CORTEX_PUBLIC_MODE=true` enable strict mode with scheme allowlist, DNS private/loopback rejection, and local file path rejection by default. See [configuration](./configuration.md) for the full environment variable list.
 
 | Endpoint | Method | Request body | Response | Purpose |
 |---|---|---|---|---|
@@ -365,7 +365,7 @@ Expected auth direction: proxy endpoints must require a dashboard session in mul
 
 | Endpoint | Method | Target | Purpose | Auth |
 |---|---|---|---|---|
-| `/api/reflectworld/*` | any | mem service endpoints from the first section, with the `/api/reflectworld` prefix removed | Browser-side memory and ReID reads/writes. The proxy strips `session_id`, strips `user_id` in single-user mode, and rewrites responses through `rewriteReflectWorldProxyResponse`, such as `entity_id` to display `ref`. | session in multi-user |
+| `/api/cortex/*` | any | mem service endpoints from the first section, with the `/api/cortex` prefix removed | Browser-side memory and ReID reads/writes. The proxy strips `session_id`, strips `user_id` in single-user mode, and rewrites responses through `rewriteCortexProxyResponse`, such as `entity_id` to display `ref`. | session in multi-user |
 
 ### Webhook
 
@@ -390,7 +390,7 @@ WS has `maxPayload=64KB`. In multi-user or public mode it validates Origin, allo
 | Read-only projection: state, sources, traces, videos, semantic-context, live, media | Open | Open, but visibility is filtered by session. |
 | Mutations: analyze, sources, config, upload, clear | Open | Session required, otherwise 401. |
 | Chat: dashboard chat and OpenAI-compatible wrapper | Open | Session required plus rate limit. |
-| Proxy: `/api/reflectworld/*` | Open | Session required; `user_id` derived server-side. |
+| Proxy: `/api/cortex/*` | Open | Session required; `user_id` derived server-side. |
 | Webhook: memory-event | loopback-only | loopback-only |
 | Host tools: `/api/tool/:name` | Open | Disabled by default or admin-token gated. |
 | Mem service endpoints | loopback, internal calls only | Shared token plus loopback binding. |

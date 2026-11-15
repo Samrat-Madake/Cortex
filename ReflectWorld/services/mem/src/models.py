@@ -1,4 +1,4 @@
-"""Pydantic request/response models for the ReflectWorld memory service.
+"""Pydantic request/response models for the Cortex memory service.
 
 These models mirror the TypeScript types defined in ts-client-types.ts
 and maintain backwards compatibility with fields from current-main.py.

@@ -1,12 +1,12 @@
 {
-  "name": "@reflectworld/host",
+  "name": "@cortex/host",
   "version": "0.1.0",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./src/server.ts",
   "dependencies": {
-    "@reflectworld/reflectworld": "*",
-    "@reflectworld/shared": "*",
+    "@cortex/cortex": "*",
+    "@cortex/shared": "*",
     "dotenv": "^17.3.1",
     "ws": "^8.21.0"
   },

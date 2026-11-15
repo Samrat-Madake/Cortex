@@ -1,4 +1,4 @@
-# ReflectWorld Eval Overview
+# Cortex Eval Overview
 
 `eval/` contains runnable evaluation and validation entry points. It is split by purpose:
 

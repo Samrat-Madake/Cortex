@@ -4,7 +4,7 @@ import type { IncomingMessage } from "node:http";
 import { join } from "node:path";
 import { isLoopbackRequest } from "./dashboard-common.js";
 
-export const INTERNAL_WEBHOOK_TOKEN_HEADER = "x-reflectworld-internal-token";
+export const INTERNAL_WEBHOOK_TOKEN_HEADER = "x-cortex-internal-token";
 
 const INTERNAL_WEBHOOK_TOKEN_FILE = ".internal-webhook-token";
 

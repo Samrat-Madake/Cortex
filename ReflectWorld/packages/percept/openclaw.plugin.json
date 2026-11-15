@@ -1,6 +1,6 @@
 {
-  "id": "reflectworld-percept",
-  "name": "ReflectWorld Perception",
+  "id": "cortex-percept",
+  "name": "Cortex Perception",
   "description": "Visual perception pipeline — VLM analysis, working memory, media upload, strategy routing",
   "version": "0.1.0",
   "skills": ["./skills"],
@@ -21,7 +21,7 @@
       "scene_description": { "type": "string", "description": "Describes the camera scene for VLM context" },
       "focus_targets": { "type": "string", "description": "Targets to pay extra attention to" },
       "security_rules": { "type": "string", "description": "Custom security criteria" },
-      "reflectworld_endpoint": { "type": "string", "default": "http://localhost:8219", "description": "ReflectWorld API base URL" },
+      "cortex_endpoint": { "type": "string", "default": "http://localhost:8219", "description": "Cortex API base URL" },
       "working_memory_event_timeout_sec": { "type": "number", "default": 30, "description": "Seconds of inactivity before an open event is closed" },
       "working_memory_max_event_segments": { "type": "number", "default": 18, "description": "Maximum segments allowed before an open event is force-rotated" },
       "stubs_only": { "type": "boolean", "default": true, "description": "When true, detection/tracking/ReID analyzers remain as stubs" },

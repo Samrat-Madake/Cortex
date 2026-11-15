@@ -7,15 +7,15 @@ import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 /**
- * @reflectworld/reflectworld — All-in-one OpenClaw plugin.
+ * @cortex/cortex — All-in-one OpenClaw plugin.
  *
  * One install gives AI agents:
  *   - Video capture (cam)
  *   - VLM analysis (perception)
- *   - Persistent memory (memory + ReflectWorld)
+ *   - Persistent memory (memory + Cortex)
  *   - VLM-driven notifications (replaces rule engine)
  *
- * Infrastructure (Qdrant, ReflectWorld) auto-starts as services after setup-prepared binaries are present.
+ * Infrastructure (Qdrant, Cortex) auto-starts as services after setup-prepared binaries are present.
  * Media stored locally (SQLite + filesystem).
  * User only needs: VLM_PROVIDER, VLM_MODEL, VLM_API_KEY, and VLM_BASE_URL for OpenAI-compatible APIs.
  *
@@ -29,25 +29,25 @@ import { fileURLToPath } from "node:url";
 import {
   createRuntimeHealthReporter,
   monitorBus,
-  resolveReflectWorldHome,
-} from "@reflectworld/shared";
+  resolveCortexHome,
+} from "@cortex/shared";
 import type {
   OpenClawPluginApi,
   Segment,
   PerceptionResult,
-} from "@reflectworld/shared";
-import camPlugin from "@reflectworld/cam";
-import perceptionPlugin from "@reflectworld/percept";
-import { analyze, createPipelineDeps, resolvePerceptionConfig, FrameAnalyzer, SemanticContextManager, buildSummarizationPrompt, logPipelineSelfCheck, clearCameraRuntimeState, parseSemanticContextSections, executeToolAction, resolveVlmCallProfile, buildAnimatedSegmentPreviewBuffer } from "@reflectworld/percept";
-import type { EventCloseSummary, PipelineMemory, PipelineSelfCheckComponent, PostProcessor, VlmMeta, SummarizationResult } from "@reflectworld/percept";
-import memoryPlugin from "@reflectworld/mem";
-import { ReflectWorldClient, parseMemoryConfig, flattenMemoriesResponse, flattenSearchResults } from "@reflectworld/mem";
+} from "@cortex/shared";
+import camPlugin from "@cortex/cam";
+import perceptionPlugin from "@cortex/percept";
+import { analyze, createPipelineDeps, resolvePerceptionConfig, FrameAnalyzer, SemanticContextManager, buildSummarizationPrompt, logPipelineSelfCheck, clearCameraRuntimeState, parseSemanticContextSections, executeToolAction, resolveVlmCallProfile, buildAnimatedSegmentPreviewBuffer } from "@cortex/percept";
+import type { EventCloseSummary, PipelineMemory, PipelineSelfCheckComponent, PostProcessor, VlmMeta, SummarizationResult } from "@cortex/percept";
+import memoryPlugin from "@cortex/mem";
+import { CortexClient, parseMemoryConfig, flattenMemoriesResponse, flattenSearchResults } from "@cortex/mem";
 import { QdrantService } from "./src/services/qdrant-service.js";
-import { ReflectWorldService } from "./src/services/reflectworld-service.js";
+import { CortexService } from "./src/services/cortex-service.js";
 import { DEFAULT_MEDIA_RETENTION_DAYS, DEFAULT_TEXT_RETENTION_DAYS, PipelineStore } from "./src/store.js";
 import { Notifier, type DeliveryResult } from "./src/notifier.js";
-import { loadActiveWatchStates, loadPersistedWatchStates, logSourceSecurityEnvWarningsOnce, updateWatchState } from "@reflectworld/cam";
-import type { NotifyPolicy } from "@reflectworld/cam";
+import { loadActiveWatchStates, loadPersistedWatchStates, logSourceSecurityEnvWarningsOnce, updateWatchState } from "@cortex/cam";
+import type { NotifyPolicy } from "@cortex/cam";
 import { DashboardServer } from "./src/services/dashboard-server.js";
 import type { ActiveSourceStatus, AnalysisStatusItem, AnalysisStatusSnapshot, DashboardChatRequest, DashboardChatResponse, SourcePurgeRequest, SourcePurgeResponse, SourceRemoveRequest, SourceRemoveResponse, SourceStopRequest, SourceStopResponse, StreamAnalyzeResponse } from "./src/services/dashboard-server.js";
 import type { DashboardServerOptions } from "./src/services/dashboard-server.js";
@@ -66,7 +66,7 @@ import { PerceptionRuntime } from "./src/runtime/perception-runtime.js";
 import type { SegmentRuntimeTask } from "./src/runtime/perception-runtime.js";
 import { buildPerceptionAddRequest, countAddMemoryTypes, createMemoryReidAdapter, createMemoryStorePerception } from "./src/memory-adapter.js";
 import { buildCamConfig, resolveGo2rtcEndpoint } from "./src/config-helpers.js";
-import type { ReflectWorldPortOverlay } from "./src/config-helpers.js";
+import type { CortexPortOverlay } from "./src/config-helpers.js";
 import { bridgePluginConfigToEnv } from "./src/config-env-bridge.js";
 import {
   buildDashboardChatUnavailablePrompt,
@@ -83,7 +83,7 @@ import {
   type DashboardChatToolResult,
 } from "./src/services/dashboard-chat-memory-search.js";
 
-const runtimeHealth = createRuntimeHealthReporter("reflectworld");
+const runtimeHealth = createRuntimeHealthReporter("cortex");
 
 /**
  * Structured payload submitted when VisionController segment policy wants
@@ -113,18 +113,18 @@ export interface ConsultationRequest {
  * Pluggable dispatcher for VisionController segment policy consultations.
  *
  * Production path:
- *   ReflectWorld submits a consultation to OpenClaw via system events.
+ *   Cortex submits a consultation to OpenClaw via system events.
  *
  * E2E path:
  *   A SimAgent test double can receive the same consultation payload and
  *   simulate what OpenClaw would decide to do next.
  *
  * Important:
- * - Frame policy fast rules are still executed locally inside ReflectWorld.
+ * - Frame policy fast rules are still executed locally inside Cortex.
  * - Segment policy is an OpenClaw consultation path, not an internal synchronous
  *   tool-execution loop.
  * - A returned tool call is treated as test-only metadata and is NOT executed
- *   internally by ReflectWorld.
+ *   internally by Cortex.
  */
 export interface ConsultationDispatcher {
   submitConsultation(context: ConsultationRequest): Promise<{
@@ -146,14 +146,14 @@ export interface ConsultationHandler {
   } | null | void>;
 }
 
-/** Walk up from startDir to find the @reflectworld/reflectworld package root. */
+/** Walk up from startDir to find the @cortex/cortex package root. */
 function findPkgRoot(startDir: string): string {
   let d = startDir;
   while (d !== dirname(d)) {
     if (existsSync(join(d, "package.json"))) {
       try {
         const pkg = JSON.parse(readFileSync(join(d, "package.json"), "utf8"));
-        if (pkg.name === "@reflectworld/reflectworld") return d;
+        if (pkg.name === "@cortex/cortex") return d;
       } catch { /* skip unreadable package.json */ }
     }
     d = dirname(d);
@@ -183,7 +183,7 @@ function commandAvailable(bin: string): boolean {
   }
 }
 
-function stableReflectWorldBin(home: string, name: string): string {
+function stableCortexBin(home: string, name: string): string {
   return join(home, "bin", name);
 }
 
@@ -268,12 +268,12 @@ async function withNotificationTimeout(
 }
 
 export default {
-  id: "reflectworld",
-  name: "ReflectWorld",
+  id: "cortex",
+  name: "Cortex",
   description:
     "Visual perception + persistent memory platform — " +
     "video capture, VLM analysis, memory storage, VLM-driven notifications. " +
-    "Infrastructure (Qdrant, ReflectWorld) auto-starts after setup-prepared binaries are present.",
+    "Infrastructure (Qdrant, Cortex) auto-starts after setup-prepared binaries are present.",
 
   async register(api: OpenClawPluginApi) {
     const bridgedConfig = bridgePluginConfigToEnv((api.pluginConfig ?? {}) as Record<string, unknown>);
@@ -283,9 +283,9 @@ export default {
     logSourceSecurityEnvWarningsOnce(logger);
 
     // ── Resolve canonical homeDir / stateDir from pluginConfig (injected by CLI start.ts) ──
-    const homeDir = typeof rawConfig?._homeDir === "string" ? rawConfig._homeDir : resolveReflectWorldHome();
+    const homeDir = typeof rawConfig?._homeDir === "string" ? rawConfig._homeDir : resolveCortexHome();
     const stateDir = typeof rawConfig?._stateDir === "string" ? rawConfig._stateDir : api.runtime.state.resolveStateDir();
-    const ports = (typeof rawConfig?._ports === "object" && rawConfig._ports !== null ? rawConfig._ports : {}) as ReflectWorldPortOverlay;
+    const ports = (typeof rawConfig?._ports === "object" && rawConfig._ports !== null ? rawConfig._ports : {}) as CortexPortOverlay;
 
     const memoryServiceStoragePath = typeof config.memory?.storage_path === "string"
       ? config.memory.storage_path
@@ -316,9 +316,9 @@ export default {
       : typeof ports.mem === "number" ? ports.mem : undefined;
     const internalWebhookToken = resolveInternalWebhookToken(
       stateDir,
-      process.env.REFLECTWORLD_INTERNAL_WEBHOOK_TOKEN,
+      process.env.CORTEX_INTERNAL_WEBHOOK_TOKEN,
     );
-    process.env.REFLECTWORLD_INTERNAL_WEBHOOK_TOKEN = internalWebhookToken;
+    process.env.CORTEX_INTERNAL_WEBHOOK_TOKEN = internalWebhookToken;
     const pendingConsultations = new Map<string, {
       consultationId: string;
       segmentId: string;
@@ -338,7 +338,7 @@ export default {
       httpPort: resolvedQdrantPort,
       grpcPort: resolvedQdrantGrpcPort,
     });
-    const reflectworld = new ReflectWorldService({
+    const cortex = new CortexService({
       homeDir,
       stateDir,
       port: memoryServicePort,
@@ -352,7 +352,7 @@ export default {
       id: "qdrant",
       async start() {
         await qdrant.start();
-        logger.info(`[reflectworld] qdrant ${qdrant.mode === "external" ? "reused external instance" : "started as managed service"}`);
+        logger.info(`[cortex] qdrant ${qdrant.mode === "external" ? "reused external instance" : "started as managed service"}`);
       },
       async stop() {
         await qdrant.stop();
@@ -360,22 +360,22 @@ export default {
     });
 
     api.registerService({
-      id: "reflectworld",
+      id: "cortex",
       async start() {
-        await reflectworld.start();
+        await cortex.start();
         // Expose actual endpoint for E2E/assertion harness (port may have changed)
-        process.env.REFLECTWORLD_URL = reflectworld.endpoint;
-        process.env.REFLECTWORLD_ENDPOINT = reflectworld.endpoint;
+        process.env.CORTEX_URL = cortex.endpoint;
+        process.env.CORTEX_ENDPOINT = cortex.endpoint;
         logger.info(
-          `[reflectworld] python service ${
-            reflectworld.mode === "external"
+          `[cortex] python service ${
+            cortex.mode === "external"
               ? "reused external instance"
-              : `started as managed service (${reflectworld.mode})`
-          } at ${reflectworld.endpoint}`,
+              : `started as managed service (${cortex.mode})`
+          } at ${cortex.endpoint}`,
         );
       },
       async stop() {
-        await reflectworld.stop();
+        await cortex.stop();
       },
     });
 
@@ -385,7 +385,7 @@ export default {
     const recentAnalyses = new Map<string, AnalysisStatusItem>();
     const clearedDashboardSources = new Set<string>();
 
-    const archiveSegments = (process.env.REFLECTWORLD_ARCHIVE_LEVEL ?? "off").toLowerCase() !== "off";
+    const archiveSegments = (process.env.CORTEX_ARCHIVE_LEVEL ?? "off").toLowerCase() !== "off";
     const segmentArchiveDir = join(stateDir, "segments");
     const segmentFileById = new Map<string, string>();
     const segmentCameraById = new Map<string, string>();
@@ -511,7 +511,7 @@ export default {
     };
     const normalizeDashboardDir = (dir: string): string => dir.replace("~", home);
     const legacyUploadDirsConfig = dashboardConfig.legacy_uploads_dirs ?? dashboardConfig.legacyUploadsDirs;
-    const legacyUploadDirsEnv = process.env.REFLECTWORLD_DASHBOARD_LEGACY_UPLOADS_DIRS;
+    const legacyUploadDirsEnv = process.env.CORTEX_DASHBOARD_LEGACY_UPLOADS_DIRS;
     const legacyUploadsDirs = [
       ...parseDashboardDirs(legacyUploadDirsConfig),
       ...parseDashboardDirs(legacyUploadDirsEnv),
@@ -520,8 +520,8 @@ export default {
       typeof dashboardConfig.public_videos_dir === "string" ? dashboardConfig.public_videos_dir
         : typeof dashboardConfig.fixture_videos_dir === "string" ? dashboardConfig.fixture_videos_dir
           : typeof dashboardConfig.fixtureVideosDir === "string" ? dashboardConfig.fixtureVideosDir
-            : process.env.REFLECTWORLD_DASHBOARD_PUBLIC_VIDEOS_DIR
-              ?? process.env.REFLECTWORLD_DASHBOARD_FIXTURE_VIDEOS_DIR
+            : process.env.CORTEX_DASHBOARD_PUBLIC_VIDEOS_DIR
+              ?? process.env.CORTEX_DASHBOARD_FIXTURE_VIDEOS_DIR
               ?? ""
     ).trim();
     const dashboardServer = new DashboardServer({
@@ -530,17 +530,17 @@ export default {
       port: typeof dashboardConfig.port === "number"
         ? dashboardConfig.port
         : Number.isFinite(configuredDashboardPort) && configuredDashboardPort > 0 ? configuredDashboardPort : undefined,
-      reflectworldEndpoint: reflectworld.endpoint,
+      cortexEndpoint: cortex.endpoint,
       internalWebhookToken,
       store,
       recordingsDir: resolvedRecordingsDir,
       mediaDirs: [join(stateDir, "media")],
       ffmpegBin: typeof mergedCamForDashboard.ffmpeg_bin === "string" && mergedCamForDashboard.ffmpeg_bin.trim()
         ? mergedCamForDashboard.ffmpeg_bin
-        : stableReflectWorldBin(homeDir, "ffmpeg"),
+        : stableCortexBin(homeDir, "ffmpeg"),
       ffprobeBin: typeof mergedCamForDashboard.ffprobe_bin === "string" && mergedCamForDashboard.ffprobe_bin.trim()
         ? mergedCamForDashboard.ffprobe_bin
-        : stableReflectWorldBin(homeDir, "ffprobe"),
+        : stableCortexBin(homeDir, "ffprobe"),
       go2rtcApiPort: mergedCamForDashboard.go2rtc_api_port as number | string | undefined,
       uploadsDir,
       legacyUploadsDirs,
@@ -574,10 +574,10 @@ export default {
       async start() {
         monitorBus.publish("system:service_origins", {
           qdrant: qdrant.mode,
-          reflectworld: reflectworld.mode,
+          cortex: cortex.mode,
         });
         logger.info(
-          `[services] origins: qdrant=${qdrant.mode}, reflectworld=${reflectworld.mode}`,
+          `[services] origins: qdrant=${qdrant.mode}, cortex=${cortex.mode}`,
         );
       },
     });
@@ -610,11 +610,11 @@ export default {
 
     const camConfig: Record<string, unknown> = {
       ...buildCamConfig(config.eye as Record<string, unknown> | undefined, config.cam as Record<string, unknown> | undefined, ports),
-      reflectworld_endpoint: reflectworld.endpoint,
+      cortex_endpoint: cortex.endpoint,
       mediaDir: join(stateDir, "media"),
       onCamReady: (executor: (action: string, params: Record<string, unknown>) => Promise<string>) => {
         executeCam = executor;
-        logger.info("[reflectworld] Cam action executor ready for VisionController");
+        logger.info("[cortex] Cam action executor ready for VisionController");
       },
       waitForCameraIdle: (cameraId: string) => waitForCameraIdle(cameraId),
     };
@@ -623,18 +623,18 @@ export default {
 
     // Auto-detect stubs_only: if models directory has ONNX files, enable local models.
     const modelsDir = (config.perception?.models_dir as string)
-      ?? process.env.REFLECTWORLD_MODELS_DIR;
+      ?? process.env.CORTEX_MODELS_DIR;
     const resolvedModelsDir = expandHomePath(modelsDir ?? join(homeDir, "models"));
     const hasModels = (() => {
       try {
         return readdirSync(resolvedModelsDir).some((f: string) => f.endsWith(".onnx"));
       } catch { return false; }
     })();
-    if (hasModels) logger.info(`[reflectworld] Models found in ${resolvedModelsDir}, local inference enabled`);
+    if (hasModels) logger.info(`[cortex] Models found in ${resolvedModelsDir}, local inference enabled`);
 
     const perceptionConfig = {
       ...config.perception,
-      reflectworld_endpoint: reflectworld.endpoint,
+      cortex_endpoint: cortex.endpoint,
       models_dir: resolvedModelsDir,
       stubs_only: hasModels ? false : (config.perception?.stubs_only ?? true),
     };
@@ -649,10 +649,10 @@ export default {
       : "admin";
     memoryConfig.defaultUserId = memoryUserId;
     const resolvedMemoryConfig = parseMemoryConfig(memoryConfig);
-    const memoryClient = new ReflectWorldClient({
-      // ReflectWorldService.start() may move to a free port at runtime.
+    const memoryClient = new CortexClient({
+      // CortexService.start() may move to a free port at runtime.
       // Resolve the endpoint per request so writes follow the active service.
-      baseUrl: () => configuredMemoryBaseUrl ?? reflectworld.endpoint,
+      baseUrl: () => configuredMemoryBaseUrl ?? cortex.endpoint,
       timeoutMs: resolvedMemoryConfig.timeoutMs,
     });
 
@@ -661,19 +661,19 @@ export default {
       ? rawConfig.retention
       : {}) as Record<string, unknown>;
     const mediaRetentionDays = readNonNegativeInt(
-      process.env.REFLECTWORLD_MEDIA_RETENTION_DAYS
+      process.env.CORTEX_MEDIA_RETENTION_DAYS
         ?? retentionConfig.media_days
         ?? retentionConfig.media_retention_days,
       DEFAULT_MEDIA_RETENTION_DAYS,
     );
     const textRetentionDays = readNonNegativeInt(
-      process.env.REFLECTWORLD_TEXT_RETENTION_DAYS
+      process.env.CORTEX_TEXT_RETENTION_DAYS
         ?? retentionConfig.text_days
         ?? retentionConfig.text_retention_days,
       DEFAULT_TEXT_RETENTION_DAYS,
     );
     const retentionIntervalHours = readPositiveInt(
-      process.env.REFLECTWORLD_RETENTION_INTERVAL_HOURS
+      process.env.CORTEX_RETENTION_INTERVAL_HOURS
         ?? retentionConfig.interval_hours,
       24,
     );
@@ -808,7 +808,7 @@ export default {
 
     // Default dispatcher: submit segment policy consultations to OpenClaw. The
     // decision itself should happen in OpenClaw, not synchronously inside
-    // ReflectWorld.
+    // Cortex.
     const defaultConsultationDispatcher: ConsultationDispatcher = {
       async submitConsultation({ eventText, camera_id }) {
         try {
@@ -857,7 +857,7 @@ export default {
         logger.warn(`[memory-write] ${hook} hook failed: ${err instanceof Error ? err.message : String(err)}`);
       },
     });
-    (globalThis as any).__reflectworld_waitForMemoryIdle = () => memoryWriteScheduler.waitForIdle();
+    (globalThis as any).__cortex_waitForMemoryIdle = () => memoryWriteScheduler.waitForIdle();
 
     // ── Memory adapter: all Memory-service interactions used by Percept ──
     const userIdByCamera = new Map<string, string>();
@@ -946,7 +946,7 @@ export default {
         // Returns a Promise that resolves/rejects when the final write state is
         // known, preserving the contract that pipeline's writeMemoryHistory uses.
         const queueDepthAtEnqueue = memoryWriteScheduler.depth;
-        logger.info(`[memory-write] Enqueuing for ${segment.segment_id} camera=${segment.camera_id} url=${reflectworld.endpoint} (depth: ${queueDepthAtEnqueue})`);
+        logger.info(`[memory-write] Enqueuing for ${segment.segment_id} camera=${segment.camera_id} url=${cortex.endpoint} (depth: ${queueDepthAtEnqueue})`);
         return memoryWriteScheduler.enqueue({
           run: async ({ attempt, queueWaitMs }) => {
             if (result._trace) {
@@ -1029,7 +1029,7 @@ export default {
             } catch (deadLetterErr) {
               logger.error(`[memory-write] Failed to record dead-letter for ${segment.segment_id}: ${deadLetterErr instanceof Error ? deadLetterErr.message : deadLetterErr}`);
             }
-            store.logError(result.segment_id, result.camera_id, "reflectworld", msg);
+            store.logError(result.segment_id, result.camera_id, "cortex", msg);
           },
         });
       },
@@ -1358,7 +1358,7 @@ export default {
       }
     });
 
-    // ── User rules provider: fetches from ReflectWorld procedural collection ──
+    // ── User rules provider: fetches from Cortex procedural collection ──
     // Caches per camera_id; merges global rules + per-camera rules.
     const rulesCache = new Map<string, { rules: string | undefined; expiry: number }>();
     const RULES_CACHE_TTL_MS = 30_000; // refresh every 30s
@@ -1377,7 +1377,7 @@ export default {
             ? memoryClient.getMemories({ camera_id: cameraId, memory_type: "procedural", limit: 50 })
             : Promise.resolve([]),
         ]);
-        // ReflectWorld may return collection-keyed object { "coll_name": [...] } or []
+        // Cortex may return collection-keyed object { "coll_name": [...] } or []
         const flattenMemories = (raw: unknown): Array<{ id: string; memory: string }> => {
           if (Array.isArray(raw)) return raw;
           if (raw && typeof raw === "object") {
@@ -1415,13 +1415,13 @@ export default {
     pipelineDeps.postProcessor = postProcessor;
     pipelineDeps.logging = {
       archiveSegments,
-      promptVersion: process.env.REFLECTWORLD_GIT_COMMIT
+      promptVersion: process.env.CORTEX_GIT_COMMIT
         ?? process.env.EVAL_GIT_COMMIT
         ?? process.env.BENCH_GIT_COMMIT
-        ?? process.env.REFLECTWORLD_PROMPT_VERSION,
+        ?? process.env.CORTEX_PROMPT_VERSION,
       llmContext: {
-        run_id: process.env.REFLECTWORLD_RUN_ID,
-        snapshot_version: process.env.REFLECTWORLD_SNAPSHOT_VERSION,
+        run_id: process.env.CORTEX_RUN_ID,
+        snapshot_version: process.env.CORTEX_SNAPSHOT_VERSION,
       },
     };
     pipelineDeps.vlmAnalyzer.setLlmCallRecorder((call) => {
@@ -1429,7 +1429,7 @@ export default {
     });
 
     // ── NarrativeMemory: video-level cognitive layer ──
-    const { NarrativeMemory } = await import("@reflectworld/percept");
+    const { NarrativeMemory } = await import("@cortex/percept");
     const narrativeMemory = new NarrativeMemory({
       baseDir: join(stateDir, "narratives"),
       memClient: memoryClient,
@@ -1509,7 +1509,7 @@ export default {
         }
       },
       onAgentConsult: async (cameraId, currentProfile, observationSummary) => {
-        const eventText = `[Semantic Context Review] Camera "${cameraId}" has accumulated new observations. Current profile:\n${currentProfile}\n\nRecent observations:\n${observationSummary}\n\nReview the semantic context profile and update if needed using reflectworld_perception configure action with semantic_context_notes.`;
+        const eventText = `[Semantic Context Review] Camera "${cameraId}" has accumulated new observations. Current profile:\n${currentProfile}\n\nRecent observations:\n${observationSummary}\n\nReview the semantic context profile and update if needed using cortex_perception configure action with semantic_context_notes.`;
         try {
           api.runtime.system.enqueueSystemEvent(eventText, { sessionKey: "agent:main:main" });
           if (typeof api.runtime.system.requestHeartbeatNow === "function") {
@@ -1565,7 +1565,7 @@ export default {
       async load(cameraId: string) {
         const content = await origLoad(cameraId);
         if (content) {
-          const { parseSemanticContextSections } = await import("@reflectworld/percept");
+          const { parseSemanticContextSections } = await import("@cortex/percept");
           const sections = parseSemanticContextSections(content);
           if (sections.explainDecisions) explainDecisionsPerCamera.add(cameraId);
           else explainDecisionsPerCamera.delete(cameraId);
@@ -1628,7 +1628,7 @@ export default {
       || join(homeDir, "models", "sherpa-onnx-moonshine-tiny-en-int8");
     if (resolvedPerceptionConfig.stt_provider === "moonshine" && sttModelDir) {
       try {
-        const { SttAnalyzer } = await import("@reflectworld/percept");
+        const { SttAnalyzer } = await import("@cortex/percept");
         const stt = new SttAnalyzer({
           modelDir: sttModelDir,
           numThreads: resolvedPerceptionConfig.stt_num_threads,
@@ -1880,8 +1880,8 @@ export default {
         join(stateDir, "media", cameraId),
         join(stateDir, "recordings", cameraId),
         join(stateDir, "narratives", cameraId),
-        join(stateDir, "reflectworld", "media", cameraId),
-        join(stateDir, "reflectworld", "narratives", cameraId),
+        join(stateDir, "cortex", "media", cameraId),
+        join(stateDir, "cortex", "narratives", cameraId),
       ]) {
         try {
           rmSync(dir, { recursive: true, force: true });
@@ -3205,17 +3205,17 @@ ${req.prompt}`;
     const maxConcurrentPerceptionSources = readPositiveInt(
       (config.perception as Record<string, unknown> | undefined)?.source_concurrency
         ?? (config.perception as Record<string, unknown> | undefined)?.segment_concurrency
-        ?? process.env.REFLECTWORLD_PERCEPTION_SOURCE_CONCURRENCY,
+        ?? process.env.CORTEX_PERCEPTION_SOURCE_CONCURRENCY,
       DASHBOARD_DEFAULT_SOURCE_CONCURRENCY,
     );
     const maxQueuedPerCamera = readPositiveInt(
       (config.perception as Record<string, unknown> | undefined)?.max_queued_per_source
-        ?? process.env.REFLECTWORLD_PERCEPTION_MAX_QUEUED_PER_SOURCE,
+        ?? process.env.CORTEX_PERCEPTION_MAX_QUEUED_PER_SOURCE,
       resolvedPerceptionConfig.max_queued_per_source,
     );
     const liveBacklogSkipAfterMs = readPositiveInt(
       (config.perception as Record<string, unknown> | undefined)?.live_backlog_skip_after_ms
-        ?? process.env.REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS,
+        ?? process.env.CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS,
       resolvedPerceptionConfig.live_backlog_skip_after_ms,
     );
     let rejectedSegmentsTotal = 0;
@@ -3288,7 +3288,7 @@ ${req.prompt}`;
             const eventText = [
               `[VisionController Consultation] Camera "${segment.camera_id}"${riskLabel}.`,
               "Decide whether a temporary perception prompt adjustment is needed.",
-              "Usually do nothing. If needed, call reflectworld_perception with action=\"configure\" only.",
+              "Usually do nothing. If needed, call cortex_perception with action=\"configure\" only.",
               "Allowed config keys: scene_description, focus_targets, security_rules.",
               "Do not change vc_rules_json, vc_segment_policy_json, semantic_context_notes, source_context, semantic_context_background, track_states, track_activities, explain_decisions, or model settings.",
               "Every tool call must include an exit_condition.",
@@ -3317,7 +3317,7 @@ ${req.prompt}`;
 
             if (
               applyConsultationToolCalls
-              && suggestedToolCall?.tool === "reflectworld_perception"
+              && suggestedToolCall?.tool === "cortex_perception"
               && suggestedToolCall.params
             ) {
               try {
@@ -3524,8 +3524,8 @@ ${req.prompt}`;
 
     // Expose pipeline drain for E2E / graceful shutdown.
     // Stored on process-level so test runners in the same process can access it.
-    (globalThis as any).__reflectworld_waitForPipelineIdle = () => perceptionRuntime.waitForIdle();
-    (globalThis as any).__reflectworld_getPerceptionBacklog = (cameraId?: string) => perceptionRuntime.getBacklog(cameraId);
+    (globalThis as any).__cortex_waitForPipelineIdle = () => perceptionRuntime.waitForIdle();
+    (globalThis as any).__cortex_getPerceptionBacklog = (cameraId?: string) => perceptionRuntime.getBacklog(cameraId);
     waitForCameraIdle = (cameraId: string) => perceptionRuntime.waitForCameraIdle(cameraId);
 
     // ── onSegment callback: Cam → Perception ──
@@ -3696,17 +3696,17 @@ ${req.prompt}`;
     }
 
     api.registerService({
-      id: "reflectworld-pipeline-self-check",
+      id: "cortex-pipeline-self-check",
       async start() {
         const go2rtcHealthy = await waitHttpOk(go2rtcEndpoint, "/api", 8000);
         const go2rtcConfigured = typeof config.cam?.go2rtc_bin === "string" && config.cam.go2rtc_bin.trim()
           ? config.cam.go2rtc_bin.trim()
           : undefined;
-        const go2rtcCandidates = go2rtcConfigured ? [go2rtcConfigured] : [stableReflectWorldBin(homeDir, "go2rtc")];
+        const go2rtcCandidates = go2rtcConfigured ? [go2rtcConfigured] : [stableCortexBin(homeDir, "go2rtc")];
         const go2rtcBinaryOk = go2rtcCandidates.some(commandAvailable);
 
         const qdrantHealthy = await waitHttpOk(qdrant.endpoint, "/healthz", 5000);
-        const memoryHealthy = await waitHttpOk(reflectworld.endpoint, "/health", 5000);
+        const memoryHealthy = await waitHttpOk(cortex.endpoint, "/health", 5000);
         const dashboardReachable = await waitHttpOk(`http://127.0.0.1:${dashboardServer.port}`, "/", 1500);
         const vadEnabled = config.cam?.vad_enabled !== false;
         const vadModel = typeof config.cam?.silero_vad_model === "string" && config.cam.silero_vad_model.trim()
@@ -3722,12 +3722,12 @@ ${req.prompt}`;
           },
           {
             name: "memory_service",
-            status: reflectworld.mode !== "stopped" && memoryHealthy ? "ok" : "error",
+            status: cortex.mode !== "stopped" && memoryHealthy ? "ok" : "error",
             required: true,
-            detail: `mode=${reflectworld.mode} endpoint=${reflectworld.endpoint} healthy=${memoryHealthy}`,
+            detail: `mode=${cortex.mode} endpoint=${cortex.endpoint} healthy=${memoryHealthy}`,
           },
-          requiredBinaryComponent("ffmpeg", config.cam?.ffmpeg_bin, undefined, stableReflectWorldBin(homeDir, "ffmpeg")),
-          requiredBinaryComponent("ffprobe", config.cam?.ffprobe_bin, undefined, stableReflectWorldBin(homeDir, "ffprobe")),
+          requiredBinaryComponent("ffmpeg", config.cam?.ffmpeg_bin, undefined, stableCortexBin(homeDir, "ffmpeg")),
+          requiredBinaryComponent("ffprobe", config.cam?.ffprobe_bin, undefined, stableCortexBin(homeDir, "ffprobe")),
           {
             name: "go2rtc",
             status: go2rtcHealthy ? "ok" : "error",
@@ -3768,7 +3768,7 @@ ${req.prompt}`;
         ];
 
         logPipelineSelfCheck(pipelineDeps, {
-          mode: "reflectworld-main",
+          mode: "cortex-main",
           label: "all-in-one",
           throwOnFatal: true,
           components,
@@ -3779,7 +3779,7 @@ ${req.prompt}`;
 
     // ── Notification policy tool ──
     api.registerTool({
-      name: "reflectworld_notify",
+      name: "cortex_notify",
       description: `Manage per-camera notification policies.
 
 Actions:
@@ -3820,7 +3820,7 @@ Note: The first segment after starting a watch ALWAYS sends a notification regar
         if (!nameOrId) return JSON.stringify({ error: "name is required" });
 
         const ws = watchStates.find((w) => w.id === nameOrId || w.id === nameOrId.toLowerCase().replace(/\s+/g, "_"));
-        if (!ws) return JSON.stringify({ error: `No active watch for "${nameOrId}". Use reflectworld_cam list_sources.` });
+        if (!ws) return JSON.stringify({ error: `No active watch for "${nameOrId}". Use cortex_cam list_sources.` });
 
         if (action === "get_policy") {
           return JSON.stringify({ camera: ws.id, policy: ws.notifyPolicy ?? "smart" });
@@ -3833,7 +3833,7 @@ Note: The first segment after starting a watch ALWAYS sends a notification regar
           }
           const ok = updateWatchState(ws.id, { notifyPolicy: policy });
           if (!ok) return JSON.stringify({ error: `Failed to update policy for "${ws.id}".` });
-          logger.info(`[reflectworld] Notification policy for ${ws.id} changed to: ${policy}`);
+          logger.info(`[cortex] Notification policy for ${ws.id} changed to: ${policy}`);
           return JSON.stringify({ camera: ws.id, policy, message: `Policy updated to "${policy}".` });
         }
 
@@ -3843,7 +3843,7 @@ Note: The first segment after starting a watch ALWAYS sends a notification regar
 
     // ── Source Context tool: stable external entry point for user-provided background ──
     api.registerTool({
-      name: "reflectworld_source_context",
+      name: "cortex_source_context",
       description: `Set or read user-provided background context for a camera/source.
 
 Actions:
@@ -3903,8 +3903,8 @@ Use this for source background supplied by a user. Runtime observations continue
         const health: Record<string, string> = {};
         try {
           const memHealth = await memoryClient.health();
-          health.ReflectWorld = memHealth.status ?? "unknown";
-        } catch { health.ReflectWorld = "down"; }
+          health.Cortex = memHealth.status ?? "unknown";
+        } catch { health.Cortex = "down"; }
         try {
           const resp = await fetch(`${qdrant.endpoint}/collections`);
           health.Qdrant = resp.ok ? "ok" : "down";
@@ -3996,7 +3996,7 @@ Use this for source background supplied by a user. Runtime observations continue
             await api.runtime.channel.slack.sendMessageSlack(to, text, { cfg, ...mediaOpts });
             break;
           default:
-            logger.error(`[reflectworld] Unsupported channel for direct send: ${channel}`);
+            logger.error(`[cortex] Unsupported channel for direct send: ${channel}`);
         }
       };
 
@@ -4007,7 +4007,7 @@ Use this for source background supplied by a user. Runtime observations continue
         logger,
       });
 
-      logger.info("[reflectworld] Notifier ready — per-camera channel routing enabled");
+      logger.info("[cortex] Notifier ready — per-camera channel routing enabled");
     });
   },
 };

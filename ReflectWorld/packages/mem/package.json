@@ -1,5 +1,5 @@
 {
-  "name": "@reflectworld/mem",
+  "name": "@cortex/mem",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,16 +15,16 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/addxai/ReflectWorld.git",
+    "url": "git+https://github.com/addxai/Cortex.git",
     "directory": "packages/mem"
   },
-  "homepage": "https://github.com/addxai/ReflectWorld",
+  "homepage": "https://github.com/addxai/Cortex",
   "engines": {
     "node": ">=22"
   },
-  "keywords": ["reflectworld", "vision", "perception", "ai-agent", "openclaw", "memory"],
+  "keywords": ["cortex", "vision", "perception", "ai-agent", "openclaw", "memory"],
   "dependencies": {
-    "@reflectworld/shared": "^0.1.0",
+    "@cortex/shared": "^0.1.0",
     "@sinclair/typebox": "^0.34.48",
     "zod": "^3.24.0"
   },
@@ -33,8 +33,8 @@
       "./dist/index.js"
     ],
     "install": {
-      "npmSpec": "@reflectworld/mem",
-      "localPath": "extensions/reflectworld-mem"
+      "npmSpec": "@cortex/mem",
+      "localPath": "extensions/cortex-mem"
     }
   }
 }

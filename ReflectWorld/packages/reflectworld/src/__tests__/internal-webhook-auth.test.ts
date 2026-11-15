@@ -10,14 +10,14 @@ import {
 
 function request(token?: string, remoteAddress = "127.0.0.1"): IncomingMessage {
   return {
-    headers: token ? { "x-reflectworld-internal-token": token } : {},
+    headers: token ? { "x-cortex-internal-token": token } : {},
     socket: { remoteAddress },
   } as IncomingMessage;
 }
 
 describe("internal webhook authentication", () => {
   it("persists generated tokens per state directory with private permissions", () => {
-    const stateDir = mkdtempSync(join(tmpdir(), "reflectworld-webhook-token-"));
+    const stateDir = mkdtempSync(join(tmpdir(), "cortex-webhook-token-"));
 
     const first = resolveInternalWebhookToken(stateDir);
     const second = resolveInternalWebhookToken(stateDir);
@@ -30,7 +30,7 @@ describe("internal webhook authentication", () => {
   });
 
   it("uses an explicit configured token without creating a state file", () => {
-    const stateDir = mkdtempSync(join(tmpdir(), "reflectworld-webhook-token-"));
+    const stateDir = mkdtempSync(join(tmpdir(), "cortex-webhook-token-"));
 
     expect(resolveInternalWebhookToken(stateDir, " configured-secret ")).toBe("configured-secret");
     expect(() => statSync(join(stateDir, ".internal-webhook-token"))).toThrow();

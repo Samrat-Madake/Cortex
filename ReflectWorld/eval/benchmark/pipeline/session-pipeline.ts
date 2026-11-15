@@ -1,4 +1,4 @@
-import type { NarrativeMemory } from "@reflectworld/percept";
+import type { NarrativeMemory } from "@cortex/percept";
 import type { VideoPipelineCheckpoint, VideoPipelineOptions, VideoPipelineResult } from "./video-pipeline.js";
 import { runVideoPipeline } from "./video-pipeline.js";
 

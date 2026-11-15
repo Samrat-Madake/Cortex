@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export CLIP-ReID ViT-B/16 to ONNX for ReflectWorld body ReID (optional, default-disabled).
+"""Export CLIP-ReID ViT-B/16 to ONNX for Cortex body ReID (optional, default-disabled).
 
 Architecture: CLIP ViT-B/16 vision transformer (image encoder only), adapted from
 Syliz517/CLIP-ReID. Self-contained: no external repo clone required.

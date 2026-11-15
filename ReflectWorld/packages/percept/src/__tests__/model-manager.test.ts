@@ -9,7 +9,7 @@ describe("ModelManager", () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "reflectworld-models-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "cortex-models-"));
   });
 
   afterEach(() => {

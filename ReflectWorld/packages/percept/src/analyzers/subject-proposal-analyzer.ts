@@ -2,7 +2,7 @@
 // Segment-scoped face embedding clustering for subject proposal generation.
 // Replaces ByteTrack-based identity grouping with face similarity clustering.
 
-import type { BoundingBox, Frame } from "@reflectworld/shared";
+import type { BoundingBox, Frame } from "@cortex/shared";
 import type { DetectionOutput, FaceDetection } from "../types.js";
 import type { ModelRouter } from "../providers/model-router.js";
 import { FACE_CLUSTER_SIMILARITY_THRESHOLD, FACE_REID_MIN_SHARPNESS } from "../thresholds.js";

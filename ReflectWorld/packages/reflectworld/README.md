@@ -1,12 +1,12 @@
-# @reflectworld/reflectworld
+# @cortex/cortex
 
 > All-in-one OpenClaw plugin — video capture, perception, memory, and notifications.
 
 ## Overview
 
-The orchestrator plugin wires together all ReflectWorld sub-packages into a single install. It auto-starts prepared infrastructure (Qdrant, ReflectWorld Python service, go2rtc), manages a local SQLite pipeline store, provides dual-path notifications (direct alerts + subagent summaries), and exposes the Dashboard web UI. One plugin gives AI agents full visual perception and persistent memory.
+The orchestrator plugin wires together all Cortex sub-packages into a single install. It auto-starts prepared infrastructure (Qdrant, Cortex Python service, go2rtc), manages a local SQLite pipeline store, provides dual-path notifications (direct alerts + subagent summaries), and exposes the Dashboard web UI. One plugin gives AI agents full visual perception and persistent memory.
 
-Works in two forms: as an **OpenClaw plugin** (configured via `npx @reflectworld/reflectworld configure`) or as a **standalone service** (configured via `.env`).
+Works in two forms: as an **OpenClaw plugin** (configured via `npx @cortex/cortex configure`) or as a **standalone service** (configured via `.env`).
 
 ## Install & Configure
 
@@ -14,20 +14,20 @@ Works in two forms: as an **OpenClaw plugin** (configured via `npx @reflectworld
 
 ```bash
 # 1. Install the plugin (the command self-exits; takes ~15s)
-openclaw plugins install @reflectworld/reflectworld
+openclaw plugins install @cortex/cortex
 #    Not published to npm yet? Install the packed tarball instead:
-#    openclaw plugins install ./reflectworld-reflectworld-0.1.0.tgz
+#    openclaw plugins install ./cortex-cortex-0.1.0.tgz
 
 # 2. Configure providers — interactive wizard (also accepts piped/non-interactive stdin)
-npx @reflectworld/reflectworld configure
+npx @cortex/cortex configure
 #    Prompts for: VLM provider/model/key, optional independent embedder, STT mode.
 #    Writes pluginConfig into openclaw.json, validates, and restarts the gateway.
 #    Before this package is published to npm, run the CLI from the installed extension:
-#      node ~/.openclaw/extensions/reflectworld/bundle/src/cli/index.js configure
+#      node ~/.openclaw/extensions/cortex/bundle/src/cli/index.js configure
 
 # 3. (optional) Enable Level 1 in the installed plugin
-node ~/.openclaw/extensions/reflectworld/bundle/src/cli/index.js enable-level1 \
-  --package-dir ~/.openclaw/extensions/reflectworld
+node ~/.openclaw/extensions/cortex/bundle/src/cli/index.js enable-level1 \
+  --package-dir ~/.openclaw/extensions/cortex
 # Add --with-stt for the local VAD/STT runtime.
 
 # 4. Restart the gateway to apply
@@ -39,9 +39,9 @@ openclaw gateway restart           # managed service; otherwise restart your gat
 ### As a standalone service
 
 ```bash
-npm install @reflectworld/reflectworld
+npm install @cortex/cortex
 
-npx @reflectworld/reflectworld setup --level 0   # download go2rtc/ffmpeg/qdrant binaries + Level 0 assets
+npx @cortex/cortex setup --level 0   # download go2rtc/ffmpeg/qdrant binaries + Level 0 assets
                                            # use --level 1 to also fetch local perception models
 
 # Create a .env (a sample .env.example ships in the package) — minimal Level 0:
@@ -57,7 +57,7 @@ VLM_BASE_URL=https://api.openai.com/v1
 # EMBEDDER_BASE_URL=https://api.openai.com/v1
 EOF
 
-npx @reflectworld/reflectworld start             # starts Qdrant + ReflectWorld + go2rtc + dashboard
+npx @cortex/cortex start             # starts Qdrant + Cortex + go2rtc + dashboard
                                            # options: --port N, --dev, --home-dir DIR
 ```
 
@@ -67,10 +67,10 @@ The two forms read configuration from different sources — they don't mix:
 
 | Form | Config source |
 |------|---------------|
-| OpenClaw plugin | `npx @reflectworld/reflectworld configure` → `pluginConfig` in `openclaw.json` |
-| Standalone | `.env` (loaded by `npx @reflectworld/reflectworld start`) |
+| OpenClaw plugin | `npx @cortex/cortex configure` → `pluginConfig` in `openclaw.json` |
+| Standalone | `.env` (loaded by `npx @cortex/cortex start`) |
 
-`npx @reflectworld/reflectworld configure` collects:
+`npx @cortex/cortex configure` collects:
 
 - **VLM** — provider (`openai`/`gemini`), vision model, lite model, API key, base URL (OpenAI-compatible endpoints like a LiteLLM gateway are supported)
 - **Embedder** — same gateway + `text-embedding-3-small` by default, or an independent OpenAI-compatible embedder
@@ -83,20 +83,20 @@ The two forms read configuration from different sources — they don't mix:
 | **0** (default) | a VLM provider only | scene description + safety via the VLM |
 | **1** | `enable-level1` (persistently installs `onnxruntime-node` + `sharp` in the target project) | local detection, identity continuity, face ReID (ONNX, CoreML on Apple Silicon) |
 
-Level 1 model files come from `npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses` (standalone) or `~/.reflectworld/models`. Set `perception.required_level = 1` (or `REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL=1`) to make a missing Level 1 capability a **fatal** startup check instead of a warning.
+Level 1 model files come from `npx @cortex/cortex setup --level 1 --yes --accept-model-licenses` (standalone) or `~/.cortex/models`. Set `perception.required_level = 1` (or `CORTEX_PERCEPTION_REQUIRED_LEVEL=1`) to make a missing Level 1 capability a **fatal** startup check instead of a warning.
 
-Runtime directories use the ReflectWorld names directly: `REFLECTWORLD_HOME` (default `~/.reflectworld`) and `REFLECTWORLD_STATE_DIR` (default `./.reflectworld-state`). Public configuration should use only `REFLECTWORLD_*` variables and ReflectWorld directory names.
+Runtime directories use the Cortex names directly: `CORTEX_HOME` (default `~/.cortex`) and `CORTEX_STATE_DIR` (default `./.cortex-state`). Public configuration should use only `CORTEX_*` variables and Cortex directory names.
 
-Linux GPU hosts use the CUDA execution provider bundled with `onnxruntime-node`; `onnxruntime-node-gpu` is not required. Make sure the NVIDIA driver, CUDA 12 runtime, and cuDNN 9 are visible to Node, for example through the system linker path, `LD_LIBRARY_PATH`, or `REFLECTWORLD_CUDNN_LIB_DIR`.
+Linux GPU hosts use the CUDA execution provider bundled with `onnxruntime-node`; `onnxruntime-node-gpu` is not required. Make sure the NVIDIA driver, CUDA 12 runtime, and cuDNN 9 are visible to Node, for example through the system linker path, `LD_LIBRARY_PATH`, or `CORTEX_CUDNN_LIB_DIR`.
 
 ## CLI
 
-Run via `npx @reflectworld/reflectworld <command>` (standalone), or the installed extension's bundled CLI in plugin mode (`node ~/.openclaw/extensions/reflectworld/bundle/src/cli/index.js <command>`).
+Run via `npx @cortex/cortex <command>` (standalone), or the installed extension's bundled CLI in plugin mode (`node ~/.openclaw/extensions/cortex/bundle/src/cli/index.js <command>`).
 
 ```
   setup [--yes] [--level 0|1] [--home-dir DIR]   Download binaries + models (standalone)
   enable-level1 [--gpu] [--with-stt]              Install native Level 1 peer deps (--gpu is compatibility-only)
-  start [--dev] [--port N] [--home-dir DIR]       Start ReflectWorld (standalone)
+  start [--dev] [--port N] [--home-dir DIR]       Start Cortex (standalone)
   configure                                       Configure OpenClaw plugin providers
 ```
 
@@ -107,7 +107,7 @@ Run via `npx @reflectworld/reflectworld <command>` (standalone), or the installe
 | Service | Description |
 |---------|-------------|
 | `qdrant` | Vector database (setup-prepared Qdrant binary + auto-start) |
-| `reflectworld` | Python FastAPI memory service |
+| `cortex` | Python FastAPI memory service |
 | `dashboard` | Web UI + WebSocket server |
 | `go2rtc` | Video proxy (registered by the cam sub-plugin) |
 
@@ -115,10 +115,10 @@ Run via `npx @reflectworld/reflectworld <command>` (standalone), or the installe
 
 | Tool | Description |
 |------|-------------|
-| `reflectworld_cam` | Camera control (add, snapshot, watch, stop) |
-| `reflectworld_perception` | Scene configuration and analysis |
-| `reflectworld_memory` | Memory search, get, delete, add_note |
-| `reflectworld_notify` | Per-camera notification policy (always/smart/security_only) |
+| `cortex_cam` | Camera control (add, snapshot, watch, stop) |
+| `cortex_perception` | Scene configuration and analysis |
+| `cortex_memory` | Memory search, get, delete, add_note |
+| `cortex_notify` | Per-camera notification policy (always/smart/security_only) |
 
 ### Key Internal Classes
 
@@ -127,12 +127,12 @@ Run via `npx @reflectworld/reflectworld <command>` (standalone), or the installe
 | `PipelineStore` | SQLite store for pipeline logs, errors, media files, traces |
 | `Notifier` | Dual-path push: direct channel send (alerts) + subagent (summaries) |
 | `QdrantService` | Qdrant subprocess lifecycle management |
-| `ReflectWorldService` | Python service lifecycle management |
-| `DashboardServer` | Static file server + ReflectWorld API proxy for the Dashboard UI |
+| `CortexService` | Python service lifecycle management |
+| `DashboardServer` | Static file server + Cortex API proxy for the Dashboard UI |
 
 ## See Also
 
-- [ReflectWorld Architecture](https://github.com/addxai/ReflectWorld/blob/main/docs/architecture/overview.md)
-- [Installation Guide](https://github.com/addxai/ReflectWorld/blob/main/docs/user-guide/installation.md)
-- [Configuration Guide](https://github.com/addxai/ReflectWorld/blob/main/docs/user-guide/configuration.md)
-- [Privacy & Responsible Use](https://github.com/addxai/ReflectWorld#privacy--responsible-use)
+- [Cortex Architecture](https://github.com/addxai/Cortex/blob/main/docs/architecture/overview.md)
+- [Installation Guide](https://github.com/addxai/Cortex/blob/main/docs/user-guide/installation.md)
+- [Configuration Guide](https://github.com/addxai/Cortex/blob/main/docs/user-guide/configuration.md)
+- [Privacy & Responsible Use](https://github.com/addxai/Cortex#privacy--responsible-use)

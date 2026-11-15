@@ -1,7 +1,7 @@
-const USER_ID_STORAGE_KEY = "reflectworld.dashboard.user_id.v1";
-const SESSION_ID_STORAGE_KEY = "reflectworld.dashboard.session_id.v1";
-const ADMIN_STORAGE_KEY = "reflectworld.dashboard.admin.v1";
-const ADMIN_TOKEN_STORAGE_KEY = "reflectworld.dashboard.admin_token.v1";
+const USER_ID_STORAGE_KEY = "cortex.dashboard.user_id.v1";
+const SESSION_ID_STORAGE_KEY = "cortex.dashboard.session_id.v1";
+const ADMIN_STORAGE_KEY = "cortex.dashboard.admin.v1";
+const ADMIN_TOKEN_STORAGE_KEY = "cortex.dashboard.admin_token.v1";
 
 export interface DashboardSession {
   sessionId: string;

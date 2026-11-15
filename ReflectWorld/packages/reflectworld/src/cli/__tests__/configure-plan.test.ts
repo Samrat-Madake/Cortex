@@ -24,12 +24,12 @@ const base: ConfigureAnswers = {
 describe("buildConfigSetArgs", () => {
   it("emits perception sets for VLM and llm_model", () => {
     const paths = buildConfigSetArgs(base).map(([path]) => path);
-    expect(paths).toContain("plugins.entries.reflectworld.config.perception.vlm_provider");
-    expect(paths).toContain("plugins.entries.reflectworld.config.perception.vlm_model");
-    expect(paths).toContain("plugins.entries.reflectworld.config.perception.vlm_model_lite");
-    expect(paths).toContain("plugins.entries.reflectworld.config.perception.vlm_api_key");
-    expect(paths).toContain("plugins.entries.reflectworld.config.perception.vlm_base_url");
-    expect(paths).toContain("plugins.entries.reflectworld.config.perception.llm_model");
+    expect(paths).toContain("plugins.entries.cortex.config.perception.vlm_provider");
+    expect(paths).toContain("plugins.entries.cortex.config.perception.vlm_model");
+    expect(paths).toContain("plugins.entries.cortex.config.perception.vlm_model_lite");
+    expect(paths).toContain("plugins.entries.cortex.config.perception.vlm_api_key");
+    expect(paths).toContain("plugins.entries.cortex.config.perception.vlm_base_url");
+    expect(paths).toContain("plugins.entries.cortex.config.perception.llm_model");
   });
 
   it("uses provider-aware vlm_model_lite defaults", () => {
@@ -79,7 +79,7 @@ describe("buildConfigSetArgs", () => {
       embedder_api_key: "ek",
       embedder_base_url: "u",
     });
-    expect(cmds.some(([path]) => path === "plugins.entries.reflectworld.config.memory.embedder_model")).toBe(true);
+    expect(cmds.some(([path]) => path === "plugins.entries.cortex.config.memory.embedder_model")).toBe(true);
     expect(cmds.find(([path]) => path.endsWith(".embedder_provider"))?.[1]).toBe("openai");
     expect(cmds.find(([path]) => path.endsWith(".embedder_api_key"))?.[1]).toBe("ek");
     expect(cmds.find(([path]) => path.endsWith(".embedder_base_url"))?.[1]).toBe("u");
@@ -111,8 +111,8 @@ describe("buildConfigSetArgs", () => {
 
   it("emits elevenlabs STT config", () => {
     const paths = buildConfigSetArgs({ ...base, stt: "elevenlabs", elevenlabs_api_key: "ek" }).map(([path]) => path);
-    expect(paths).toContain("plugins.entries.reflectworld.config.perception.stt_provider");
-    expect(paths).toContain("plugins.entries.reflectworld.config.perception.elevenlabs_api_key");
+    expect(paths).toContain("plugins.entries.cortex.config.perception.stt_provider");
+    expect(paths).toContain("plugins.entries.cortex.config.perception.elevenlabs_api_key");
   });
 
   it("emits disabled STT provider for stt=off", () => {
@@ -122,7 +122,7 @@ describe("buildConfigSetArgs", () => {
 
   it("emits moonshine stt_model_dir", () => {
     const cmds = buildConfigSetArgs({ ...base, stt: "moonshine", stt_model_dir: "/m/dir" });
-    expect(cmds.map(([path]) => path)).toContain("plugins.entries.reflectworld.config.perception.stt_provider");
+    expect(cmds.map(([path]) => path)).toContain("plugins.entries.cortex.config.perception.stt_provider");
     expect(cmds.find(([path]) => path.endsWith(".stt_model_dir"))?.[1]).toBe("/m/dir");
   });
 
@@ -133,10 +133,10 @@ describe("buildConfigSetArgs", () => {
       embedder_model: "voyage-3",
       embedder_api_key: "ek",
       embedding_dims: 1024,
-      collection_name: "reflectworld_voyage",
+      collection_name: "cortex_voyage",
     });
-    expect(cmds.find(([path]) => path === "plugins.entries.reflectworld.config.memory.embedding_dims")?.[1]).toBe("1024");
-    expect(cmds.find(([path]) => path === "plugins.entries.reflectworld.config.memory.collection_name")?.[1]).toBe("reflectworld_voyage");
+    expect(cmds.find(([path]) => path === "plugins.entries.cortex.config.memory.embedding_dims")?.[1]).toBe("1024");
+    expect(cmds.find(([path]) => path === "plugins.entries.cortex.config.memory.collection_name")?.[1]).toBe("cortex_voyage");
   });
 
   it("exposes provider-specific defaults and embedder guard helpers", () => {
@@ -155,9 +155,9 @@ describe("buildConfigSetArgs", () => {
   });
 
   it("quotes string config values but leaves embedding_dims numeric", () => {
-    expect(configSetValue("plugins.entries.reflectworld.config.perception.vlm_model", "true")).toBe("\"true\"");
-    expect(configSetValue("plugins.entries.reflectworld.config.perception.vlm_api_key", "12345")).toBe("\"12345\"");
-    expect(configSetValue("plugins.entries.reflectworld.config.memory.embedding_dims", "1024")).toBe("1024");
+    expect(configSetValue("plugins.entries.cortex.config.perception.vlm_model", "true")).toBe("\"true\"");
+    expect(configSetValue("plugins.entries.cortex.config.perception.vlm_api_key", "12345")).toBe("\"12345\"");
+    expect(configSetValue("plugins.entries.cortex.config.memory.embedding_dims", "1024")).toBe("1024");
   });
 
   it("parses embedding dims as strict positive integers", () => {

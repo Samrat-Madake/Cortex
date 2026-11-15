@@ -19,7 +19,7 @@ def test_runtime_health_sends_internal_webhook_token() -> None:
             "http://127.0.0.1:3211/api/memory-event", "test-secret"
         )
 
-    assert reporter._headers == {"X-ReflectWorld-Internal-Token": "test-secret"}
+    assert reporter._headers == {"X-Cortex-Internal-Token": "test-secret"}
 
 
 def test_runtime_health_checks_http_response_status() -> None:

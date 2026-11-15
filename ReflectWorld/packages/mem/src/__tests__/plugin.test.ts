@@ -8,8 +8,8 @@ describe("memoryPlugin", () => {
   });
 
   it("has correct id and name", () => {
-    expect(memoryPlugin.id).toBe("reflectworld-mem");
-    expect(memoryPlugin.name).toBe("ReflectWorld Memory");
+    expect(memoryPlugin.id).toBe("cortex-mem");
+    expect(memoryPlugin.name).toBe("Cortex Memory");
   });
 
   it("register() calls api.registerTool once", () => {
@@ -18,11 +18,11 @@ describe("memoryPlugin", () => {
     expect(mockApi.registerTool).toHaveBeenCalledOnce();
   });
 
-  it("registered tool has name reflectworld_memory", () => {
+  it("registered tool has name cortex_memory", () => {
     const mockApi = { registerTool: vi.fn() };
     memoryPlugin.register(mockApi as unknown as Parameters<typeof memoryPlugin.register>[0]);
     const tool = mockApi.registerTool.mock.calls[0][0] as { name: string };
-    expect(tool.name).toBe("reflectworld_memory");
+    expect(tool.name).toBe("cortex_memory");
   });
 
   it("search action calls client.search", async () => {
@@ -192,6 +192,6 @@ describe("memoryPlugin", () => {
 
     await expect(
       tool.execute("test-call-id", { action: "unknown_action" }),
-    ).rejects.toThrow(/unknown reflectworld_memory action/i);
+    ).rejects.toThrow(/unknown cortex_memory action/i);
   });
 });

@@ -1,4 +1,4 @@
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 const ALLOWED_CONFIG_KEYS = new Set(["scene_description", "focus_targets", "security_rules"]);
 
@@ -25,7 +25,7 @@ export function buildVisionControllerConsultationPrompt(context: Record<string, 
     "Allowed output:",
     "- Return null for no change.",
     "- Or return JSON exactly in this shape:",
-    "{\"tool\":\"reflectworld_perception\",\"params\":{\"action\":\"configure\",\"camera_id\":\"...\",\"config\":{\"scene_description\":\"...\",\"focus_targets\":\"...\",\"security_rules\":\"...\"}},\"exit_condition\":{...}}",
+    "{\"tool\":\"cortex_perception\",\"params\":{\"action\":\"configure\",\"camera_id\":\"...\",\"config\":{\"scene_description\":\"...\",\"focus_targets\":\"...\",\"security_rules\":\"...\"}},\"exit_condition\":{...}}",
     "",
     "Output constraints:",
     "- params.action must be \"configure\".",
@@ -46,7 +46,7 @@ export function parseVisionControllerConsultationResponse(
 ): Record<string, unknown> | null {
   const parsed = JSON.parse(text) as Record<string, unknown> | null;
   if (!parsed) return null;
-  if (parsed.tool !== "reflectworld_perception") return null;
+  if (parsed.tool !== "cortex_perception") return null;
   if (!parsed.exit_condition) {
     writeStderr(`[${logPrefix}] segment policy consultation ignored: missing exit_condition`);
     return null;
@@ -74,7 +74,7 @@ export function parseVisionControllerConsultationResponse(
   }
 
   return {
-    tool: "reflectworld_perception",
+    tool: "cortex_perception",
     params: {
       action: "configure",
       camera_id: typeof params.camera_id === "string" ? params.camera_id : undefined,

@@ -19,7 +19,7 @@ die() { printf "${RED}FAILED:${RST} %s\n" "$*" >&2; exit 1; }
 
 DATASET=""
 VIDEOS=""
-OUTPUT="${BENCH_OUTPUT_DIR:-$HOME/.reflectworld/benchmark/manual_$(date +%Y%m%d_%H%M%S)}"
+OUTPUT="${BENCH_OUTPUT_DIR:-$HOME/.cortex/benchmark/manual_$(date +%Y%m%d_%H%M%S)}"
 FPS="1"
 FRAMES_PER_SEGMENT="15"
 MAX_DURATION=""
@@ -36,7 +36,7 @@ Required:
 
 Common options:
   --videos id1,id2        Only run selected video IDs
-  --output DIR            Output directory (default: ~/.reflectworld/benchmark/manual_TIMESTAMP)
+  --output DIR            Output directory (default: ~/.cortex/benchmark/manual_TIMESTAMP)
   --smoke                 Run only the first 60 seconds
   --max-duration-sec N    Run only the first N seconds
   --reuse-run DIR         Skip perception and rerun QA against an existing run
@@ -87,16 +87,16 @@ done
 [ -n "$DATASET" ] || { usage; exit 2; }
 [ -f "$DATASET" ] || die "dataset not found: $DATASET"
 [ -f "$REPO_ROOT/.env" ] || warn ".env not found. Run: bash eval/benchmark/bootstrap.sh"
-[ -d "$REPO_ROOT/node_modules" ] || die "node_modules not found. Run: npm install && npx reflectworld setup --level 1 --yes --accept-model-licenses"
-[ -x "$HOME/.reflectworld/bin/ffmpeg" ] || die "prepared ffmpeg not found at $HOME/.reflectworld/bin/ffmpeg. Run: npx reflectworld setup --level 1 --yes --accept-model-licenses"
+[ -d "$REPO_ROOT/node_modules" ] || die "node_modules not found. Run: npm install && npx cortex setup --level 1 --yes --accept-model-licenses"
+[ -x "$HOME/.cortex/bin/ffmpeg" ] || die "prepared ffmpeg not found at $HOME/.cortex/bin/ffmpeg. Run: npx cortex setup --level 1 --yes --accept-model-licenses"
 
 bash "$SCRIPT_DIR/preflight-build.sh" "$REPO_ROOT" || die "benchmark preflight failed"
 
 source "$SCRIPT_DIR/cuda-runtime-env.sh"
 if [ -z "$REUSE_RUN" ]; then
-  reflectworld_setup_cuda_runtime require || die "CUDA/cuDNN runtime is not ready for benchmark perception"
+  cortex_setup_cuda_runtime require || die "CUDA/cuDNN runtime is not ready for benchmark perception"
 else
-  reflectworld_setup_cuda_runtime warn || true
+  cortex_setup_cuda_runtime warn || true
 fi
 
 if [ -n "$REUSE_RUN" ] && [ "$CLEANUP" -eq 1 ]; then
@@ -123,7 +123,7 @@ info "Running benchmark"
 echo "Dataset: $DATASET"
 echo "Videos:  ${VIDEOS:-all}"
 echo "Output:  $OUTPUT"
-echo "CUDA:    ${REFLECTWORLD_CUDA_RUNTIME_LIBS:-not configured}"
+echo "CUDA:    ${CORTEX_CUDA_RUNTIME_LIBS:-not configured}"
 echo "Command: ${CMD[*]}"
 echo
 

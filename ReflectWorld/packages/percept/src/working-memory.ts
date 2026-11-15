@@ -14,8 +14,8 @@ import type {
   NarrativeCallbacks,
   VlmEventContextUpdate,
 } from "./types.js";
-import type { PerceptionDialogueLine } from "@reflectworld/shared";
-import { writeStderr } from "@reflectworld/shared";
+import type { PerceptionDialogueLine } from "@cortex/shared";
+import { writeStderr } from "@cortex/shared";
 
 /** Configuration for WorkingMemoryManager. */
 export interface WorkingMemoryConfig {

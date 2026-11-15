@@ -1,7 +1,7 @@
 // Service lifecycle — MiniHost orchestration, service registration, startup/stop ordering
 //
 // Tests the deterministic host mechanics without live external services.
-// Live service startup (Qdrant, ReflectWorld Python) is only exercised by
+// Live service startup (Qdrant, Cortex Python) is only exercised by
 // eval/video-runner/runner.ts. This file verifies the orchestration contract.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, existsSync } from "node:fs";
@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { MiniHost } from "../../packages/host/src/mini-host.js";
 import type { PluginModule } from "../../packages/host/src/mini-host.js";
-import type { PluginService, AnyAgentTool } from "@reflectworld/shared";
+import type { PluginService, AnyAgentTool } from "@cortex/shared";
 
 // ── Factories ──
 

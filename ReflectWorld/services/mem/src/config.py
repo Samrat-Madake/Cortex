@@ -24,7 +24,7 @@ class MemConfig:
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
     # Stable storage namespace kept from the original memory module name.
-    # The product was renamed to ReflectWorld, but changing this default would
+    # The product was renamed to Cortex, but changing this default would
     # make migrated Qdrant collections invisible to existing local installs.
     collection_prefix: str = "visionmem_me_production"
 
@@ -61,7 +61,7 @@ class MemConfig:
     @classmethod
     def from_env(cls) -> "MemConfig":
         """Build config from environment variables."""
-        default_storage = str(Path.home() / ".reflectworld" / "memory-state")
+        default_storage = str(Path.home() / ".cortex" / "memory-state")
         storage_path = os.getenv("STORAGE_PATH", default_storage)
         vlm_provider = os.getenv("VLM_PROVIDER", "openai")
         vlm_api_key = os.getenv("VLM_API_KEY", "")
@@ -89,6 +89,6 @@ class MemConfig:
             monitor_webhook_url=os.getenv(
                 "MONITOR_WEBHOOK_URL", "http://localhost:3211/api/memory-event"
             ),
-            internal_webhook_token=os.getenv("REFLECTWORLD_INTERNAL_WEBHOOK_TOKEN", ""),
-            log_path=os.getenv("LOG_PATH", str(Path.home() / ".reflectworld" / "logs")),
+            internal_webhook_token=os.getenv("CORTEX_INTERNAL_WEBHOOK_TOKEN", ""),
+            log_path=os.getenv("LOG_PATH", str(Path.home() / ".cortex" / "logs")),
         )

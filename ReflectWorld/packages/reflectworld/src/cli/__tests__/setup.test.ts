@@ -48,7 +48,7 @@ vi.mock("../model-converter.js", async () => {
 
 vi.mock("../python-env.js", () => ({ copyServices: vi.fn() }));
 
-vi.mock("@reflectworld/percept", async () => {
+vi.mock("@cortex/percept", async () => {
   const { mkdirSync } = await import("node:fs");
   const { join } = await import("node:path");
   return {
@@ -69,9 +69,9 @@ vi.mock("@reflectworld/percept", async () => {
 import { runSetup } from "../setup.js";
 import { convertModel } from "../model-converter.js";
 import { downloadAndExtractBinary, downloadFile, extractZipMember } from "../download.js";
-import { setupSttModels } from "@reflectworld/percept";
+import { setupSttModels } from "@cortex/percept";
 
-const ENV_KEYS = ["STT_PROVIDER", "REFLECTWORLD_BODY_REID_ENABLED", "REFLECTWORLD_HOME", "REFLECTWORLD_STATE_DIR"];
+const ENV_KEYS = ["STT_PROVIDER", "CORTEX_BODY_REID_ENABLED", "CORTEX_HOME", "CORTEX_STATE_DIR"];
 
 describe("runSetup orchestration", () => {
   let home = "";

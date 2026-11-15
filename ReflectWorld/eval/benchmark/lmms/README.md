@@ -1,6 +1,6 @@
 # lmms-eval Integration Layer
 
-This directory contains ReflectWorld's custom backend and integration notes for `lmms-eval`.
+This directory contains Cortex's custom backend and integration notes for `lmms-eval`.
 
 Current backend:
 
@@ -14,4 +14,4 @@ The backend registers this lmms-eval model name:
 memory_api
 ```
 
-After installation, `lmms-eval` converts each question into an HTTP request to the ReflectWorld `eval-server.ts`.
+After installation, `lmms-eval` converts each question into an HTTP request to the Cortex `eval-server.ts`.

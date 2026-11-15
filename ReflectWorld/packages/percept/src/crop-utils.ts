@@ -1,7 +1,7 @@
 // packages/percept/src/crop-utils.ts
 // Utility for extracting and downscaling bbox crops from keyframe images.
 
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 
 /** Target short edge for anonymous subject thumbnails. */
 const ANON_CROP_SHORT_EDGE = 128;

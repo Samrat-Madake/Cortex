@@ -23,7 +23,7 @@ class RuntimeHealthReporter:
             parsed_url._replace(path="/api/runtime-health/observe", query="", fragment="")
         )
         self._headers = (
-            {"X-ReflectWorld-Internal-Token": internal_webhook_token}
+            {"X-Cortex-Internal-Token": internal_webhook_token}
             if internal_webhook_token
             else None
         )

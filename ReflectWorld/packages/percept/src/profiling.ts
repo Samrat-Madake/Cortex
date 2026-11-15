@@ -1,4 +1,4 @@
-import type { PipelineTrace } from "@reflectworld/shared";
+import type { PipelineTrace } from "@cortex/shared";
 
 export type PipelineStage =
   | "stt"

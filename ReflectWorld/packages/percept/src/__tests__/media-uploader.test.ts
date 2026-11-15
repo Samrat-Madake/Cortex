@@ -1,6 +1,6 @@
 // packages/percept/src/__tests__/media-uploader.test.ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 import { MediaUploader, type MediaSaver } from "../media-uploader.js";
 import { saveSegmentMedia } from "../pipeline/media.js";
 

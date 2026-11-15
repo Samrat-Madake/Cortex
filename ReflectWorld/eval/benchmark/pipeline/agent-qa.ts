@@ -11,13 +11,13 @@ import {
   type LlmCallContext,
   type LlmCallRecord,
   type LlmTokenUsage,
-} from "@reflectworld/shared";
-import { resolveFfmpegBin } from "@reflectworld/cam";
+} from "@cortex/shared";
+import { resolveFfmpegBin } from "@cortex/cam";
 import {
-  ReflectWorldClient,
+  CortexClient,
   flattenSearchResults,
   flattenMemoriesResponse,
-} from "@reflectworld/mem";
+} from "@cortex/mem";
 // MemoryType import removed — agent-qa uses `as any` casts since tool schemas
 // expose group aliases (episodic, semantic) alongside specific collection names.
 import {
@@ -813,7 +813,7 @@ const TOOL_DEFS = [
   {
     type: "function" as const,
     function: {
-      name: "reflectworld_memory_search",
+      name: "cortex_memory_search",
       description:
         "Semantic search over a selected memory collection. Use it to locate candidate segments, people, topics, speech, or events by meaning. Results are relevance-ranked, not time-ordered; use memory_get for segment drilldown, neighboring context, or time-ordered reads. For visible facts, use search to find the segment_id, then verify with view_visual_evidence.",
       parameters: {
@@ -846,7 +846,7 @@ const TOOL_DEFS = [
   {
     type: "function" as const,
     function: {
-      name: "reflectworld_memory_get",
+      name: "cortex_memory_get",
       description:
         "Deterministically fetch or list memory records. Use segment_id to expand one retrieved segment, around_segment_id to read neighboring episodic_trace context, or sort_order to read records in time order. This is for context expansion, order comparison, and exact lookup; it is not semantic search.",
       parameters: {
@@ -942,7 +942,7 @@ function injectToolScope(params: Record<string, unknown>, cameraId: string): Rec
 const OPTION_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 type AugmentedMemoryToolResult = {
-  __reflectworld_augmented_tool_result: true;
+  __cortex_augmented_tool_result: true;
   result_kind: "memory_search" | "memory_get";
   primary_result: unknown;
   expanded_context: unknown[];
@@ -953,7 +953,7 @@ function isAugmentedMemoryToolResult(result: unknown): result is AugmentedMemory
     result
     && typeof result === "object"
     && !Array.isArray(result)
-    && (result as Record<string, unknown>).__reflectworld_augmented_tool_result === true,
+    && (result as Record<string, unknown>).__cortex_augmented_tool_result === true,
   );
 }
 
@@ -961,7 +961,7 @@ async function augmentMemoryToolResultWithRelatedTrace(
   resultKind: AugmentedMemoryToolResult["result_kind"],
   result: unknown,
   primaryItems: unknown[],
-  memClient: ReflectWorldClient,
+  memClient: CortexClient,
   cameraId: string,
   userId?: string,
 ): Promise<unknown> {
@@ -991,7 +991,7 @@ async function augmentMemoryToolResultWithRelatedTrace(
   );
   if (expandedContext.length === 0) return result;
   return {
-    __reflectworld_augmented_tool_result: true,
+    __cortex_augmented_tool_result: true,
     result_kind: resultKind,
     primary_result: result,
     expanded_context: expandedContext,
@@ -999,19 +999,19 @@ async function augmentMemoryToolResultWithRelatedTrace(
 }
 
 /**
- * Execute a single tool call against the ReflectWorld client.
+ * Execute a single tool call against the Cortex client.
  * Returns the raw API result and the flattened item count.
  */
 async function executeTool(
   toolName: string,
   params: Record<string, unknown>,
-  memClient: ReflectWorldClient,
+  memClient: CortexClient,
   cameraId: string,
   userId?: string,
   videoFrameSource?: VideoFrameSource,
 ): Promise<{ result: unknown; count: number }> {
   switch (toolName) {
-    case "reflectworld_memory_search": {
+    case "cortex_memory_search": {
       const query = String(params.query ?? "");
       const scopedUserId = memoryUserIdFor(cameraId, userId);
       const memoryType = (params.memory_type as string) ?? "episodic_trace";
@@ -1036,7 +1036,7 @@ async function executeTool(
       );
       return { result: augmented, count: items.length };
     }
-    case "reflectworld_memory_get": {
+    case "cortex_memory_get": {
       const memoryType = (params.memory_type as string) ?? "episodic_trace";
       const segmentId = firstString(params.segment_id);
       const aroundSegmentId = firstString(params.around_segment_id);
@@ -1101,7 +1101,7 @@ async function executeTool(
       const items = flattenMemoriesResponse(result);
       return { result, count: items.length };
     }
-    case "reflectworld_memory_get_history": {
+    case "cortex_memory_get_history": {
       const limit = (params.limit as number) ?? 50;
       const position = (params.position as string) ?? "latest";
       // Use Mem API sort_order explicitly; Qdrant scroll's natural order is not chronological.
@@ -1356,7 +1356,7 @@ async function executeTool(
         // Filesystem video fallback when VideoFrameSource cannot serve this segment.
         const startSec = Math.max(0, numberValue(params.start_sec) ?? 0);
         const durationSec = Math.max(1, Math.min(30, numberValue(params.duration_sec) ?? 30));
-        const frameDir = mkdtempSync(join(tmpdir(), "reflectworld-agent-video-"));
+        const frameDir = mkdtempSync(join(tmpdir(), "cortex-agent-video-"));
         try {
           const outputPattern = join(frameDir, "frame_%03d.jpg");
           execFileSync(resolveFfmpegBin(), [
@@ -1485,7 +1485,7 @@ export interface AgentQAOptions {
   agentModel: string;
   cameraId: string;
   userId?: string;
-  memClient: ReflectWorldClient;
+  memClient: CortexClient;
   /** Video frame source for view_visual_evidence video_segment mode.
    *  When provided, enables extracting frames from original video at original resolution. */
   videoFrameSource?: VideoFrameSource;
@@ -1678,7 +1678,7 @@ function memoryIdFromItem(item: any): string | undefined {
 }
 
 async function resolveEpisodicTraceItemBySegmentLikeId(params: {
-  memClient: ReflectWorldClient;
+  memClient: CortexClient;
   cameraId: string;
   userId?: string;
   segmentId: string;
@@ -1768,7 +1768,7 @@ function compactToolResultForExtraction(toolName: string, result: unknown): unkn
   if (isAugmentedMemoryToolResult(result)) {
     const primary = compactToolResultForExtraction(toolName, result.primary_result) as Record<string, unknown>;
     return {
-      schema: "reflectworld.compact_tool_result.v1",
+      schema: "cortex.compact_tool_result.v1",
       result_kind: result.result_kind,
       primary_hits: primary.collections ?? primary.results ?? [],
       expanded_context: result.expanded_context,
@@ -1790,7 +1790,7 @@ function compactToolResultForExtraction(toolName: string, result: unknown): unkn
     };
   }
 
-  if (toolName === "reflectworld_memory_search" && result && typeof result === "object" && !Array.isArray(result)) {
+  if (toolName === "cortex_memory_search" && result && typeof result === "object" && !Array.isArray(result)) {
     const collections = Object.entries(result as Record<string, unknown>)
       .filter(([, value]) => Array.isArray(value))
       .map(([collection, value]) => ({
@@ -1802,17 +1802,17 @@ function compactToolResultForExtraction(toolName: string, result: unknown): unkn
       }))
       .filter(collection => collection.results.length > 0);
     return {
-      schema: "reflectworld.compact_tool_result.v1",
+      schema: "cortex.compact_tool_result.v1",
       result_kind: "memory_search",
       result_count: collections.reduce((sum, collection) => sum + collection.results.length, 0),
       collections,
     };
   }
 
-  if (toolName === "reflectworld_memory_get" && result) {
+  if (toolName === "cortex_memory_get" && result) {
     const items = flattenMemoriesResponse(result as any);
     return {
-      schema: "reflectworld.compact_tool_result.v1",
+      schema: "cortex.compact_tool_result.v1",
       result_kind: "memory_get",
       result_count: items.length,
       results: items.map((item, index) => compactEvidenceItem(item, index, {
@@ -2079,7 +2079,7 @@ function compactVisualEvidenceResult(result: unknown): Record<string, unknown> {
   const raw = result as Record<string, unknown>;
   if (raw.error) {
     return {
-      schema: "reflectworld.compact_tool_result.v1",
+      schema: "cortex.compact_tool_result.v1",
       result_kind: "visual_evidence",
       ...(sanitizeToolResultForArtifact(raw) as Record<string, unknown>),
     };
@@ -2087,7 +2087,7 @@ function compactVisualEvidenceResult(result: unknown): Record<string, unknown> {
   const imageUrls = Array.isArray(raw.image_urls) ? raw.image_urls : [];
   const frameTimestamps = Array.isArray(raw.frame_timestamps_sec) ? raw.frame_timestamps_sec : [];
   return stripUndefined({
-    schema: "reflectworld.compact_tool_result.v1",
+    schema: "cortex.compact_tool_result.v1",
     result_kind: "visual_evidence",
     source: firstString(raw.source),
     visual_scope: firstString(raw.visual_scope),
@@ -2436,7 +2436,7 @@ export async function runAgentQASimple(
           let result: unknown;
           let count = 0;
           try {
-            const out = await executeTool("reflectworld_memory_search", params, opts.memClient, opts.cameraId, opts.userId, opts.videoFrameSource);
+            const out = await executeTool("cortex_memory_search", params, opts.memClient, opts.cameraId, opts.userId, opts.videoFrameSource);
             result = out.result;
             count = out.count;
           } catch (err) {
@@ -2444,8 +2444,8 @@ export async function runAgentQASimple(
             count = 0;
           }
           const latencyMs = Date.now() - toolStart;
-          toolCalls.push({ round: 0, source: "host_candidate_prefetch", tool: "reflectworld_memory_search", params, result_count: count, latency_ms: latencyMs });
-          const rendered = serializeToolResultForCompaction("reflectworld_memory_search", result);
+          toolCalls.push({ round: 0, source: "host_candidate_prefetch", tool: "cortex_memory_search", params, result_count: count, latency_ms: latencyMs });
+          const rendered = serializeToolResultForCompaction("cortex_memory_search", result);
           const evidenceBlock = `### Candidate ${letter} coverage — ${count} result(s)\n${rendered}`;
           roundHistory.push(evidenceBlock);
           retrievedTexts.push(evidenceBlock);
@@ -2453,7 +2453,7 @@ export async function runAgentQASimple(
             type: "tool_result",
             round: 0,
             source: "host_candidate_prefetch",
-            tool: "reflectworld_memory_search",
+            tool: "cortex_memory_search",
             params: sanitizeForTrace(params),
             result_count: count,
             latency_ms: latencyMs,
@@ -2544,7 +2544,7 @@ Step 2 (if view_visual): pick a segment_id that appears in the retrieved results
             };
             label = `visual ${decision.segment_id}`;
           } else if (decision.decision === "get" && (decision.segment_id || decision.around_segment_id || decision.sort_order || decision.memory_type)) {
-            toolName = "reflectworld_memory_get";
+            toolName = "cortex_memory_get";
             if (decision.segment_id) {
               params = {
                 memory_type: "episodic_trace",
@@ -2580,7 +2580,7 @@ Step 2 (if view_visual): pick a segment_id that appears in the retrieved results
               label = `get ${memType} ${sort}`;
             }
           } else if (decision.decision === "search" && decision.search_query) {
-            toolName = "reflectworld_memory_search";
+            toolName = "cortex_memory_search";
             const memType = decision.memory_type && SIMPLE_MEMORY_TYPES.has(decision.memory_type)
               ? decision.memory_type
               : "episodic_trace";

@@ -3,11 +3,11 @@ import { join } from "node:path";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import type { EntityContext, EventCloseSummary } from "./types.js";
 import { sanitizeCameraId } from "./semantic-context.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 /**
  * Minimal interface for the Qdrant write path.
- * Matches ReflectWorldClient.addEpisodicSchema() without importing @reflectworld/mem.
+ * Matches CortexClient.addEpisodicSchema() without importing @cortex/mem.
  */
 export interface EpisodicSchemaWriter {
   addEpisodicSchema(request: {
@@ -44,7 +44,7 @@ export interface NarrativeMemoryConfig {
     reasoningEffort?: "minimal" | "low" | "medium" | "high";
     stage?: string;
     promptVersion?: string;
-    llmContext?: import("@reflectworld/shared").LlmCallContext;
+    llmContext?: import("@cortex/shared").LlmCallContext;
   }) => Promise<string>;
 }
 

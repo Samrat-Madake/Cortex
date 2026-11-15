@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import type { PipelineDeps } from "@reflectworld/percept";
+import type { PipelineDeps } from "@cortex/percept";
 import { wireBenchmarkReidMemory } from "../../eval/benchmark/pipeline/pipeline-memory.js";
-import { createMemoryStorePerception } from "../../packages/reflectworld/src/memory-adapter.js";
+import { createMemoryStorePerception } from "../../packages/cortex/src/memory-adapter.js";
 
 function makeDeps(): PipelineDeps {
   return { memory: {} } as PipelineDeps;

@@ -1,11 +1,11 @@
 #!/bin/bash
-# Record golden input/output test data from the running ReflectWorld service.
+# Record golden input/output test data from the running Cortex service.
 # Run this script while the service is up with real data.
 # Output: eval/benchmark/fixtures/mem-golden/
 
 set -e
 
-BASE_URL="${REFLECTWORLD_URL:-http://localhost:8219}"
+BASE_URL="${CORTEX_URL:-http://localhost:8219}"
 OUT_DIR="eval/benchmark/fixtures/mem-golden"
 mkdir -p "$OUT_DIR"
 

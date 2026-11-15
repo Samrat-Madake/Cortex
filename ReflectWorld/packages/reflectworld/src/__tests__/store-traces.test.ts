@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { PipelineStore } from "../store.js";
-import type { LlmCallRecord, PipelineTrace } from "@reflectworld/shared";
+import type { LlmCallRecord, PipelineTrace } from "@cortex/shared";
 
 function makeTrace(segmentId: string, opts?: Partial<{
   cameraId: string;

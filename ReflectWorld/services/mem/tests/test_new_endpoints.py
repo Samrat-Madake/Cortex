@@ -1,7 +1,7 @@
 """Integration tests for the new episodic_schema and semantic_context endpoints.
 
 Requires a writable Qdrant instance. Configure with QDRANT_TEST_URL or
-REFLECTWORLD_TEST_QDRANT_HOST/PORT.
+CORTEX_TEST_QDRANT_HOST/PORT.
 Tests validate the POST /memories/schema, PUT /memories/context endpoints,
 and the POST /memories guard that rejects schema/context memory types.
 """
@@ -18,10 +18,10 @@ from httpx import ASGITransport, AsyncClient
 pytestmark = pytest.mark.qdrant
 
 TEST_ENV = {
-    "COLLECTION_PREFIX": "reflectworld_newep_test",
+    "COLLECTION_PREFIX": "cortex_newep_test",
     "PORT": "8222",
-    "STORAGE_PATH": "/tmp/reflectworld_newep_test",
-    "HISTORY_DB_PATH": "/tmp/reflectworld_newep_test/history.db",
+    "STORAGE_PATH": "/tmp/cortex_newep_test",
+    "HISTORY_DB_PATH": "/tmp/cortex_newep_test/history.db",
 }
 
 
@@ -61,7 +61,7 @@ def _initialized_app(requires_qdrant):
             from src.qdrant_store import COLLECTION_SPECS
 
             for suffix in COLLECTION_SPECS:
-                coll = f"reflectworld_newep_test_{suffix}"
+                coll = f"cortex_newep_test_{suffix}"
                 try:
                     store.client.delete_collection(coll)
                 except Exception:

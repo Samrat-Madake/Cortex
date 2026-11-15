@@ -14,7 +14,7 @@ export interface BinaryAsset {
 }
 
 /**
- * Acquisition recipe for a model that ReflectWorld cannot redistribute (AGPL or
+ * Acquisition recipe for a model that Cortex cannot redistribute (AGPL or
  * non-commercial weights). The open-source weights are downloaded and converted
  * to ONNX locally, in a throwaway Python env, on the user's machine. The user
  * accepts the model's license during setup; nothing is redistributed by us.
@@ -218,7 +218,7 @@ export const MODELS: ModelAsset[] = [
       member: "20230831/rtmpose_onnx/rtmpose-s_simcc-body7_pt-body7_420e-256x192-acd4a1ef_20230504/end2end.onnx",
       sha256: "9aeb635b83f86aea45cf45d85798f7eba1a162de8e0d721c44e54fe5eebaf47d",
     },
-    gatedBy: { env: "REFLECTWORLD_BODY_REID_ENABLED", equals: "true" },
+    gatedBy: { env: "CORTEX_BODY_REID_ENABLED", equals: "true" },
   },
   {
     name: "CLIP-ReID ViT-B",
@@ -231,6 +231,6 @@ export const MODELS: ModelAsset[] = [
       weightFile: "clip_reid_market.pth",
       gdriveId: "1GnyAVeNOg3Yug1KBBWMKKbT2x43O5Ch7",
     },
-    gatedBy: { env: "REFLECTWORLD_BODY_REID_ENABLED", equals: "true" },
+    gatedBy: { env: "CORTEX_BODY_REID_ENABLED", equals: "true" },
   },
 ];

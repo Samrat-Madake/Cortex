@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { WebSocket } from "ws";
-import { createRuntimeHealthReporter, writeStderr } from "@reflectworld/shared";
+import { createRuntimeHealthReporter, writeStderr } from "@cortex/shared";
 import type { DashboardSessionScope } from "./dashboard-common.js";
 import type { DashboardChatCallback, DashboardChatMessage } from "./dashboard-chat.js";
 

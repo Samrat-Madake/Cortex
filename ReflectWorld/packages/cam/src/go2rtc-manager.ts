@@ -1,7 +1,7 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 /** go2rtc RTSP does not support non-ASCII path names; map them to hex aliases. */
 export function toRtspSafeName(name: string): string {
@@ -284,7 +284,7 @@ export class Go2rtcManager {
 }
 
 function go2rtcStartTimeoutMs(): number {
-  const raw = process.env.REFLECTWORLD_GO2RTC_START_TIMEOUT_MS ?? process.env.GO2RTC_START_TIMEOUT_MS;
+  const raw = process.env.CORTEX_GO2RTC_START_TIMEOUT_MS ?? process.env.GO2RTC_START_TIMEOUT_MS;
   const parsed = raw ? Number.parseInt(raw, 10) : NaN;
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 5000;
 }

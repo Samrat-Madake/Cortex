@@ -10,7 +10,7 @@ export type CaptureMode = "snapshot" | "event" | "stream";
 export type SemanticMode = "inline" | "background";
 
 /**
- * Memory collection types supported by ReflectWorld.
+ * Memory collection types supported by Cortex.
  *
  * The new taxonomy has 7 collections in 3 groups:
  *   episodic:  trace, entity, schema, visual
@@ -173,7 +173,7 @@ export interface SearchResultItem {
 /**
  * Response from POST /search.
  *
- * ReflectWorld returns collection-keyed results, e.g.:
+ * Cortex returns collection-keyed results, e.g.:
  *   { "visionmem_me_production_episodic": [...], ... }
  *
  * Use `flattenSearchResults()` to get a flat array.
@@ -183,7 +183,7 @@ export interface SearchResponse {
   episodic?: SearchResultItem[];
   semantic?: SearchResultItem[];
   procedural?: SearchResultItem[];
-  /** Dynamic collection keys from ReflectWorld (e.g. "visionmem_me_production_episodic") */
+  /** Dynamic collection keys from Cortex (e.g. "visionmem_me_production_episodic") */
   [collection: string]: SearchResultItem[] | undefined;
 }
 
@@ -230,10 +230,10 @@ export interface MemoryItem {
 /**
  * Response from GET /memories.
  *
- * ReflectWorld returns either:
+ * Cortex returns either:
  * - a flat array of memory items, or
  * - a collection-keyed object like
- *   { "reflectworld_test_episodic_trace": [...], "reflectworld_test_semantic_entity": [...] }
+ *   { "cortex_test_episodic_trace": [...], "cortex_test_semantic_entity": [...] }
  */
 export type GetMemoriesResponse =
   | MemoryItem[]

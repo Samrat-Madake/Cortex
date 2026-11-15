@@ -18,7 +18,7 @@ import {
   unlinkSync,
   statSync,
 } from "node:fs";
-import type { LlmCallRecord, PerceptionResult, Segment, MediaUrls, PipelineTrace } from "@reflectworld/shared";
+import type { LlmCallRecord, PerceptionResult, Segment, MediaUrls, PipelineTrace } from "@cortex/shared";
 
 export type MediaType = "raw" | "keyframe" | "gif" | "crop";
 

@@ -1,5 +1,5 @@
 // packages/percept/src/media-uploader.ts
-import type { MediaUrls } from "@reflectworld/shared";
+import type { MediaUrls } from "@cortex/shared";
 
 /**
  * Abstraction for saving perception media artefacts (keyframes, GIF, crops).

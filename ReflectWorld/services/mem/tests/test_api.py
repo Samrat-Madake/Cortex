@@ -1,7 +1,7 @@
 """API integration tests for key scenarios.
 
 Requires a writable Qdrant instance. Configure with QDRANT_TEST_URL or
-REFLECTWORLD_TEST_QDRANT_HOST/PORT.
+CORTEX_TEST_QDRANT_HOST/PORT.
 Tests that require real LLM/Embedder are marked and may be skipped in CI.
 Tests that only need Qdrant run against the local instance.
 """
@@ -19,10 +19,10 @@ from httpx import ASGITransport, AsyncClient
 pytestmark = pytest.mark.qdrant
 
 TEST_ENV = {
-    "COLLECTION_PREFIX": "reflectworld_apitest",
+    "COLLECTION_PREFIX": "cortex_apitest",
     "PORT": "8221",
-    "STORAGE_PATH": "/tmp/reflectworld_apitest",
-    "HISTORY_DB_PATH": "/tmp/reflectworld_apitest/history.db",
+    "STORAGE_PATH": "/tmp/cortex_apitest",
+    "HISTORY_DB_PATH": "/tmp/cortex_apitest/history.db",
 }
 
 
@@ -66,7 +66,7 @@ def _initialized_app(requires_qdrant):
             from src.qdrant_store import COLLECTION_SPECS
 
             for suffix in COLLECTION_SPECS:
-                coll = f"reflectworld_apitest_{suffix}"
+                coll = f"cortex_apitest_{suffix}"
                 try:
                     store.client.delete_collection(coll)
                 except Exception:
@@ -98,7 +98,7 @@ async def test_health(client):
     assert resp.status_code == 200
     data = resp.json()
     assert data["status"] == "healthy"
-    assert data["service"] == "ReflectWorld Memory"
+    assert data["service"] == "Cortex Memory"
     assert "episodic_trace" in data["memory_types"]
     assert "reid_entity" in data["reid_collections"]
     assert data["vector_store"] == "qdrant"
@@ -110,7 +110,7 @@ async def test_status(client):
     assert resp.status_code == 200
     data = resp.json()
     assert "initialized" in data
-    assert data["service"] == "ReflectWorld Memory"
+    assert data["service"] == "Cortex Memory"
 
 
 # ---------------------------------------------------------------------------

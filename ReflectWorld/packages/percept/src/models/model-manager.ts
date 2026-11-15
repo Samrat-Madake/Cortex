@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { MODEL_MANIFEST, LEVEL_REQUIREMENTS, getModelsDir } from "./model-manifest.js";
 import { OnnxInferenceEngine } from "./onnx-engine.js";
 import type { ModelId, ModelCapability } from "./model-manifest.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 /**
  * Manages model discovery, loading, and capability reporting.

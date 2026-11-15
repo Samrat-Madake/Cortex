@@ -31,8 +31,8 @@ function iconForRule(description: string): IconName {
  *
  * Supports:
  * - Viewing and filtering by procedural rules.
- * - Adding new rules via the Monitor same-origin ReflectWorld proxy.
- * - Deleting existing rules via the Monitor same-origin ReflectWorld proxy.
+ * - Adding new rules via the Monitor same-origin Cortex proxy.
+ * - Deleting existing rules via the Monitor same-origin Cortex proxy.
  */
 export function RulesButton({ rules, selection, session, onSelectRule, onRuleDeleted }: RulesButtonProps) {
   const [open, setOpen] = useState(false);
@@ -81,7 +81,7 @@ export function RulesButton({ rules, selection, session, onSelectRule, onRuleDel
     setError(null);
 
     try {
-      const res = await fetch(withDashboardQuery("/api/reflectworld/memories", session), {
+      const res = await fetch(withDashboardQuery("/api/cortex/memories", session), {
         method: "POST",
         headers: { "Content-Type": "application/json", ...dashboardAuthHeaders(session) },
         body: JSON.stringify({
@@ -116,7 +116,7 @@ export function RulesButton({ rules, selection, session, onSelectRule, onRuleDel
     if (rule.memory_id) return rule.memory_id;
 
     const resp = await fetch(
-      withDashboardQuery("/api/reflectworld/memories?memory_type=procedural&camera_id=global&limit=100", session),
+      withDashboardQuery("/api/cortex/memories?memory_type=procedural&camera_id=global&limit=100", session),
       { headers: dashboardAuthHeaders(session) },
     );
     if (!resp.ok) return null;
@@ -148,7 +148,7 @@ export function RulesButton({ rules, selection, session, onSelectRule, onRuleDel
     setError(null);
 
     try {
-      const res = await fetch(withDashboardQuery(`/api/reflectworld/memories/${encodeURIComponent(memoryId)}?memory_type=procedural`, session), {
+      const res = await fetch(withDashboardQuery(`/api/cortex/memories/${encodeURIComponent(memoryId)}?memory_type=procedural`, session), {
         method: "DELETE",
         headers: dashboardAuthHeaders(session),
       });

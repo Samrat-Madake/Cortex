@@ -1,7 +1,7 @@
 // packages/percept/src/__tests__/analyzer-entries.test.ts
 import { describe, it, expect } from "vitest";
 import { runDetection } from "../analyzers/detection-entry.js";
-import type { Frame } from "@reflectworld/shared";
+import type { Frame } from "@cortex/shared";
 
 const DUMMY_FRAMES: Frame[] = [
   { data: "base64frame", timestamp: Date.now(), index: 0 },

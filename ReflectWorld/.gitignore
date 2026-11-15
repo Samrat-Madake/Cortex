@@ -4,7 +4,7 @@ dist/
 *.tsbuildinfo
 logs/
 results/
-.reflectworld.pids
+.cortex.pids
 .internal-webhook-token
 .venv
 __pycache__/
@@ -48,12 +48,12 @@ eval/fixtures/mem-golden/
 tests/fixtures/videos/
 tests/fixtures/mem-golden/
 .qdrant-initialized
-.reflectworld-state/
-packages/reflectworld/publish/
+.cortex-state/
+packages/cortex/publish/
 
 # Local env copies / build artifacts / unrelated locks (not for VCS)
 .env copy
-packages/reflectworld/bundled-monitor/
+packages/cortex/bundled-monitor/
 
 # AI assistant local context (not for VCS)
 CLAUDE.md

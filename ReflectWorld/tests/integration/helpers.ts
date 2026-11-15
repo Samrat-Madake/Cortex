@@ -4,7 +4,7 @@ import { vi } from "vitest";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import type { Frame, Segment } from "@reflectworld/shared";
+import type { Frame, Segment } from "@cortex/shared";
 import type { VlmOutput } from "../../packages/percept/src/types.js";
 import type { PipelineDeps } from "../../packages/percept/src/pipeline.js";
 import type { VlmSegmentAnalysis } from "../../packages/percept/src/analyzers/vlm-analyzer.js";
@@ -92,7 +92,7 @@ export class TempMediaSaver implements MediaSaver {
   public readonly rootDir: string;
 
   constructor() {
-    this.rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "reflectworld-e2e-"));
+    this.rootDir = fs.mkdtempSync(path.join(os.tmpdir(), "cortex-e2e-"));
   }
 
   saveMedia(

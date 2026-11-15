@@ -1,6 +1,6 @@
 // eval/benchmark/eval-server.ts
 // HTTP evaluation service for lmms-eval integration.
-// Wraps ReflectWorld pipeline as a single /evaluate endpoint.
+// Wraps Cortex pipeline as a single /evaluate endpoint.
 
 import dotenv from "dotenv";
 import { resolve, dirname, join, basename, extname } from "node:path";
@@ -11,13 +11,13 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 dotenv.config({ path: resolve(__root, ".env") });
 
-import { monitorBus, resolveReflectWorldHome, resolveReflectWorldStateDir } from "@reflectworld/shared";
-import { createPipelineDeps, NarrativeMemory, resolvePerceptionConfig, VlmAnalyzer } from "@reflectworld/percept";
+import { monitorBus, resolveCortexHome, resolveCortexStateDir } from "@cortex/shared";
+import { createPipelineDeps, NarrativeMemory, resolvePerceptionConfig, VlmAnalyzer } from "@cortex/percept";
 import { OnnxInferenceEngine } from "../../packages/percept/src/models/onnx-engine.js";
-import { ReflectWorldClient } from "@reflectworld/mem";
-import { PipelineStore } from "../../packages/reflectworld/src/store.js";
-import { QdrantService } from "../../packages/reflectworld/src/services/qdrant-service.js";
-import { ReflectWorldService } from "../../packages/reflectworld/src/services/reflectworld-service.js";
+import { CortexClient } from "@cortex/mem";
+import { PipelineStore } from "../../packages/cortex/src/store.js";
+import { QdrantService } from "../../packages/cortex/src/services/qdrant-service.js";
+import { CortexService } from "../../packages/cortex/src/services/cortex-service.js";
 import { runSessionPipeline, type SessionPipelineClip } from "./pipeline/session-pipeline.js";
 import type { VideoPipelineCheckpoint } from "./pipeline/video-pipeline.js";
 import { runAgentQA } from "./pipeline/agent-qa.js";
@@ -30,7 +30,7 @@ import { wireBenchmarkReidMemory } from "./pipeline/pipeline-memory.js";
 import { recordBenchmarkSemanticContextObservation, wireBenchmarkSemanticContext } from "./pipeline/semantic-context.js";
 import { buildVisionControllerConsultationPrompt, parseVisionControllerConsultationResponse } from "./pipeline/consultation.js";
 import type { AgentQATrace, BenchmarkQuestion, QAResult } from "./pipeline/types.js";
-import { createBenchmarkVisionControllerConfig } from "../../packages/reflectworld/src/vision-controller/default-config.js";
+import { createBenchmarkVisionControllerConfig } from "../../packages/cortex/src/vision-controller/default-config.js";
 import { SingleFileFrameSource, SessionFrameSource } from "./pipeline/video-frame-source.js";
 
 // ── CLI args ──
@@ -475,7 +475,7 @@ function resolveReuseOutputDir(root: string, key: string, videoId?: string): str
 async function writeMemoryCheckpoint(params: {
   checkpoint: QueryCheckpoint;
   videoOutputDir: string;
-  memClient: ReflectWorldClient;
+  memClient: CortexClient;
   cameraId: string;
   userId: string;
   segmentId: string;
@@ -549,7 +549,7 @@ function parseQuestionFromPrompt(prompt: string): Pick<BenchmarkQuestion, "quest
 
 // ── Main ──
 async function main() {
-  const stateDir = resolveReflectWorldStateDir();
+  const stateDir = resolveCortexStateDir();
   const runId = process.env.EVAL_RUN_ID?.trim() || `eval_${Date.now().toString(36)}`;
   const datasetName = sanitizePathSegment(process.env.EVAL_DATASET_NAME?.trim() || "benchmark", "benchmark");
   const gitCommit = process.env.EVAL_GIT_COMMIT?.trim() || null;
@@ -587,7 +587,7 @@ async function main() {
   const checkpointManifest = checkpointManifestPath
     ? readJsonFile<CheckpointManifest>(resolve(checkpointManifestPath), {})
     : {};
-  const externalMemBaseUrl = process.env.EVAL_REFLECTWORLD_BASE_URL?.trim();
+  const externalMemBaseUrl = process.env.EVAL_CORTEX_BASE_URL?.trim();
   const reuseExistingVideoMemory = envFlag("EVAL_REUSE_EXISTING_VIDEO_MEMORY");
   const reuseVideoOutputRoot = process.env.EVAL_REUSE_VIDEO_OUTPUT_ROOT?.trim();
   const cleanVideoMemoryOnStart = reuseExistingVideoMemory
@@ -599,7 +599,7 @@ async function main() {
 
   // ── Start/Reuse Mem service ──
   let qdrantService: QdrantService | null = null;
-  let memService: ReflectWorldService | null = null;
+  let memService: CortexService | null = null;
   let memBaseUrl: string;
 
   if (externalMemBaseUrl) {
@@ -619,11 +619,11 @@ async function main() {
     await qdrantService.start();
     console.error(`[eval-server] Qdrant ready (mode=${qdrantService.mode}, endpoint=${qdrantService.endpoint}, state=${qdrantStateDir})`);
 
-    const memPort = parseInt(process.env.EVAL_REFLECTWORLD_PORT ?? "18219", 10);
-    const memStoragePath = process.env.EVAL_REFLECTWORLD_STORAGE_PATH?.trim() || join(workerRoot, "mem-storage");
+    const memPort = parseInt(process.env.EVAL_CORTEX_PORT ?? "18219", 10);
+    const memStoragePath = process.env.EVAL_CORTEX_STORAGE_PATH?.trim() || join(workerRoot, "mem-storage");
     mkdirSync(memStoragePath, { recursive: true });
 
-    memService = new ReflectWorldService({
+    memService = new CortexService({
       stateDir,
       port: memPort,
       qdrantHost: "127.0.0.1",
@@ -642,7 +642,7 @@ async function main() {
     10_000,
     Number.parseInt(process.env.EVAL_MEM_CLIENT_TIMEOUT_MS ?? "60000", 10) || 60_000,
   );
-  const memClient = new ReflectWorldClient({ baseUrl: memBaseUrl, timeoutMs: memClientTimeoutMs });
+  const memClient = new CortexClient({ baseUrl: memBaseUrl, timeoutMs: memClientTimeoutMs });
   console.error(`[eval-server] QA runs: dataset=${datasetName} snapshot=${snapshotVersion} qa_run=${qaRunVersion} mem_timeout_ms=${memClientTimeoutMs}`);
   if (reuseExistingVideoMemory) {
     console.error(
@@ -676,7 +676,7 @@ async function main() {
     },
     paths: {
       qdrant_state_dir: process.env.EVAL_QDRANT_STATE_DIR?.trim() || join(workerRoot, "qdrant-state"),
-      mem_storage_path: process.env.EVAL_REFLECTWORLD_STORAGE_PATH?.trim() || join(workerRoot, "mem-storage"),
+      mem_storage_path: process.env.EVAL_CORTEX_STORAGE_PATH?.trim() || join(workerRoot, "mem-storage"),
     },
   });
   writeJsonFile(join(versionRoot, "version_meta.json"), {
@@ -700,7 +700,7 @@ async function main() {
     limit: process.env.EVAL_WORKER_LIMIT?.trim() || null,
     gpu: process.env.EVAL_WORKER_GPU?.trim() || null,
     eval_port: port,
-    mem_port: process.env.EVAL_REFLECTWORLD_PORT?.trim() || null,
+    mem_port: process.env.EVAL_CORTEX_PORT?.trim() || null,
     qdrant_port: process.env.EVAL_QDRANT_PORT?.trim() || null,
     worker_root: workerRoot,
     runtime_manifest: runtimeManifestPath,
@@ -710,11 +710,11 @@ async function main() {
   // ── Perception config (shared, immutable) ──
   // Prefer runtime-local model cache; some checked-in .env files still contain
   // machine-specific absolute paths which do not exist on servers.
-  const configuredModelsDir = process.env.REFLECTWORLD_MODELS_DIR?.trim();
-  const homeModelsDir = join(resolveReflectWorldHome(), "models");
+  const configuredModelsDir = process.env.CORTEX_MODELS_DIR?.trim();
+  const homeModelsDir = join(resolveCortexHome(), "models");
   let resolvedModelsDir = configuredModelsDir || homeModelsDir;
   if (!existsSync(resolvedModelsDir) && configuredModelsDir && existsSync(homeModelsDir)) {
-    console.error(`[eval-server] REFLECTWORLD_MODELS_DIR not found: ${configuredModelsDir}; fallback -> ${homeModelsDir}`);
+    console.error(`[eval-server] CORTEX_MODELS_DIR not found: ${configuredModelsDir}; fallback -> ${homeModelsDir}`);
     resolvedModelsDir = homeModelsDir;
   }
   const hasLocalOnnxModels = (() => {
@@ -1685,7 +1685,7 @@ async function main() {
 
   server.listen(port, () => {
     console.error(`\n══════════════════════════════════════════`);
-    console.error(`  ReflectWorld Eval Server`);
+    console.error(`  Cortex Eval Server`);
     console.error(`  POST http://localhost:${port}/evaluate`);
     console.error(`  POST http://localhost:${port}/v1/lmms_eval/generate`);
     console.error(`  GET  http://localhost:${port}/health`);

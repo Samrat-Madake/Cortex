@@ -10,7 +10,7 @@ describe("DashboardVideoLibrary", () => {
   let fixturesDir = "";
 
   beforeEach(() => {
-    tmpRoot = mkdtempSync(join(tmpdir(), "reflectworld-dashboard-videos-"));
+    tmpRoot = mkdtempSync(join(tmpdir(), "cortex-dashboard-videos-"));
     uploadsDir = join(tmpRoot, "uploads");
     fixturesDir = join(tmpRoot, "fixtures");
     mkdirSync(uploadsDir, { recursive: true });

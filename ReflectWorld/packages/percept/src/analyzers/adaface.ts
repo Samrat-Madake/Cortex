@@ -12,7 +12,7 @@
 //   - Dynamic batch supported
 
 import type { ModelManager } from "../models/model-manager.js";
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 
 // Dynamic import for sharp (optional dependency)
 let sharpFn: any = null;

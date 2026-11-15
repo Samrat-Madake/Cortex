@@ -17,8 +17,8 @@ describe("QA trace diagnostics", () => {
   it("summarizes tool counts and final coverage buckets", () => {
     const diagnostics = summarizeQaTraceDiagnostics({
       ...trace([
-        { type: "tool_result", tool: "reflectworld_memory_search" },
-        { type: "tool_result", tool: "reflectworld_memory_get" },
+        { type: "tool_result", tool: "cortex_memory_search" },
+        { type: "tool_result", tool: "cortex_memory_get" },
         { type: "tool_result", tool: "view_visual_evidence" },
         {
           type: "tool_result_evidence_extraction",
@@ -35,7 +35,7 @@ describe("QA trace diagnostics", () => {
             visual_evidence_insufficient: true,
             followup_requests: [
               { suggested_tool: "view_visual_evidence", source: "video_segment", segment_id: "seg_001", reason: "view segment video" },
-              { suggested_tool: "reflectworld_memory_search", query: "search adjacent transcript", reason: "search adjacent transcript" },
+              { suggested_tool: "cortex_memory_search", query: "search adjacent transcript", reason: "search adjacent transcript" },
             ],
           }),
         },
@@ -113,7 +113,7 @@ describe("QA trace diagnostics", () => {
       extraction_followup_request_count: 3,
       extraction_last_followup_requests: [
         { suggested_tool: "view_visual_evidence", source: "video_segment", segment_id: "seg_001", reason: "view segment video" },
-        { suggested_tool: "reflectworld_memory_search", query: "search adjacent transcript", reason: "search adjacent transcript" },
+        { suggested_tool: "cortex_memory_search", query: "search adjacent transcript", reason: "search adjacent transcript" },
       ],
       duplicate_option_group_count: 1,
       evidence_slot_counts: { supported: 3, contradicted: 0, unknown: 2, other: 1 },

@@ -1,4 +1,4 @@
-import { writeStderr, type MediaUrls, type Segment } from "@reflectworld/shared";
+import { writeStderr, type MediaUrls, type Segment } from "@cortex/shared";
 import { MediaUploader } from "../media-uploader.js";
 
 const ANIMATED_PREVIEW_FRAME_DELAY_MS = 200;

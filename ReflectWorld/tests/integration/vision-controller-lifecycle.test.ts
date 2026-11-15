@@ -1,8 +1,8 @@
 // E2E: VisionController lifecycle — real VisionController + SignalExtractor + rule-matcher
 import { describe, it, expect } from "vitest";
-import { VisionController } from "../../packages/reflectworld/src/vision-controller/index.js";
-import type { VisionControllerConfig } from "../../packages/reflectworld/src/vision-controller/index.js";
-import type { PerceptionResult, Segment, PerceptionMemory } from "@reflectworld/shared";
+import { VisionController } from "../../packages/cortex/src/vision-controller/index.js";
+import type { VisionControllerConfig } from "../../packages/cortex/src/vision-controller/index.js";
+import type { PerceptionResult, Segment, PerceptionMemory } from "@cortex/shared";
 
 function makeSegment(cameraId = "cam1"): Segment {
   return {

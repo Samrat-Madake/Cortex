@@ -150,7 +150,7 @@ export class PhoneSource implements Source {
 
   /** Capture a single frame from the phone camera. */
   snapshot(options?: SnapshotOptions): Promise<FrameResult> {
-    const outputPath = join(tmpdir(), `reflectworld_phone_${this.name}_${Date.now()}.jpg`);
+    const outputPath = join(tmpdir(), `cortex_phone_${this.name}_${Date.now()}.jpg`);
     const args = ["snapshot", "-d", this.name, "-o", outputPath];
 
     if (options?.quality) {

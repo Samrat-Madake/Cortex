@@ -6,7 +6,7 @@ import {
   type LlmCallRecord,
   type LlmTokenUsage,
   writeStderr,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 import {
   normalizeGeminiUsage,
   normalizeOpenAIUsage,

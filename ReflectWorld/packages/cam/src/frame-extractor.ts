@@ -1,8 +1,8 @@
 import { spawn, type ChildProcess } from "node:child_process";
-import { monitorBus } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
 import type { FrameResult } from "./types.js";
 import { toRtspSafeName } from "./go2rtc-manager.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 export interface FrameExtractorOptions {
   ffmpegBin: string;

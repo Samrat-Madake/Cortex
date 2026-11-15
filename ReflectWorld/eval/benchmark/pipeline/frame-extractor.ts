@@ -1,7 +1,7 @@
 // eval/benchmark/pipeline/frame-extractor.ts
-import { LocalFileMediaSource, resolveFfmpegBin, resolveFfprobeBin } from "@reflectworld/cam";
+import { LocalFileMediaSource, resolveFfmpegBin, resolveFfprobeBin } from "@cortex/cam";
 import { mkdirSync, existsSync, unlinkSync, writeFileSync } from "node:fs";
-import type { Frame } from "@reflectworld/shared";
+import type { Frame } from "@cortex/shared";
 import { streamFrames } from "./frame-stream.js";
 
 export interface ExtractedAudio {

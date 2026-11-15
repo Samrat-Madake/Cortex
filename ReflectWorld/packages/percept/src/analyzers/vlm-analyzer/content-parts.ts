@@ -1,4 +1,4 @@
-import type { Frame } from "@reflectworld/shared";
+import type { Frame } from "@cortex/shared";
 import type { CompletionContentPart, CompletionImage } from "./types.js";
 
 interface ContentPartsInput {

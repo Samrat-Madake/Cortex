@@ -1,12 +1,12 @@
 import { WebSocket, type WebSocketServer } from "ws";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 import type {
   ActiveSourceStatus,
   DashboardStateDomain,
   DashboardStateEnvelope,
   DashboardStateOperation,
   MonitorEvent,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 import type { DashboardSessionScope } from "./dashboard-common.js";
 import type { DashboardSegmentProjector } from "./dashboard-segments.js";
 import type { DashboardSessionManager } from "./dashboard-sessions.js";

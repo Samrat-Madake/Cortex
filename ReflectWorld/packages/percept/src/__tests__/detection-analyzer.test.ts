@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { runPerFrameFaceDetection } from "../analyzers/detection-analyzer.js";
 import type { ModelRouter } from "../providers/model-router.js";
-import type { Frame } from "@reflectworld/shared";
+import type { Frame } from "@cortex/shared";
 import type { DetectionOutput } from "../types.js";
 
 function makeMockRouter(hasFace = false): ModelRouter {

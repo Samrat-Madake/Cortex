@@ -134,7 +134,7 @@ export function generateReport(data: ReportData): string {
 
   // Header
   sections.push(
-    `# ReflectWorld E2E Test Report`,
+    `# Cortex E2E Test Report`,
     `> Date: ${dateStr}`,
     `> Times: MM:SS.mmm. Capture/content times are video positions; playback times show where a 1x replay would be when processing happened. Durations marked "wall" are actual processing time.`,
     `> Duration: ${durationStr}`,

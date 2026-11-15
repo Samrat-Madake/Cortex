@@ -16,7 +16,7 @@ function makeBaseDeps(): PipelineDeps {
         working_memory_event_timeout_sec: 30,
         working_memory_max_event_segments: 15,
         stubs_only: false,
-        models_dir: "/tmp/reflectworld-models",
+        models_dir: "/tmp/cortex-models",
       } as any,
     },
     router: {

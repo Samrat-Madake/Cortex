@@ -107,16 +107,16 @@ export class SimAgent {
       ``,
       `Based on this consultation, decide what action to take.`,
       `You may adjust camera/runtime settings when appropriate. Common options include:`,
-      `- reflectworld_cam/set_sampling: fps, width, height`,
-      `- reflectworld_cam/switch_mode: event or stream`,
-      `- reflectworld_perception/configure: security_rules, scene_description, focus_targets, vlm_model`,
-      `- reflectworld_perception/configure: vc_rules_json / vc_segment_policy_json`,
-      `Use reflectworld_perception/configure when you want to change VLM behavior, model choice, or semantic guidance.`,
-      `Use reflectworld_cam when you want to change fps, resolution, or watch mode immediately.`,
-      `If you use reflectworld_perception with action="configure", generate a camera-specific natural-language "security_rules" text based on the scene, trigger, detected classes, and risk posture.`,
+      `- cortex_cam/set_sampling: fps, width, height`,
+      `- cortex_cam/switch_mode: event or stream`,
+      `- cortex_perception/configure: security_rules, scene_description, focus_targets, vlm_model`,
+      `- cortex_perception/configure: vc_rules_json / vc_segment_policy_json`,
+      `Use cortex_perception/configure when you want to change VLM behavior, model choice, or semantic guidance.`,
+      `Use cortex_cam when you want to change fps, resolution, or watch mode immediately.`,
+      `If you use cortex_perception with action="configure", generate a camera-specific natural-language "security_rules" text based on the scene, trigger, detected classes, and risk posture.`,
       `Do not use vague placeholders. Make the rule text operational and specific to what should be watched next.`,
-      `Example perception config: {"tool":"reflectworld_perception","params":{"action":"configure","camera_id":"${context.camera_id}","config":{"camera_id":"${context.camera_id}","security_rules":"Watch for vehicles lingering near the gate; treat any person approaching the truck after hours as suspicious and describe whether they load, unload, or inspect it.","vlm_model":"gemini-2.5-flash"}}}`,
-      `Example camera tuning: {"tool":"reflectworld_cam","params":{"action":"set_sampling","name":"${context.camera_id}","fps":2,"width":1280,"height":720}}`,
+      `Example perception config: {"tool":"cortex_perception","params":{"action":"configure","camera_id":"${context.camera_id}","config":{"camera_id":"${context.camera_id}","security_rules":"Watch for vehicles lingering near the gate; treat any person approaching the truck after hours as suspicious and describe whether they load, unload, or inspect it.","vlm_model":"gemini-2.5-flash"}}}`,
+      `Example camera tuning: {"tool":"cortex_cam","params":{"action":"set_sampling","name":"${context.camera_id}","fps":2,"width":1280,"height":720}}`,
       `Output a single JSON object with "tool" and "params" fields. If no action needed, output {"tool": "none", "params": {}}.`,
     ].join("\n");
 
@@ -157,7 +157,7 @@ export class SimAgent {
 
   /**
    * Returns a consultation dispatcher compatible object for injection into
-   * ReflectWorld during E2E. This simulates OpenClaw receiving a consultation.
+   * Cortex during E2E. This simulates OpenClaw receiving a consultation.
    */
   asConsultationDispatcher(): {
     submitConsultation(context: ConsultationContext): Promise<ToolCall | null>;
@@ -186,7 +186,7 @@ export class SimAgent {
     state?: { visionControllerConfig?: unknown; latestPerception?: string },
   ): string {
     const parts = [
-      `You are ReflectWorld's management Agent. You control a visual perception system.`,
+      `You are Cortex's management Agent. You control a visual perception system.`,
       ``,
       `Available tools (read carefully — your output must match these exactly):`,
       this.skillContent,
@@ -206,8 +206,8 @@ export class SimAgent {
       ``,
       `Output a single JSON object with "tool" and "params" fields. Nothing else.`,
       `If the user or consultation clearly implies an action, do not return "none".`,
-      `Prefer these canonical tool names: "reflectworld_perception", "reflectworld_cam", "reflectworld_memory".`,
-      `Legacy runtime aliases are still accepted during migration: "reflectworld_cam" for cam and "reflectworld_mem" for memory.`,
+      `Prefer these canonical tool names: "cortex_perception", "cortex_cam", "cortex_memory".`,
+      `Legacy runtime aliases are still accepted during migration: "cortex_cam" for cam and "cortex_mem" for memory.`,
       `The "params" field must include "action" and all required parameters for that action.`,
       `You are allowed to tune fps, resolution, watch mode, VLM model, semantic prompt context, and VisionController config when the situation calls for it.`,
     );
@@ -259,7 +259,7 @@ export class SimAgent {
     const text = `${context.eventText} ${JSON.stringify(context.trigger_reason)}`.toLowerCase();
     if (text.includes("action required") || text.includes("configure") || text.includes("class_detected")) {
       return {
-        tool: "reflectworld_perception",
+        tool: "cortex_perception",
         params: {
           action: "configure",
           camera_id: context.camera_id,
@@ -276,7 +276,7 @@ export class SimAgent {
 
   private finalizeConsultationToolCall(call: ToolCall | null, context: ConsultationContext): ToolCall | null {
     if (!call) return null;
-    if (call.tool !== "reflectworld_perception") return call;
+    if (call.tool !== "cortex_perception") return call;
 
     const params = { ...call.params };
     const action = typeof params.action === "string" ? params.action : undefined;
@@ -316,7 +316,7 @@ export class SimAgent {
 
     if (text.includes("night") && text.includes("security")) {
       return {
-        tool: "reflectworld_perception",
+        tool: "cortex_perception",
         params: {
           action: "configure",
           config: {
@@ -329,7 +329,7 @@ export class SimAgent {
 
     if (text.includes("walking")) {
       return {
-        tool: "reflectworld_perception",
+        tool: "cortex_perception",
         params: {
           action: "configure",
           config: {
@@ -344,7 +344,7 @@ export class SimAgent {
       const fpsMatch = text.match(/(\d+(?:\.\d+)?)/);
       const fps = fpsMatch ? Number(fpsMatch[1]) : 3;
       return {
-        tool: "reflectworld_cam",
+        tool: "cortex_cam",
         params: {
           action: "set_sampling",
           name: cameraId,
@@ -355,7 +355,7 @@ export class SimAgent {
 
     if (text.includes("stop") && (text.includes("monitor") || text.includes("watch"))) {
       return {
-        tool: "reflectworld_cam",
+        tool: "cortex_cam",
         params: {
           action: "stop_watch",
           name: cameraId,
@@ -365,7 +365,7 @@ export class SimAgent {
 
     if (text.includes("who came") || text.includes("came by") || text.includes("visitor") || text.includes("today")) {
       return {
-        tool: "reflectworld_memory",
+        tool: "cortex_memory",
         params: {
           action: "search",
           camera_id: cameraId,

@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { createServer } from "node:http";
 import { WebSocket } from "ws";
 import { attachMonitorWs } from "../ws-server.js";
-import { monitorBus } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
 
 describe("attachMonitorWs", () => {
   let server: ReturnType<typeof createServer>;

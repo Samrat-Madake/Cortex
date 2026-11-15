@@ -4,9 +4,9 @@
 // is only exercised by eval/video-runner/runner.ts with live services. This file tests
 // the deterministic links in the chain to catch regressions without external deps.
 import { describe, it, expect, vi } from "vitest";
-import { VisionController } from "../../packages/reflectworld/src/vision-controller/index.js";
-import type { VisionControllerConfig } from "../../packages/reflectworld/src/vision-controller/index.js";
-import type { PerceptionResult, Segment, PerceptionMemory } from "@reflectworld/shared";
+import { VisionController } from "../../packages/cortex/src/vision-controller/index.js";
+import type { VisionControllerConfig } from "../../packages/cortex/src/vision-controller/index.js";
+import type { PerceptionResult, Segment, PerceptionMemory } from "@cortex/shared";
 import type { ToolCall, ConsultationContext } from "../../eval/video-runner/sim-agent.js";
 import type { ToolResult } from "../../eval/video-runner/tool-executor.js";
 
@@ -153,12 +153,12 @@ describe("consultation chain: context marshalling", () => {
 // ── Link 3: ToolCall → tool-executor dispatch ──
 
 describe("consultation chain: tool dispatch", () => {
-  it("executeTool routes reflectworld_cam to MiniHost.callTool", async () => {
+  it("executeTool routes cortex_cam to MiniHost.callTool", async () => {
     // Import executeTool dynamically to verify the dispatch logic
     const { executeTool } = await import("../../eval/video-runner/tool-executor.js");
 
     const toolCall: ToolCall = {
-      tool: "reflectworld_cam",
+      tool: "cortex_cam",
       params: { action: "set_sampling", name: "cam1", fps: 5 },
     };
 
@@ -169,16 +169,16 @@ describe("consultation chain: tool dispatch", () => {
     const result: ToolResult = await executeTool(toolCall, mockHost);
 
     expect(result.success).toBe(true);
-    expect(result.tool).toBe("reflectworld_cam");
+    expect(result.tool).toBe("cortex_cam");
     expect(result.action).toBe("set_sampling");
-    expect(callToolSpy).toHaveBeenCalledWith("reflectworld_cam", toolCall.params);
+    expect(callToolSpy).toHaveBeenCalledWith("cortex_cam", toolCall.params);
   });
 
-  it("executeTool routes reflectworld_perception to MiniHost.callTool", async () => {
+  it("executeTool routes cortex_perception to MiniHost.callTool", async () => {
     const { executeTool } = await import("../../eval/video-runner/tool-executor.js");
 
     const toolCall: ToolCall = {
-      tool: "reflectworld_perception",
+      tool: "cortex_perception",
       params: {
         action: "configure",
         camera_id: "cam1",
@@ -192,8 +192,8 @@ describe("consultation chain: tool dispatch", () => {
     const result: ToolResult = await executeTool(toolCall, mockHost);
 
     expect(result.success).toBe(true);
-    expect(result.tool).toBe("reflectworld_perception");
-    expect(callToolSpy).toHaveBeenCalledWith("reflectworld_perception", toolCall.params);
+    expect(result.tool).toBe("cortex_perception");
+    expect(callToolSpy).toHaveBeenCalledWith("cortex_perception", toolCall.params);
   });
 
   it("executeTool returns error for unknown tool", async () => {
@@ -215,7 +215,7 @@ describe("consultation chain: tool dispatch", () => {
     const { executeTool } = await import("../../eval/video-runner/tool-executor.js");
 
     const toolCall: ToolCall = {
-      tool: "reflectworld_cam",
+      tool: "cortex_cam",
       params: { action: "set_sampling", name: "cam1", fps: 5 },
     };
 

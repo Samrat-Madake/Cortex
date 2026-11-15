@@ -17,8 +17,8 @@ export interface ConfigureAnswers {
   elevenlabs_api_key?: string;
 }
 
-const PERCEPTION_PREFIX = "plugins.entries.reflectworld.config.perception.";
-const MEMORY_PREFIX = "plugins.entries.reflectworld.config.memory.";
+const PERCEPTION_PREFIX = "plugins.entries.cortex.config.perception.";
+const MEMORY_PREFIX = "plugins.entries.cortex.config.memory.";
 const EMBEDDING_DIMS_PATH = `${MEMORY_PREFIX}embedding_dims`;
 
 export function defaultVlmModelLite(provider: string, vlmModel: string): string {

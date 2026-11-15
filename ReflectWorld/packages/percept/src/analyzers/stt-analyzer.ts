@@ -9,8 +9,8 @@ import { createRequire } from "node:module";
 import { resolve, dirname } from "node:path";
 import { platform, arch } from "node:os";
 import { existsSync } from "node:fs";
-import type { SpeechSegment, AudioData } from "@reflectworld/shared";
-import { writeStderr } from "@reflectworld/shared";
+import type { SpeechSegment, AudioData } from "@cortex/shared";
+import { writeStderr } from "@cortex/shared";
 
 /**
  * Ensure the native library path is set before loading sherpa-onnx-node.

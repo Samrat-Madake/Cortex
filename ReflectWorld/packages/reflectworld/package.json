@@ -1,8 +1,8 @@
 {
-  "name": "@reflectworld/reflectworld",
+  "name": "@cortex/cortex",
   "version": "0.1.0",
   "type": "module",
-  "description": "ReflectWorld all-in-one OpenClaw plugin — video capture, perception, memory, automation",
+  "description": "Cortex all-in-one OpenClaw plugin — video capture, perception, memory, automation",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -29,15 +29,15 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/addxai/ReflectWorld.git",
-    "directory": "packages/reflectworld"
+    "url": "git+https://github.com/addxai/Cortex.git",
+    "directory": "packages/cortex"
   },
-  "homepage": "https://github.com/addxai/ReflectWorld",
+  "homepage": "https://github.com/addxai/Cortex",
   "engines": {
     "node": ">=22"
   },
   "keywords": [
-    "reflectworld",
+    "cortex",
     "vision",
     "perception",
     "ai-agent",
@@ -48,13 +48,13 @@
     "postinstall": "node scripts/post-install.cjs"
   },
   "bin": {
-    "reflectworld": "./dist/src/cli/index.js"
+    "cortex": "./dist/src/cli/index.js"
   },
   "dependencies": {
-    "@reflectworld/cam": "^0.1.0",
-    "@reflectworld/mem": "^0.1.0",
-    "@reflectworld/percept": "^0.1.0",
-    "@reflectworld/shared": "^0.1.0",
+    "@cortex/cam": "^0.1.0",
+    "@cortex/mem": "^0.1.0",
+    "@cortex/percept": "^0.1.0",
+    "@cortex/shared": "^0.1.0",
     "dotenv": "^16.4.7",
     "ws": "^8.21.0"
   },
@@ -66,8 +66,8 @@
       "./dist/index.js"
     ],
     "install": {
-      "npmSpec": "@reflectworld/reflectworld",
-      "localPath": "extensions/reflectworld"
+      "npmSpec": "@cortex/cortex",
+      "localPath": "extensions/cortex"
     }
   }
 }

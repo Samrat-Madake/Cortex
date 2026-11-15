@@ -1,6 +1,6 @@
 # Dashboard Guide
 
-> The ReflectWorld Dashboard is the main interface for seeing what cameras saw,
+> The Cortex Dashboard is the main interface for seeing what cameras saw,
 > what the system remembered, and how to interact with that state.
 >
 > The default URL is `http://localhost:3210`. Change the port with `PORT` or
@@ -25,7 +25,7 @@
 
 ## 1. Source Management and Live View
 
-A source is a ReflectWorld input: either an uploaded video file or a live stream.
+A source is a Cortex input: either an uploaded video file or a live stream.
 
 ### Add a Source
 
@@ -104,7 +104,7 @@ sufficient. See the [architecture overview](../architecture/overview.md).
 
 ## 4. Semantic Memory
 
-As a camera is analyzed over time, ReflectWorld builds a **Semantic Context** for
+As a camera is analyzed over time, Cortex builds a **Semantic Context** for
 that camera:
 
 - scene description,
@@ -141,7 +141,7 @@ and per-session rate limits.
 ## 6. Settings
 
 Settings are the small set of options that can change at runtime and take
-effect immediately. They affect how ReflectWorld captures and how deeply it
+effect immediately. They affect how Cortex captures and how deeply it
 analyzes, not deployment-time provider configuration.
 
 | Setting | Values | Default | Meaning |

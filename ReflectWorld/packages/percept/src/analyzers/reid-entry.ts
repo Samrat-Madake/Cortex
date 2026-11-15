@@ -1,5 +1,5 @@
 // packages/percept/src/analyzers/reid-entry.ts
-import type { Frame } from "@reflectworld/shared";
+import type { Frame } from "@cortex/shared";
 import type { ModelRouter } from "../providers/model-router.js";
 import type { MemoryReIdPort } from "./unified-reid-matcher.js";
 import type { QualifiedFace } from "./subject-proposal-analyzer.js";

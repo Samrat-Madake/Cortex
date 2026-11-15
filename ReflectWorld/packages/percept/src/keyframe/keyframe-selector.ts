@@ -10,13 +10,13 @@
 //      then fill remaining slots from entity candidates sorted by
 //      (entity_area, entity_detection_confidence).
 
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 import {
   QualityAssessor,
   laplacianVariance,
   type QualityConfig,
 } from "./quality-assessor.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 // ── Input / output interfaces ──
 

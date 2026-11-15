@@ -4,8 +4,8 @@ import {
   type PipelineDeps,
   type SemanticContextWriter,
   type SummarizationResult,
-} from "@reflectworld/percept";
-import type { LlmCallContext, LlmCallRecord, PerceptionResult } from "@reflectworld/shared";
+} from "@cortex/percept";
+import type { LlmCallContext, LlmCallRecord, PerceptionResult } from "@cortex/shared";
 
 interface SemanticContextStore {
   getSegmentCount(cameraId: string): number;

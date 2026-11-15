@@ -4,7 +4,7 @@ import type {
   DashboardSegmentDialogueLine,
   DashboardSegmentState,
   DashboardSegmentTarget,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 import type { MonitorEvent } from "../types";
 
 export type BoundingBox = DashboardBoundingBox;

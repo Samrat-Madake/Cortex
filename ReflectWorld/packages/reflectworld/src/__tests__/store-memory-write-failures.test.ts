@@ -24,7 +24,7 @@ describe("PipelineStore — memory write failures", () => {
       camera_id: "cam_a",
       user_id: "user_a",
       attempts: 2,
-      error: "ReflectWorld POST /memories returned 500",
+      error: "Cortex POST /memories returned 500",
       request: {
         video_id: "seg_dead",
         camera_id: "cam_a",
@@ -41,7 +41,7 @@ describe("PipelineStore — memory write failures", () => {
       camera_id: "cam_a",
       user_id: "user_a",
       attempts: 2,
-      error: "ReflectWorld POST /memories returned 500",
+      error: "Cortex POST /memories returned 500",
     });
     expect(JSON.parse(rows[0]!.request_json)).toMatchObject({
       video_id: "seg_dead",

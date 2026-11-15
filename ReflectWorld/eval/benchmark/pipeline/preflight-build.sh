@@ -13,10 +13,10 @@ echo "==> Benchmark preflight: refreshing TypeScript build"
 npx --no-install tsc --build
 
 node --input-type=module <<'NODE'
-const cam = await import("@reflectworld/cam");
+const cam = await import("@cortex/cam");
 if (typeof cam.LocalFileMediaSource !== "function") {
   throw new Error(
-    `@reflectworld/cam.LocalFileMediaSource is ${typeof cam.LocalFileMediaSource}; ` +
+    `@cortex/cam.LocalFileMediaSource is ${typeof cam.LocalFileMediaSource}; ` +
     "run npm run build and retry",
   );
 }

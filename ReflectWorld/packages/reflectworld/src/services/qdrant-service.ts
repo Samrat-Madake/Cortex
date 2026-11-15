@@ -7,7 +7,7 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { resolveReflectWorldHome } from "@reflectworld/shared";
+import { resolveCortexHome } from "@cortex/shared";
 import {
   downloadFile,
   extractTarGz,
@@ -17,7 +17,7 @@ import {
   ensureDir,
   isServiceHealthy,
 } from "./download.js";
-import { writeStderr, writeStdout } from "@reflectworld/shared";
+import { writeStderr, writeStdout } from "@cortex/shared";
 
 const QDRANT_VERSION = "1.17.1";
 const QDRANT_LOG_TAIL_BYTES = 12_000;
@@ -36,7 +36,7 @@ function formatQdrantLogTail(stdoutTail: string, stderrTail: string): string {
 
 export interface QdrantServiceOptions {
   stateDir: string;
-  /** Read-only asset root (~/.reflectworld). Binaries live under homeDir/bin/. */
+  /** Read-only asset root (~/.cortex). Binaries live under homeDir/bin/. */
   homeDir?: string;
   httpPort?: number;
   grpcPort?: number;
@@ -61,17 +61,17 @@ function getQdrantTargets(): string[] {
 }
 
 export function resolveQdrantBinary(homeDir?: string): string {
-  const home = homeDir ?? resolveReflectWorldHome();
+  const home = homeDir ?? resolveCortexHome();
   const binPath = join(home, "bin", "qdrant");
   if (existsSync(binPath)) return binPath;
   throw new Error(
     `Qdrant binary is not prepared at ${binPath}. Run ` +
-    "`npx tsx packages/reflectworld/scripts/setup-qdrant.ts` during environment setup.",
+    "`npx tsx packages/cortex/scripts/setup-qdrant.ts` during environment setup.",
   );
 }
 
 export async function setupQdrantBinary(homeDir?: string): Promise<string> {
-  const home = homeDir ?? resolveReflectWorldHome();
+  const home = homeDir ?? resolveCortexHome();
   const binDir = join(home, "bin");
   ensureDir(binDir);
   const binPath = join(binDir, "qdrant");
@@ -116,7 +116,7 @@ export class QdrantService {
   private readonly storageDir: string;
 
   constructor(options: QdrantServiceOptions) {
-    this.homeDir = options.homeDir ?? resolveReflectWorldHome();
+    this.homeDir = options.homeDir ?? resolveCortexHome();
     this.stateDir = options.stateDir;
     this.httpPort = options.httpPort ?? 6333;
     this.grpcPort = options.grpcPort ?? 6334;

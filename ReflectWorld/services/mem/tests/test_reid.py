@@ -10,7 +10,7 @@ pytestmark = pytest.mark.qdrant
 @pytest.fixture(scope="module")
 def reid(requires_qdrant):
     config = MemConfig(
-        collection_prefix="reflectworld_pytest_reid",
+        collection_prefix="cortex_pytest_reid",
         qdrant_host=requires_qdrant.host,
         qdrant_port=requires_qdrant.port,
     )
@@ -251,7 +251,7 @@ def test_invalid_collection_upsert(reid):
 def gallery_reid(requires_qdrant):
     """Separate ReidManager for gallery tests (isolated prefix)."""
     config = MemConfig(
-        collection_prefix="reflectworld_pytest_gallery",
+        collection_prefix="cortex_pytest_gallery",
         qdrant_host=requires_qdrant.host,
         qdrant_port=requires_qdrant.port,
     )

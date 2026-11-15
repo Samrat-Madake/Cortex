@@ -10,24 +10,24 @@ describe("source security validation", () => {
   });
 
   it("warns when public mode enables private or local source escape hatches", () => {
-    const previousPublicMode = process.env.REFLECTWORLD_PUBLIC_MODE;
-    const previousPrivateSource = process.env.REFLECTWORLD_ALLOW_PRIVATE_SOURCE;
-    const previousLocalSource = process.env.REFLECTWORLD_ALLOW_LOCAL_SOURCE;
+    const previousPublicMode = process.env.CORTEX_PUBLIC_MODE;
+    const previousPrivateSource = process.env.CORTEX_ALLOW_PRIVATE_SOURCE;
+    const previousLocalSource = process.env.CORTEX_ALLOW_LOCAL_SOURCE;
     try {
-      process.env.REFLECTWORLD_PUBLIC_MODE = "true";
-      process.env.REFLECTWORLD_ALLOW_PRIVATE_SOURCE = "true";
-      process.env.REFLECTWORLD_ALLOW_LOCAL_SOURCE = "true";
+      process.env.CORTEX_PUBLIC_MODE = "true";
+      process.env.CORTEX_ALLOW_PRIVATE_SOURCE = "true";
+      process.env.CORTEX_ALLOW_LOCAL_SOURCE = "true";
       expect(sourceSecurityEnvWarnings()).toEqual([
-        expect.stringContaining("REFLECTWORLD_ALLOW_PRIVATE_SOURCE=true"),
-        expect.stringContaining("REFLECTWORLD_ALLOW_LOCAL_SOURCE=true"),
+        expect.stringContaining("CORTEX_ALLOW_PRIVATE_SOURCE=true"),
+        expect.stringContaining("CORTEX_ALLOW_LOCAL_SOURCE=true"),
       ]);
     } finally {
-      if (previousPublicMode == null) delete process.env.REFLECTWORLD_PUBLIC_MODE;
-      else process.env.REFLECTWORLD_PUBLIC_MODE = previousPublicMode;
-      if (previousPrivateSource == null) delete process.env.REFLECTWORLD_ALLOW_PRIVATE_SOURCE;
-      else process.env.REFLECTWORLD_ALLOW_PRIVATE_SOURCE = previousPrivateSource;
-      if (previousLocalSource == null) delete process.env.REFLECTWORLD_ALLOW_LOCAL_SOURCE;
-      else process.env.REFLECTWORLD_ALLOW_LOCAL_SOURCE = previousLocalSource;
+      if (previousPublicMode == null) delete process.env.CORTEX_PUBLIC_MODE;
+      else process.env.CORTEX_PUBLIC_MODE = previousPublicMode;
+      if (previousPrivateSource == null) delete process.env.CORTEX_ALLOW_PRIVATE_SOURCE;
+      else process.env.CORTEX_ALLOW_PRIVATE_SOURCE = previousPrivateSource;
+      if (previousLocalSource == null) delete process.env.CORTEX_ALLOW_LOCAL_SOURCE;
+      else process.env.CORTEX_ALLOW_LOCAL_SOURCE = previousLocalSource;
     }
   });
 

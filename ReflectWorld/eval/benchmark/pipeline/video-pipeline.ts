@@ -5,18 +5,18 @@
 import { execFileSync } from "node:child_process";
 import { basename, extname, join } from "node:path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { monitorBus, type Segment, type PerceptionResult, type FrameDetection } from "@reflectworld/shared";
-import { CamPipeline, CompositeSegmenter, MotionFilter, SileroVad, VAD_CHUNK_SIZE, getSileroVadModelPath, resolveFfmpegBin, resolveFfprobeBin } from "@reflectworld/cam";
-import type { SegmenterHints } from "@reflectworld/cam";
-import { analyze, logPipelineSelfCheck, parseSemanticContextSections } from "@reflectworld/percept";
-import type { EventCloseSummary, PipelineDeps, PipelineSelfCheckComponent } from "@reflectworld/percept";
-import { NarrativeMemory } from "@reflectworld/percept";
-import { ReflectWorldClient } from "@reflectworld/mem";
-import { FRAME_POLICY_MAX_FPS } from "../../../packages/reflectworld/src/vision-controller/constants.js";
-import { VisionController } from "../../../packages/reflectworld/src/vision-controller/vision-controller.js";
-import type { VisionControllerConfig } from "../../../packages/reflectworld/src/vision-controller/types.js";
-import { PerceptionRuntime } from "../../../packages/reflectworld/src/runtime/perception-runtime.js";
-import { buildSourceTimeMetadata, createMemoryStorePerception } from "../../../packages/reflectworld/src/memory-adapter.js";
+import { monitorBus, type Segment, type PerceptionResult, type FrameDetection } from "@cortex/shared";
+import { CamPipeline, CompositeSegmenter, MotionFilter, SileroVad, VAD_CHUNK_SIZE, getSileroVadModelPath, resolveFfmpegBin, resolveFfprobeBin } from "@cortex/cam";
+import type { SegmenterHints } from "@cortex/cam";
+import { analyze, logPipelineSelfCheck, parseSemanticContextSections } from "@cortex/percept";
+import type { EventCloseSummary, PipelineDeps, PipelineSelfCheckComponent } from "@cortex/percept";
+import { NarrativeMemory } from "@cortex/percept";
+import { CortexClient } from "@cortex/mem";
+import { FRAME_POLICY_MAX_FPS } from "../../../packages/cortex/src/vision-controller/constants.js";
+import { VisionController } from "../../../packages/cortex/src/vision-controller/vision-controller.js";
+import type { VisionControllerConfig } from "../../../packages/cortex/src/vision-controller/types.js";
+import { PerceptionRuntime } from "../../../packages/cortex/src/runtime/perception-runtime.js";
+import { buildSourceTimeMetadata, createMemoryStorePerception } from "../../../packages/cortex/src/memory-adapter.js";
 import type { SrtEntry } from "./srt-provider.js";
 import { sliceSrtToSttOutput } from "./srt-provider.js";
 import { streamFrames } from "./frame-stream.js";
@@ -127,7 +127,7 @@ export interface VideoPipelineOptions {
   framesPerSegment: number;
   outputDir: string;
   pipelineDeps: PipelineDeps;
-  memClient: ReflectWorldClient;
+  memClient: CortexClient;
   vcConfig?: VisionControllerConfig;
   consultationDispatcher?: {
     submitConsultation: (context: Record<string, unknown>) => Promise<Record<string, unknown> | null>;
@@ -636,8 +636,8 @@ export async function runVideoPipeline(opts: VideoPipelineOptions): Promise<Vide
             }, cameraId);
             if (!toolCall) return;
             const toolName = (toolCall as Record<string, unknown>)?.tool as string | undefined;
-            if (toolName === "reflectworld_perception" && (toolCall as Record<string, unknown>).params) {
-              const toolModuleSpecifier = "@reflectworld/percept/src/tool.js";
+            if (toolName === "cortex_perception" && (toolCall as Record<string, unknown>).params) {
+              const toolModuleSpecifier = "@cortex/percept/src/tool.js";
               (import(toolModuleSpecifier) as Promise<ToolModule>)
                 .then(({ executeToolAction }) => {
                   executeToolAction(

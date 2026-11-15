@@ -1,23 +1,23 @@
-# @reflectworld/mem
+# @cortex/mem
 
-> TypeScript HTTP client for the ReflectWorld Python memory service.
+> TypeScript HTTP client for the Cortex Python memory service.
 
 ## Overview
 
-This package provides `ReflectWorldClient`, a typed HTTP client wrapping the ReflectWorld FastAPI service. It supports episodic/semantic/procedural memory CRUD, semantic search, media expiration, and ReID (face + body) vector operations against Qdrant collections.
+This package provides `CortexClient`, a typed HTTP client wrapping the Cortex FastAPI service. It supports episodic/semantic/procedural memory CRUD, semantic search, media expiration, and ReID (face + body) vector operations against Qdrant collections.
 
 ## Installation
 
 ```bash
-npm install @reflectworld/mem
+npm install @cortex/mem
 ```
 
 ## Quick Start
 
 ```typescript
-import { ReflectWorldClient } from "@reflectworld/mem";
+import { CortexClient } from "@cortex/mem";
 
-const client = new ReflectWorldClient({ baseUrl: "http://localhost:8219" });
+const client = new CortexClient({ baseUrl: "http://localhost:8219" });
 
 // Store a memory
 await client.add({
@@ -45,7 +45,7 @@ const matches = await client.reidSearch({
 
 ## API
 
-### ReflectWorldClient Methods
+### CortexClient Methods
 
 | Method | Description |
 |--------|-------------|
@@ -61,10 +61,10 @@ const matches = await client.reidSearch({
 
 ### OpenClaw Plugin
 
-The default export registers as an OpenClaw plugin with the `reflectworld_memory` tool, supporting actions: `search`, `get`, `delete`, `add_note`, `get_history`.
+The default export registers as an OpenClaw plugin with the `cortex_memory` tool, supporting actions: `search`, `get`, `delete`, `add_note`, `get_history`.
 
 ## See Also
 
 - [Architecture overview](../../docs/architecture/overview.md)
 - [Configuration reference](../../docs/reference/configuration.md)
-- [ReflectWorld Python service](../../services/mem/)
+- [Cortex Python service](../../services/mem/)

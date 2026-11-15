@@ -1,7 +1,7 @@
 [project]
-name = "reflectworld-mem"
+name = "cortex-mem"
 version = "1.0.0"
-description = "ReflectWorld Memory Service"
+description = "Cortex Memory Service"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.100",

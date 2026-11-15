@@ -1,4 +1,4 @@
-import { monitorBus, writeStderr, type PerceptionResult, type Segment } from "@reflectworld/shared";
+import { monitorBus, writeStderr, type PerceptionResult, type Segment } from "@cortex/shared";
 import { extractSceneFingerprint, resolveNotifications } from "../notification-resolver.js";
 import type { AnalyzerResult, VlmOutput } from "../types.js";
 import type { WorkingMemoryManager } from "../working-memory.js";

@@ -1,9 +1,9 @@
-// packages/reflectworld/src/cli/model-converter.ts
+// packages/cortex/src/cli/model-converter.ts
 //
-// Local ONNX conversion for models ReflectWorld cannot redistribute (AGPL or
+// Local ONNX conversion for models Cortex cannot redistribute (AGPL or
 // non-commercial weights). Open-source weights are downloaded and converted to
 // ONNX on the user's machine, in a shared throwaway Python env managed by the
-// bundled `uv`. Nothing is redistributed by ReflectWorld; the resulting ONNX
+// bundled `uv`. Nothing is redistributed by Cortex; the resulting ONNX
 // stays local, and its metadata carries the user's path (no upstream leak).
 //
 // All convert-models reuse a single Python env (torch is fetched once).

@@ -1,6 +1,6 @@
-# ReflectWorld Documentation
+# Cortex Documentation
 
-> **ReflectWorld** is a local-first visual perception and persistent memory
+> **Cortex** is a local-first visual perception and persistent memory
 > platform. It gives agents eyes and memory.
 
 This directory is the documentation hub for the project. The documentation
@@ -12,11 +12,11 @@ with the public repository.
 | Goal | Go to |
 |---|---|
 | Understand the system architecture | [architecture/overview.md](./architecture/overview.md) |
-| Install, start, and configure ReflectWorld | [user-guide/](./user-guide/) |
+| Install, start, and configure Cortex | [user-guide/](./user-guide/) |
 | Look up HTTP APIs or configuration keys | [reference/](./reference/) |
 | Contribute code or open a PR | [contributing/](./contributing/) |
 
-## user-guide/ - Running ReflectWorld
+## user-guide/ - Running Cortex
 
 - [quickstart.md](./user-guide/quickstart.md) - first standalone run from `.env` to Dashboard chat
 - [installation.md](./user-guide/installation.md) - prerequisites, setup, runtime directories, Level 0 vs Level 1
@@ -30,7 +30,7 @@ with the public repository.
 
 ## reference/ - Contracts And Public Interfaces
 
-- [cli.md](./reference/cli.md) - `@reflectworld/reflectworld` CLI commands and options
+- [cli.md](./reference/cli.md) - `@cortex/cortex` CLI commands and options
 - [configuration.md](./reference/configuration.md) - complete configuration contract and env mapping
 - [http-api.md](./reference/http-api.md) - Dashboard, host, tool, memory, and media HTTP APIs
 

@@ -32,31 +32,31 @@ import type {
 } from "./types.js";
 
 /** Subset of the memory client config needed by the HTTP layer. */
-export interface ReflectWorldClientConfig {
+export interface CortexClientConfig {
   baseUrl: string | (() => string);
   timeoutMs?: number;
 }
 
-export class ReflectWorldClientError extends Error {
+export class CortexClientError extends Error {
   constructor(
     message: string,
     public readonly statusCode: number,
     public readonly body: unknown,
   ) {
     super(message);
-    this.name = "ReflectWorldClientError";
+    this.name = "CortexClientError";
   }
 }
 
 /**
- * Thin HTTP client for the ReflectWorld FastAPI service.
- * All methods throw ReflectWorldClientError on non-2xx responses.
+ * Thin HTTP client for the Cortex FastAPI service.
+ * All methods throw CortexClientError on non-2xx responses.
  */
-export class ReflectWorldClient {
+export class CortexClient {
   private readonly getBaseUrl: () => string;
   private readonly timeoutMs: number;
 
-  constructor(config: ReflectWorldClientConfig) {
+  constructor(config: CortexClientConfig) {
     const baseUrl = config.baseUrl;
     this.getBaseUrl = typeof baseUrl === "function"
       ? () => baseUrl().replace(/\/$/, "")
@@ -84,7 +84,7 @@ export class ReflectWorldClient {
       });
     } catch (err) {
       clearTimeout(timer);
-      throw new ReflectWorldClientError(
+      throw new CortexClientError(
         `Network error calling ${method} ${path}: ${String(err)}`,
         0,
         null,
@@ -100,8 +100,8 @@ export class ReflectWorldClient {
       } catch {
         // ignore parse error
       }
-      throw new ReflectWorldClientError(
-        `ReflectWorld ${method} ${path} returned ${response.status}`,
+      throw new CortexClientError(
+        `Cortex ${method} ${path} returned ${response.status}`,
         response.status,
         errorBody,
       );
@@ -110,8 +110,8 @@ export class ReflectWorldClient {
     try {
       return (await response.json()) as T;
     } catch (err) {
-      throw new ReflectWorldClientError(
-        `ReflectWorld ${method} ${path} returned malformed JSON: ${String(err)}`,
+      throw new CortexClientError(
+        `Cortex ${method} ${path} returned malformed JSON: ${String(err)}`,
         response.status,
         null,
       );

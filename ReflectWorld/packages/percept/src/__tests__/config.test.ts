@@ -12,16 +12,16 @@ const CONFIG_ENV_KEYS = [
   "VLM_MAX_RETRIES",
   "VLM_RETRY_BASE_DELAY_MS",
   "VLM_RETRY_MAX_DELAY_MS",
-  "REFLECTWORLD_PERCEPTION_SOURCE_CONCURRENCY",
-  "REFLECTWORLD_PERCEPTION_MAX_QUEUED_PER_SOURCE",
-  "REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS",
-  "REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL",
-  "REFLECTWORLD_LOCAL_FILE_PACING",
-  "REFLECTWORLD_PERCEPTION_RUNTIME_MODE",
-  "REFLECTWORLD_ENDPOINT",
+  "CORTEX_PERCEPTION_SOURCE_CONCURRENCY",
+  "CORTEX_PERCEPTION_MAX_QUEUED_PER_SOURCE",
+  "CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS",
+  "CORTEX_PERCEPTION_REQUIRED_LEVEL",
+  "CORTEX_LOCAL_FILE_PACING",
+  "CORTEX_PERCEPTION_RUNTIME_MODE",
+  "CORTEX_ENDPOINT",
   "WORKING_MEMORY_EVENT_TIMEOUT_SEC",
   "WORKING_MEMORY_MAX_EVENT_SEGMENTS",
-  "REFLECTWORLD_MODELS_DIR",
+  "CORTEX_MODELS_DIR",
   "STUBS_ONLY",
   "SCENE_DESCRIPTION",
   "STT_PROVIDER",
@@ -30,7 +30,7 @@ const CONFIG_ENV_KEYS = [
   "ELEVENLABS_API_KEY",
   "ELEVENLABS_MODEL_ID",
   "ELEVENLABS_LANGUAGE_CODE",
-  "REFLECTWORLD_BODY_REID_ENABLED",
+  "CORTEX_BODY_REID_ENABLED",
 ] as const;
 
 let savedEnv: Record<string, string | undefined> = {};
@@ -65,7 +65,7 @@ describe("PerceptionConfigSchema", () => {
 
   it("applies runtime defaults correctly", () => {
     const config = resolvePerceptionConfig({ vlm_api_key: "key" });
-    expect(config.reflectworld_endpoint).toBe("http://localhost:8219");
+    expect(config.cortex_endpoint).toBe("http://localhost:8219");
     expect(config.working_memory_event_timeout_sec).toBe(30);
     expect(config.working_memory_max_event_segments).toBe(18);
     expect(config.vlm_request_timeout_ms).toBe(120000);
@@ -119,39 +119,39 @@ describe("PerceptionConfigSchema", () => {
     expect(config.runtime_mode).toBe("live_latency");
   });
 
-  it("reads runtime_mode from REFLECTWORLD_PERCEPTION_RUNTIME_MODE", () => {
-    const previous = process.env.REFLECTWORLD_PERCEPTION_RUNTIME_MODE;
+  it("reads runtime_mode from CORTEX_PERCEPTION_RUNTIME_MODE", () => {
+    const previous = process.env.CORTEX_PERCEPTION_RUNTIME_MODE;
     try {
-      process.env.REFLECTWORLD_PERCEPTION_RUNTIME_MODE = "live_latency";
+      process.env.CORTEX_PERCEPTION_RUNTIME_MODE = "live_latency";
       const config = resolvePerceptionConfig({ vlm_api_key: "key" });
       expect(config.runtime_mode).toBe("live_latency");
     } finally {
-      if (previous === undefined) delete process.env.REFLECTWORLD_PERCEPTION_RUNTIME_MODE;
-      else process.env.REFLECTWORLD_PERCEPTION_RUNTIME_MODE = previous;
+      if (previous === undefined) delete process.env.CORTEX_PERCEPTION_RUNTIME_MODE;
+      else process.env.CORTEX_PERCEPTION_RUNTIME_MODE = previous;
     }
   });
 
-  it("reads required_level from REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL", () => {
-    const previous = process.env.REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL;
+  it("reads required_level from CORTEX_PERCEPTION_REQUIRED_LEVEL", () => {
+    const previous = process.env.CORTEX_PERCEPTION_REQUIRED_LEVEL;
     try {
-      process.env.REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL = "1";
+      process.env.CORTEX_PERCEPTION_REQUIRED_LEVEL = "1";
       const config = resolvePerceptionConfig({ vlm_api_key: "key" });
       expect(config.required_level).toBe(1);
     } finally {
-      if (previous === undefined) delete process.env.REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL;
-      else process.env.REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL = previous;
+      if (previous === undefined) delete process.env.CORTEX_PERCEPTION_REQUIRED_LEVEL;
+      else process.env.CORTEX_PERCEPTION_REQUIRED_LEVEL = previous;
     }
   });
 
-  it("reads live backlog skip threshold from REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS", () => {
-    const previous = process.env.REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS;
+  it("reads live backlog skip threshold from CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS", () => {
+    const previous = process.env.CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS;
     try {
-      process.env.REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS = "90000";
+      process.env.CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS = "90000";
       const config = resolvePerceptionConfig({ vlm_api_key: "key" });
       expect(config.live_backlog_skip_after_ms).toBe(90000);
     } finally {
-      if (previous === undefined) delete process.env.REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS;
-      else process.env.REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS = previous;
+      if (previous === undefined) delete process.env.CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS;
+      else process.env.CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS = previous;
     }
   });
 
@@ -216,17 +216,17 @@ describe("PerceptionConfigSchema", () => {
     }
   });
 
-  it("enables body ReID only through REFLECTWORLD_BODY_REID_ENABLED", () => {
-    const prevNamespaced = process.env.REFLECTWORLD_BODY_REID_ENABLED;
+  it("enables body ReID only through CORTEX_BODY_REID_ENABLED", () => {
+    const prevNamespaced = process.env.CORTEX_BODY_REID_ENABLED;
     try {
-      delete process.env.REFLECTWORLD_BODY_REID_ENABLED;
+      delete process.env.CORTEX_BODY_REID_ENABLED;
       expect(resolvePerceptionConfig({ body_reid_enabled: true }).body_reid_enabled).toBe(false);
 
-      process.env.REFLECTWORLD_BODY_REID_ENABLED = "true";
+      process.env.CORTEX_BODY_REID_ENABLED = "true";
       expect(resolvePerceptionConfig({}).body_reid_enabled).toBe(true);
     } finally {
-      if (prevNamespaced === undefined) delete process.env.REFLECTWORLD_BODY_REID_ENABLED;
-      else process.env.REFLECTWORLD_BODY_REID_ENABLED = prevNamespaced;
+      if (prevNamespaced === undefined) delete process.env.CORTEX_BODY_REID_ENABLED;
+      else process.env.CORTEX_BODY_REID_ENABLED = prevNamespaced;
     }
   });
 

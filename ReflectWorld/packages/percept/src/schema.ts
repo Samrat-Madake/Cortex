@@ -2,7 +2,7 @@
 import { Type } from "@sinclair/typebox";
 
 /**
- * Flat object schema for the reflectworld_perception OpenClaw tool.
+ * Flat object schema for the cortex_perception OpenClaw tool.
  * OpenClaw does not support anyOf/oneOf/allOf in tool schemas.
  */
 export const PerceptionToolSchema = Type.Object({

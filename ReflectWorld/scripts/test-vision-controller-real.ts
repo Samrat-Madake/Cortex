@@ -25,9 +25,9 @@ import { createPipelineDeps, analyze, type PipelineDeps } from "../packages/perc
 import { WorkingMemoryManager } from "../packages/percept/src/working-memory.js";
 import { StrategyManager } from "../packages/percept/src/strategy-manager.js";
 import { MediaUploader, type MediaSaver } from "../packages/percept/src/media-uploader.js";
-import { VisionController, type VisionControllerConfig } from "../packages/reflectworld/src/vision-controller/index.js";
-import type { SegmentPolicyOutput } from "../packages/reflectworld/src/vision-controller/index.js";
-import type { Segment, Frame, PerceptionResult, MotionHint } from "@reflectworld/shared";
+import { VisionController, type VisionControllerConfig } from "../packages/cortex/src/vision-controller/index.js";
+import type { SegmentPolicyOutput } from "../packages/cortex/src/vision-controller/index.js";
+import type { Segment, Frame, PerceptionResult, MotionHint } from "@cortex/shared";
 import { MotionFilter } from "../packages/cam/src/motion-filter.js";
 
 // ── Helpers ──

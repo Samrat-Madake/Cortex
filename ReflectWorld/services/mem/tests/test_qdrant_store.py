@@ -13,7 +13,7 @@ pytestmark = pytest.mark.qdrant
 @pytest.fixture(scope="module")
 def store(requires_qdrant):
     config = MemConfig(
-        collection_prefix="reflectworld_pytest",
+        collection_prefix="cortex_pytest",
         qdrant_host=requires_qdrant.host,
         qdrant_port=requires_qdrant.port,
     )

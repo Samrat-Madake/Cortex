@@ -56,7 +56,7 @@ describe("DashboardServer ffmpeg jobs", () => {
     mockSpawn.mockReset();
     previousMaxJobs = process.env.DASHBOARD_MAX_FFMPEG_JOBS;
     previousMaxQueue = process.env.DASHBOARD_MAX_FFMPEG_QUEUE;
-    tmpRoot = mkdtempSync(join(tmpdir(), "reflectworld-dashboard-ffmpeg-"));
+    tmpRoot = mkdtempSync(join(tmpdir(), "cortex-dashboard-ffmpeg-"));
   });
 
   afterEach(() => {

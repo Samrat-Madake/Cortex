@@ -1,6 +1,6 @@
 import { createReadStream, statSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createRuntimeHealthReporter } from "@reflectworld/shared";
+import { createRuntimeHealthReporter } from "@cortex/shared";
 import { MAX_UPLOAD_BYTES, VIDEO_EXTENSIONS } from "./dashboard-common.js";
 import type { DashboardSessionScope } from "./dashboard-common.js";
 import { ensurePreviewVideoFile, ensureThumbnailImageFile } from "./dashboard-ffmpeg.js";

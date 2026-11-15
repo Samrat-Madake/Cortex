@@ -1,5 +1,5 @@
 // packages/percept/src/analyzers/vlm-analyzer.ts
-import type { Frame, LlmCallContext } from "@reflectworld/shared";
+import type { Frame, LlmCallContext } from "@cortex/shared";
 import type { VlmOutput } from "../types.js";
 import { buildVlmArchive } from "./vlm-analyzer/archive.js";
 import { buildOrderedContentParts } from "./vlm-analyzer/content-parts.js";

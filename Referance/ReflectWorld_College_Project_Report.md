@@ -1,4 +1,4 @@
-# ReflectWorld: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams
+# Cortex: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams
 
 ## College Project Report
 
@@ -6,7 +6,7 @@
 
 ## Project Understanding
 
-ReflectWorld is a comprehensive local-first visual memory platform designed to transform continuous camera streams into persistent, queryable semantic memory. The system fundamentally differs from traditional video analytics by treating visual perception not as episodic clip-level analysis, but as continuous world memory where entities, events, and scenes are linked temporally and semantically.
+Cortex is a comprehensive local-first visual memory platform designed to transform continuous camera streams into persistent, queryable semantic memory. The system fundamentally differs from traditional video analytics by treating visual perception not as episodic clip-level analysis, but as continuous world memory where entities, events, and scenes are linked temporally and semantically.
 
 The implementation combines multiple deep learning models (object detection, face recognition, pose estimation, speech-to-text), vector-based semantic search, and a React-based interactive dashboard. The system processes video frames through a segmentation pipeline, extracts multimodal evidence (visual, audio, textual), stores observations in a hierarchical memory structure, and exposes that memory through both API endpoints and an interactive UI. The architecture is intentionally modular and local-first: raw media, local recognition models, identity evidence, and persistent memory remain on the user's machine; only explicit VLM/LLM/STT requests are sent to configured cloud providers.
 
@@ -14,7 +14,7 @@ The implementation combines multiple deep learning models (object detection, fac
 
 ## 1. Project Title
 
-**ReflectWorld: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams**
+**Cortex: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams**
 
 *Subtitle: Local-First Visual Memory for AI Agents with Persistent Entity Tracking and Semantic Retrieval*
 
@@ -69,7 +69,7 @@ Existing systems excel at individual sub-problems but lack integration:
 - Summarization without semantic retrieval: A video summarization system might produce a dense text summary but does not support efficient retrieval of specific moments or entities.
 - Privacy concerns with centralized approaches: Existing surveillance or smart-home systems typically send raw video or detailed analysis to cloud services, raising privacy concerns.
 
-ReflectWorld bridges these gaps by combining entity-aware memory, multimodal fusion, semantic indexing, and persistent storage with a local-first design that respects user privacy.
+Cortex bridges these gaps by combining entity-aware memory, multimodal fusion, semantic indexing, and persistent storage with a local-first design that respects user privacy.
 
 ### 2.5 Motivation for the Proposed Solution
 
@@ -97,7 +97,7 @@ The system leverages multiple technology families:
 
 ### 2.7 Relationship to the Research Paper
 
-The implementation is derived from the research paper "ReflectWorld-MM: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams" (Ma et al., 2026, arXiv:2607.09759). The paper proposes a memory system specifically designed for entity-oriented understanding of long, open-ended video streams. Key concepts from the paper that are reflected in the implementation include:
+The implementation is derived from the research paper "Cortex-MM: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams" (Ma et al., 2026, arXiv:2607.09759). The paper proposes a memory system specifically designed for entity-oriented understanding of long, open-ended video streams. Key concepts from the paper that are reflected in the implementation include:
 
 - **Segment-level analysis**: Breaking continuous video into meaningful temporal moments (segments) that serve as the unit of analysis and memory storage.
 - **Hierarchical memory structure**: Storing observations at multiple levels of abstraction (episodic trace, entity-level observations, semantic context, procedural memory).
@@ -290,9 +290,9 @@ Shot boundary detection and scene segmentation remain challenging problems. Bara
 
 **Recent Video-LLM Approaches:**
 
-<cite index="1-1">VideoAgent (2024) constructs a structured memory to store both generic temporal event descriptions and object-centric tracking states of the video, employing tools including video segment localization and object memory querying along with VLMs to interactively solve tasks, demonstrating 6.6% improvement on NExT-QA and 26.0% on EgoSchema over baselines</cite>. This work is closely related to ReflectWorld's objective of combining memory with perception.
+<cite index="1-1">VideoAgent (2024) constructs a structured memory to store both generic temporal event descriptions and object-centric tracking states of the video, employing tools including video segment localization and object memory querying along with VLMs to interactively solve tasks, demonstrating 6.6% improvement on NExT-QA and 26.0% on EgoSchema over baselines</cite>. This work is closely related to Cortex's objective of combining memory with perception.
 
-<cite index="3-1">VidCompress proposes memory-enhanced temporal compression for Video-LLMs to address insufficient temporal-spatial interaction and difficulty in processing longer videos due to limited visual token capacity</cite>. The approach of compressing video into a memory-like representation aligns with ReflectWorld's hierarchy of abstraction.
+<cite index="3-1">VidCompress proposes memory-enhanced temporal compression for Video-LLMs to address insufficient temporal-spatial interaction and difficulty in processing longer videos due to limited visual token capacity</cite>. The approach of compressing video into a memory-like representation aligns with Cortex's hierarchy of abstraction.
 
 <cite index="4-1">StreamForest introduces efficient online video understanding with persistent event memory, addressing the gap between offline video understanding (where models have full access to the complete sequence) and streaming scenarios where real-time understanding of continuously evolving scenes is required</cite>.
 
@@ -312,7 +312,7 @@ Shot boundary detection and scene segmentation remain challenging problems. Bara
 
 Despite their capabilities, VLMs have fundamental limitations. <cite index="31-1">Testing shows that state-of-the-art VLMs including GPT-4o, Gemini-1.5 Pro, and Claude-3.5 Sonnet cannot reliably tell whether two lines or circles are intersecting and require minimal world knowledge, with accuracy ranging from ~41% to 93% depending on the task</cite>, indicating limitations in fine-grained visual perception even for simple geometric tasks.
 
-**Relevant to ReflectWorld:** VLMs are used in ReflectWorld as the perception back-end for semantic reasoning (generating summaries, identifying subjects, detecting security risks). The system leverages their strengths while working around limitations by grounding responses in stored evidence and supporting correction through memory updates.
+**Relevant to Cortex:** VLMs are used in Cortex as the perception back-end for semantic reasoning (generating summaries, identifying subjects, detecting security risks). The system leverages their strengths while working around limitations by grounding responses in stored evidence and supporting correction through memory updates.
 
 ### 5.4 Person Re-Identification and Face Recognition
 
@@ -328,7 +328,7 @@ Despite their capabilities, VLMs have fundamental limitations. <cite index="31-1
 
 <cite index="15-1">Video-based person re-identification using 3D Convolutional Networks and non-local attention tackles temporal dependency and spatial misalignment problems simultaneously, using 3D convolutions to extract spatial and temporal features and non-local blocks to capture spatial-temporal long-range dependencies</cite>.
 
-**Relevance:** ReflectWorld uses face detection (RetinaFace), face ReID (ArcFace embeddings), and body ReID (CLIP-ReID) to link entity observations across time. The literature confirms that multi-modal identity evidence (face and body) provides more robust identity resolution than single-modality approaches.
+**Relevance:** Cortex uses face detection (RetinaFace), face ReID (ArcFace embeddings), and body ReID (CLIP-ReID) to link entity observations across time. The literature confirms that multi-modal identity evidence (face and body) provides more robust identity resolution than single-modality approaches.
 
 ### 5.5 Temporal Video Segmentation
 
@@ -340,7 +340,7 @@ Despite their capabilities, VLMs have fundamental limitations. <cite index="31-1
 
 <cite index="22-1">Temporal video segmentation to scene can be formulated as a label identification problem using conditional random fields to integrate context information of neighboring shots, achieving 0.88 F-measure on various TV program genres</cite>.
 
-**Relevance:** ReflectWorld uses motion detection, optical flow, and audio activity detection for segmentation. The literature on CRF-based scene segmentation informed the design of segment boundary detection as a probabilistic problem, though ReflectWorld's approach prioritizes real-time inference over perfect segmentation accuracy.
+**Relevance:** Cortex uses motion detection, optical flow, and audio activity detection for segmentation. The literature on CRF-based scene segmentation informed the design of segment boundary detection as a probabilistic problem, though Cortex's approach prioritizes real-time inference over perfect segmentation accuracy.
 
 ### 5.6 Vector Databases and Semantic Search
 
@@ -352,7 +352,7 @@ Despite their capabilities, VLMs have fundamental limitations. <cite index="31-1
 
 <cite index="42-1">Vector search is a transformative information retrieval technique that goes beyond keyword matching to find data based on semantic meaning, with embeddings (vectors) representing data's conceptual essence, allowing search for "climate change" to retrieve documents about "global warming" even if exact words differ</cite>.
 
-**Relevance:** ReflectWorld uses Qdrant to store and retrieve memory records based on semantic similarity. The hierarchical memory structure (episodic_trace, episodic_entity, episodic_schema, semantic_entity, semantic_context, procedural) maps to different Qdrant collections, enabling efficient filtering by memory type and scope identifiers (camera_id, entity_id, user_id).
+**Relevance:** Cortex uses Qdrant to store and retrieve memory records based on semantic similarity. The hierarchical memory structure (episodic_trace, episodic_entity, episodic_schema, semantic_entity, semantic_context, procedural) maps to different Qdrant collections, enabling efficient filtering by memory type and scope identifiers (camera_id, entity_id, user_id).
 
 ### 5.7 Speech-to-Text and Audio Analysis
 
@@ -362,7 +362,7 @@ Despite their capabilities, VLMs have fundamental limitations. <cite index="31-1
 
 <cite index="63-1">Moonshine is an extremely compact speech-to-text model at only 61M parameters designed for resource-constrained environments like Raspberry Pi, achieving around 7.8% Word Error Rate on standard benchmarks while supporting speaker diarization and working efficiently on edge devices</cite>.
 
-**Relevance:** ReflectWorld supports both Moonshine (for local, edge-based STT) and ElevenLabs (for cloud-based higher-accuracy STT). The choice between them depends on accuracy requirements and privacy preferences, demonstrating the system's flexibility in model provider selection.
+**Relevance:** Cortex supports both Moonshine (for local, edge-based STT) and ElevenLabs (for cloud-based higher-accuracy STT). The choice between them depends on accuracy requirements and privacy preferences, demonstrating the system's flexibility in model provider selection.
 
 ### 5.8 Human Pose Estimation
 
@@ -372,7 +372,7 @@ Despite their capabilities, VLMs have fundamental limitations. <cite index="31-1
 
 <cite index="65-1">Whole-body pose estimation aims to predict fine-grained pose information for the human body including face, torso, hands, and feet, playing an important role in human-centric perception; RTMW incorporates RTMPose architecture with FPN and Hierarchical Encoding Module for better capture of pose information at different scales</cite>.
 
-**Relevance:** ReflectWorld uses RTMPose for body keypoint detection when body-level ReID is enabled. Pose information helps disambiguate person identity in challenging scenarios (e.g., two similar-looking people in different poses) and supports analysis of actions and interactions.
+**Relevance:** Cortex uses RTMPose for body keypoint detection when body-level ReID is enabled. Pose information helps disambiguate person identity in challenging scenarios (e.g., two similar-looking people in different poses) and supports analysis of actions and interactions.
 
 ### 5.9 Object Detection
 
@@ -384,7 +384,7 @@ The YOLO (You Only Look Once) series has evolved from the original single-stage 
 
 <cite index="46-1">YOLOv5Face builds upon YOLO's foundation by specializing in facial detection tasks, leveraging YOLO's efficient architecture and speed while adapting it specifically for face detection with high effectiveness and practical performance</cite>.
 
-**Relevance:** ReflectWorld uses YOLO26m (a compact YOLO variant, AGPL-licensed) for general object detection at Level 0 (all segments) and RetinaFace for specialized face detection at Level 1.
+**Relevance:** Cortex uses YOLO26m (a compact YOLO variant, AGPL-licensed) for general object detection at Level 0 (all segments) and RetinaFace for specialized face detection at Level 1.
 
 ### 5.10 Memory-Augmented AI Systems
 
@@ -394,17 +394,17 @@ The YOLO (You Only Look Once) series has evolved from the original single-stage 
 
 **Episodic vs. Semantic Memory:**
 
-Cognitive science distinguishes episodic memory (specific events) from semantic memory (facts and concepts). ReflectWorld mirrors this distinction by storing episodic traces (what happened when) and semantic context (stable facts about the scene and entities).
+Cognitive science distinguishes episodic memory (specific events) from semantic memory (facts and concepts). Cortex mirrors this distinction by storing episodic traces (what happened when) and semantic context (stable facts about the scene and entities).
 
 **Procedural Memory:**
 
-Beyond episodic and semantic, ReflectWorld supports procedural memory in the form of user-defined rules (e.g., "alert if a person appears in the office after hours"). This aligns with cognitive models that distinguish how-to knowledge (procedures) from what-is knowledge (facts).
+Beyond episodic and semantic, Cortex supports procedural memory in the form of user-defined rules (e.g., "alert if a person appears in the office after hours"). This aligns with cognitive models that distinguish how-to knowledge (procedures) from what-is knowledge (facts).
 
 ---
 
 ### 5.11 Comparison Table: Related Work
 
-| # | System/Paper | Year | Methodology | Technology | Key Contribution | Limitation | Relevance to ReflectWorld |
+| # | System/Paper | Year | Methodology | Technology | Key Contribution | Limitation | Relevance to Cortex |
 |---|---|---|---|---|---|---|---|
 | 1 | VideoAgent | 2024 | Memory-augmented agent with VLM reasoning | LLMs + VLM + Object tracking | Structured memory for video QA; 26% improvement on EgoSchema | Limited to QA; no persistent cross-session memory | Memory-augmented approach; agent integration |
 | 2 | FlexMem | 2024 | Visual memory with retrieval augmentation | MLLM + compression | Efficient handling of long videos via key-frame retrieval | Does not address entity tracking or multimodal fusion | Memory-based efficiency; semantic retrieval |
@@ -434,14 +434,14 @@ Beyond episodic and semantic, ReflectWorld supports procedural memory in the for
 
 2. **Episodic vs. persistent memory confusion**: Most systems treat memory as a compression technique (reducing video to summaries) rather than a first-class modeling concern (accumulating and linking observations).
 
-3. **Limited multimodal fusion**: While VLMs understand images, they do not natively integrate identity evidence from face/body detection, speech content, or written labels. ReflectWorld bridges these modalities.
+3. **Limited multimodal fusion**: While VLMs understand images, they do not natively integrate identity evidence from face/body detection, speech content, or written labels. Cortex bridges these modalities.
 
 4. **Privacy-unfriendly designs**: Existing surveillance and smart-home systems centralize raw or processed video to cloud services. Local-first design with explicit data-flow transparency is rare.
 
 5. **Weak agent integration**: Few systems expose memory through agent-friendly APIs that allow LLMs to treat stored experience as a reasoning resource rather than a static database.
 
-**How ReflectWorld Addresses the Gap:**
-ReflectWorld is positioned as a system that treats entity-oriented semantic memory as a first-class design principle. By combining local-first deployment, multimodal identity evidence, hierarchical memory storage, efficient retrieval, and agent-ready APIs, it enables continuous world understanding rather than episodic clip analysis.
+**How Cortex Addresses the Gap:**
+Cortex is positioned as a system that treats entity-oriented semantic memory as a first-class design principle. By combining local-first deployment, multimodal identity evidence, hierarchical memory storage, efficient retrieval, and agent-ready APIs, it enables continuous world understanding rather than episodic clip analysis.
 
 ---
 
@@ -449,7 +449,7 @@ ReflectWorld is positioned as a system that treats entity-oriented semantic memo
 
 ### 6.1 Overall System Approach
 
-ReflectWorld processes continuous video streams through a pipeline:
+Cortex processes continuous video streams through a pipeline:
 
 1. **Source Ingestion**: Accept video from files, RTSP streams, webcams, or uploads
 2. **Frame Extraction and Segmentation**: Extract frames and identify segment boundaries using motion, temporal changes, and audio activity
@@ -813,7 +813,7 @@ Agent Tools / Memory Search Available
 
 ### 7.2 Module Descriptions
 
-#### 7.2.1 @reflectworld/cam (Capture & Segmentation)
+#### 7.2.1 @cortex/cam (Capture & Segmentation)
 
 **Responsibility:** Accept video from diverse sources, extract frames, and identify segment boundaries.
 
@@ -851,7 +851,7 @@ interface Segment {
 
 **Dependencies:** FFmpeg, go2rtc, sharp (image processing), ONNX Runtime (for VAD)
 
-#### 7.2.2 @reflectworld/percept (Perception & Analysis)
+#### 7.2.2 @cortex/percept (Perception & Analysis)
 
 **Responsibility:** Extract multimodal perception (visual, audio, semantic) from each segment.
 
@@ -920,7 +920,7 @@ interface EntityRecord {
 - **Level 1:** Full local perception (detection, ReID, pose, VAD) + VLM; comprehensive analysis; higher compute
 - **Level 2:** Not yet implemented; would include advanced reasoning or custom models
 
-#### 7.2.3 @reflectworld/mem (Memory Client)
+#### 7.2.3 @cortex/mem (Memory Client)
 
 **Responsibility:** TypeScript client library for communicating with the Python memory service.
 
@@ -976,7 +976,7 @@ async searchReid(request: ReidSearchRequest): Promise<ReidSearchResponse>;
 
 **Dependencies:** FastAPI, Qdrant Python client, sentence-transformers or OpenAI embedding API
 
-#### 7.2.5 @reflectworld/reflectworld (Orchestrator, CLI, Runtime)
+#### 7.2.5 @cortex/cortex (Orchestrator, CLI, Runtime)
 
 **Responsibility:** Main orchestrator; CLI entry point; runtime configuration; dashboard API routes.
 
@@ -987,7 +987,7 @@ async searchReid(request: ReidSearchRequest): Promise<ReidSearchResponse>;
   - `configure.ts`: Configure as OpenClaw plugin
   - `enable-level1.ts`: Enable Level 1 perception features
 - `src/cli/index.ts`: Entry point for CLI commands
-- `src/services/reflectworld-service.ts`: Main service orchestrator; coordinates cam, percept, mem, memory adapter
+- `src/services/cortex-service.ts`: Main service orchestrator; coordinates cam, percept, mem, memory adapter
 - `src/services/dashboard-server.ts`: HTTP server; routes for sources, segments, entities, memory, chat
 - `src/services/memory-adapter.ts`: Bridge between TypeScript packages and Python memory service
 - `src/runtime/`: Runtime lifecycle management
@@ -1002,7 +1002,7 @@ async searchReid(request: ReidSearchRequest): Promise<ReidSearchResponse>;
 
 **Dependencies:** Everything (cam, percept, mem, host packages); Node.js; configured providers (OpenAI, Gemini, ElevenLabs)
 
-#### 7.2.6 @reflectworld/dashboard (React UI)
+#### 7.2.6 @cortex/dashboard (React UI)
 
 **Responsibility:** Interactive browser-based interface for system control and memory exploration.
 
@@ -1021,7 +1021,7 @@ async searchReid(request: ReidSearchRequest): Promise<ReidSearchResponse>;
 
 **Dependencies:** React, TypeScript, Tailwind CSS, WebSocket
 
-#### 7.2.7 @reflectworld/shared (Shared Types & Utilities)
+#### 7.2.7 @cortex/shared (Shared Types & Utilities)
 
 **Responsibility:** Shared data structures, constants, and utilities used across packages.
 
@@ -1033,7 +1033,7 @@ async searchReid(request: ReidSearchRequest): Promise<ReidSearchResponse>;
 
 **No Business Logic:** Purely type definitions and utilities.
 
-#### 7.2.8 @reflectworld/host (Development Host)
+#### 7.2.8 @cortex/host (Development Host)
 
 **Responsibility:** Standalone HTTP server for serving dashboard and tool APIs; used for development and demo.
 
@@ -1078,10 +1078,10 @@ PERCEPT (Running Continuously)
   ├─ Listen for segment_finalized
   ├─ Extract perception (object detect, face detect, VLM reason, etc.)
   ├─ Return PerceptionMemory
-  └─ → ReflectWorld service receives perception
+  └─ → Cortex service receives perception
      → Memory adapter stores in Python service
 
-ReflectWorld Service
+Cortex Service
   ├─ Listen for perception from PERCEPT
   ├─ Call memory_adapter.write(segment_summary, entities, context)
   ├─ Memory service writes to Qdrant
@@ -1187,7 +1187,7 @@ ReflectWorld Service
 
 #### 7.5.3 Tool Interface (For LLM Agents)
 
-ReflectWorld exposes memory as tools compatible with Claude, GPT-4, and other LLM tool-use APIs:
+Cortex exposes memory as tools compatible with Claude, GPT-4, and other LLM tool-use APIs:
 
 ```json
 {
@@ -1221,10 +1221,10 @@ ReflectWorld exposes memory as tools compatible with Claude, GPT-4, and other LL
 
 ### 7.6 System Workflow (End-to-End)
 
-**Scenario: User starts ReflectWorld with a webcam feed and asks "What did I do in the kitchen?"**
+**Scenario: User starts Cortex with a webcam feed and asks "What did I do in the kitchen?"**
 
 1. **Setup Phase:**
-   - User runs `npx @reflectworld/reflectworld start`
+   - User runs `npx @cortex/cortex start`
    - CLI loads `.env` configuration (VLM provider, embeddings model, etc.)
    - System initializes: CAM, PERCEPT, Memory Service, Dashboard Server
    - Dashboard opens at http://localhost:3210
@@ -1484,7 +1484,7 @@ ReflectWorld exposes memory as tools compatible with Claude, GPT-4, and other LL
 
 **Agent Frameworks:**
 - Current: Basic OpenClaw plugin support
-- Future: LangChain integration (agents can use ReflectWorld as a tool)
+- Future: LangChain integration (agents can use Cortex as a tool)
 - Future: AutoGen support (multi-agent scenarios)
 - Requires: Framework-specific API adapters
 
@@ -1528,7 +1528,7 @@ ReflectWorld exposes memory as tools compatible with Claude, GPT-4, and other LL
 
 ### Research Papers
 
-[1] Ma, X., Sun, Y., Jin, Z., Gu, J., Luo, Y., Shao, S., ... & Chen, J. (2026). "ReflectWorld-MM: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams." arXiv preprint arXiv:2607.09759.
+[1] Ma, X., Sun, Y., Jin, Z., Gu, J., Luo, Y., Shao, S., ... & Chen, J. (2026). "Cortex-MM: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams." arXiv preprint arXiv:2607.09759.
 
 [2] Zhang, G., Ding, M., Liu, T., Zhang, Y., Tresp, V., & Ludwig Maximilians University. (2025). "Memory Helps, but Confabulation Misleads: Understanding Streaming Events in Videos with MLLMs." arXiv preprint arXiv:2502.15457.
 
@@ -1606,12 +1606,12 @@ ReflectWorld exposes memory as tools compatible with Claude, GPT-4, and other LL
 | Perception Level 0 | `packages/percept/src/pipeline.ts` | VLM reasoning on keyframes |
 | Perception Level 1 | `packages/percept/src/analyzers/` | YOLO, RetinaFace, ArcFace, RTMPose, STT |
 | Entity Resolution | `packages/percept/src/identity-resolver.ts` | Cross-segment entity linking with ReID embeddings |
-| Memory Writing | `packages/reflectworld/src/memory-adapter.ts` | Calls Python memory service `/memories` endpoint |
+| Memory Writing | `packages/cortex/src/memory-adapter.ts` | Calls Python memory service `/memories` endpoint |
 | Memory Retrieval | `services/mem/src/memory_manager.py` | Qdrant search with filters |
-| Dashboard API | `packages/reflectworld/src/services/dashboard-server.ts` | HTTP endpoints for sources, segments, entities, memory, chat |
+| Dashboard API | `packages/cortex/src/services/dashboard-server.ts` | HTTP endpoints for sources, segments, entities, memory, chat |
 | WebSocket Events | `packages/shared/src/events.ts` | Event definitions; emitted by orchestrator |
 | Data Types | `packages/shared/src/types.ts` | Segment, PerceptionMemory, EntityRecord structures |
-| Configuration | `packages/reflectworld/src/cli/config.ts` | Environment variables, model providers, levels |
+| Configuration | `packages/cortex/src/cli/config.ts` | Environment variables, model providers, levels |
 
 ---
 
@@ -1619,7 +1619,7 @@ ReflectWorld exposes memory as tools compatible with Claude, GPT-4, and other LL
 
 ### What Was Confirmed from the Code
 
-✅ **Modular Architecture**: The codebase has clear package separation (cam, percept, mem, dashboard, reflectworld, shared, host), each with focused responsibilities.
+✅ **Modular Architecture**: The codebase has clear package separation (cam, percept, mem, dashboard, cortex, shared, host), each with focused responsibilities.
 
 ✅ **Segmentation Strategy**: Code implements composite segmentation using motion analysis (optical flow), visual change detection (histogram), and VAD (Silero). See `packages/cam/src/segmenter/`.
 
@@ -1629,11 +1629,11 @@ ReflectWorld exposes memory as tools compatible with Claude, GPT-4, and other LL
 
 ✅ **Entity Linking**: Code performs cross-segment entity resolution using face/body embedding similarity and semantic matching. See `packages/percept/src/identity-resolver.ts`.
 
-✅ **Dashboard and APIs**: HTTP endpoints for sources, segments, entities, memory search, and chat. WebSocket for real-time updates. See `packages/reflectworld/src/services/dashboard-server.ts` and `packages/dashboard/src/`.
+✅ **Dashboard and APIs**: HTTP endpoints for sources, segments, entities, memory search, and chat. WebSocket for real-time updates. See `packages/cortex/src/services/dashboard-server.ts` and `packages/dashboard/src/`.
 
-✅ **Local-First Design**: Raw media stored locally; configured VLM/STT calls are the only external requests. Configuration allows choosing providers (OpenAI, Gemini, ElevenLabs, etc.). See `.env.example` and `packages/reflectworld/src/cli/config.ts`.
+✅ **Local-First Design**: Raw media stored locally; configured VLM/STT calls are the only external requests. Configuration allows choosing providers (OpenAI, Gemini, ElevenLabs, etc.). See `.env.example` and `packages/cortex/src/cli/config.ts`.
 
-✅ **OpenClaw Plugin Support**: Code includes `openclaw.plugin.json` files in packages, indicating plugin architecture support. See `packages/percept/openclaw.plugin.json`, `packages/reflectworld/openclaw.plugin.json`.
+✅ **OpenClaw Plugin Support**: Code includes `openclaw.plugin.json` files in packages, indicating plugin architecture support. See `packages/percept/openclaw.plugin.json`, `packages/cortex/openclaw.plugin.json`.
 
 ### What Was Confirmed from the Research Paper
 
@@ -1686,8 +1686,8 @@ ReflectWorld exposes memory as tools compatible with Claude, GPT-4, and other LL
 **Report Prepared**: August 30, 2026
 
 **Source Analysis**:
-- Research Paper: "ReflectWorld-MM: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams" (Ma et al., arXiv:2607.09759)
-- Codebase: Full ReflectWorld repository analysis (packages: cam, percept, mem, dashboard, reflectworld, shared, host; services: mem)
+- Research Paper: "Cortex-MM: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams" (Ma et al., arXiv:2607.09759)
+- Codebase: Full Cortex repository analysis (packages: cam, percept, mem, dashboard, cortex, shared, host; services: mem)
 - External Research: 75+ academic papers and technical documentation reviewed for literature survey and technology validation
 
 **Key Findings**:

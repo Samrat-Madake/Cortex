@@ -1,10 +1,10 @@
 # Development Setup
 
-> This page is for contributors. It explains how to run ReflectWorld locally for
+> This page is for contributors. It explains how to run Cortex locally for
 > development. Architectural rationale lives under [architecture/](../architecture/overview.md);
 > this page focuses on the workflow.
 
-ReflectWorld is a TypeScript monorepo using npm workspaces, plus one Python
+Cortex is a TypeScript monorepo using npm workspaces, plus one Python
 subservice. Most code is TypeScript. The memory service is Python. The
 orchestrator imports the TypeScript packages as same-process libraries; only
 cross-language or external runtime dependencies such as Python mem, Rust
@@ -41,7 +41,7 @@ npm run build
 ```
 
 `npm install` installs all workspace dependencies and links local
-`@reflectworld/*` packages.
+`@cortex/*` packages.
 
 `npm run build` runs:
 
@@ -75,7 +75,7 @@ cp .env.example .env
 
 For a minimal Level 0 run, fill the `VLM_*` block. Infrastructure settings such
 as Qdrant ports and memory endpoints have defaults. OpenClaw plugin users should
-use `npx @reflectworld/reflectworld configure` instead of editing `.env`.
+use `npx @cortex/cortex configure` instead of editing `.env`.
 
 See [reference/configuration.md](../reference/configuration.md) and the
 [architecture overview](../architecture/overview.md).
@@ -85,13 +85,13 @@ See [reference/configuration.md](../reference/configuration.md) and the
 ## 3. Monorepo Layout
 
 ```text
-reflectworld/
+cortex/
 ├── packages/
 │   ├── shared/        shared types and event contracts
 │   ├── cam/           capture: sources -> VAD/STT -> segments
 │   ├── percept/       perception: detection -> ReID -> VLM
 │   ├── mem/           TypeScript client and types for the memory service
-│   ├── reflectworld/  orchestrator, process/config/storage, CLI, packaging
+│   ├── cortex/  orchestrator, process/config/storage, CLI, packaging
 │   ├── dashboard/     React frontend
 │   ├── host/          standalone host and demo server
 │   └── monitor/       deprecated; do not add new functionality here
@@ -108,7 +108,7 @@ reflectworld/
 | **cam** | `packages/cam` | TS | Multi-source capture to `Segment` |
 | **percept** | `packages/percept` | TS | Detection, ReID, VLM, identity resolution |
 | **mem client** | `packages/mem` | TS | HTTP client and type contract for the memory service |
-| **reflectworld** | `packages/reflectworld` | TS | Composition root, services, CLI, packaging |
+| **cortex** | `packages/cortex` | TS | Composition root, services, CLI, packaging |
 | **dashboard** | `packages/dashboard` | TS | Realtime UI, streaming partials, entity and memory views |
 | **host** | `packages/host` | TS | Standalone demo and tool API host |
 | **mem service** | `services/mem` | Python | Qdrant-backed memory, retrieval, semantic merge, ReID vector store |
@@ -117,13 +117,13 @@ Dependency direction:
 
 - `shared` is the bottom contract layer and depends on no workspace package.
 - `cam`, `percept`, and the TS `mem` client depend on `shared`.
-- `reflectworld` depends on `cam`, `percept`, `mem`, and `shared` and wires them
+- `cortex` depends on `cam`, `percept`, `mem`, and `shared` and wires them
   together in `register()`.
 - `dashboard` consumes backend events over HTTP/WebSocket and is not imported by
   backend packages.
 
 Put shared types/contracts in `shared`, package-specific business logic in the
-owning package, and orchestration in `reflectworld`.
+owning package, and orchestration in `cortex`.
 
 ---
 
@@ -132,8 +132,8 @@ owning package, and orchestration in `reflectworld`.
 ### Full Stack
 
 ```bash
-npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses
-npx @reflectworld/reflectworld start --dev
+npx @cortex/cortex setup --level 1 --yes --accept-model-licenses
+npx @cortex/cortex start --dev
 ```
 
 `--dev` uses local sources. The orchestrator starts subprocesses such as Python
@@ -149,7 +149,7 @@ npm run start
 ### Multiple Local Instances
 
 ```bash
-PORT=3211 QDRANT_PORT=6334 npx @reflectworld/reflectworld start --dev
+PORT=3211 QDRANT_PORT=6334 npx @cortex/cortex start --dev
 ```
 
 ### Python Memory Service Only
@@ -176,7 +176,7 @@ demo:
 
 ```bash
 npm run build
-npx @reflectworld/reflectworld setup --yes
+npx @cortex/cortex setup --yes
 npm run dashboard:demo
 ```
 

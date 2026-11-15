@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const VM_PKG = resolve(ROOT, "packages/reflectworld");
+const VM_PKG = resolve(ROOT, "packages/cortex");
 
 // ── Python services ──
 const BUNDLED_SERVICES = resolve(VM_PKG, "bundled-services");
@@ -64,18 +64,18 @@ if (uiPackage) {
       throw new Error(`${uiPackage} build produced no dist/`);
     }
   } catch (e) {
-    if (process.env.REFLECTWORLD_BUNDLE_ALLOW_MISSING_DASHBOARD === "1") {
-      console.warn(`[bundle] Dashboard UI build failed, skipping (REFLECTWORLD_BUNDLE_ALLOW_MISSING_DASHBOARD=1): ${e.message}`);
+    if (process.env.CORTEX_BUNDLE_ALLOW_MISSING_DASHBOARD === "1") {
+      console.warn(`[bundle] Dashboard UI build failed, skipping (CORTEX_BUNDLE_ALLOW_MISSING_DASHBOARD=1): ${e.message}`);
     } else {
-      console.error(`[bundle] Dashboard UI build failed. Set REFLECTWORLD_BUNDLE_ALLOW_MISSING_DASHBOARD=1 to skip.`);
+      console.error(`[bundle] Dashboard UI build failed. Set CORTEX_BUNDLE_ALLOW_MISSING_DASHBOARD=1 to skip.`);
       process.exit(1);
     }
   }
 } else {
-  if (process.env.REFLECTWORLD_BUNDLE_ALLOW_MISSING_DASHBOARD === "1") {
+  if (process.env.CORTEX_BUNDLE_ALLOW_MISSING_DASHBOARD === "1") {
     console.warn("[bundle] packages/dashboard not found, skipping");
   } else {
-    console.error("[bundle] packages/dashboard not found. Set REFLECTWORLD_BUNDLE_ALLOW_MISSING_DASHBOARD=1 to skip.");
+    console.error("[bundle] packages/dashboard not found. Set CORTEX_BUNDLE_ALLOW_MISSING_DASHBOARD=1 to skip.");
     process.exit(1);
   }
 }

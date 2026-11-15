@@ -391,7 +391,7 @@ def parse_args() -> argparse.Namespace:
     env_parser.add_argument(
         "--env-file",
         type=Path,
-        default=Path(os.getenv("REFLECTWORLD_ENV_FILE", REPO_ROOT / ".env")),
+        default=Path(os.getenv("CORTEX_ENV_FILE", REPO_ROOT / ".env")),
         help="Env file to load before resolving endpoint/model defaults. Defaults to repo .env.",
     )
     env_parser.add_argument("--env-override", action="store_true", help="Allow --env-file values to override shell env.")

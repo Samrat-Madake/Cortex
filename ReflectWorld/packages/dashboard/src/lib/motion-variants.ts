@@ -1,4 +1,4 @@
-// Shared motion animation presets for ReflectWorld Monitor.
+// Shared motion animation presets for Cortex Monitor.
 // Used with LazyMotion + domAnimation for minimal bundle.
 
 export const fadeInUp = {

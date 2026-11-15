@@ -75,9 +75,9 @@ export class Notifier {
     try {
       const { runId } = await this.deps.subagentRun({
         sessionKey,
-        message: `ReflectWorld notification — relay to user concisely:\n${text}`,
+        message: `Cortex notification — relay to user concisely:\n${text}`,
         deliver: true,
-        idempotencyKey: `reflectworld:summary:${randomUUID()}`,
+        idempotencyKey: `cortex:summary:${randomUUID()}`,
       });
       this.deps.logger.info(`[notifier:subagent] dispatched summary (runId=${runId}): ${text.slice(0, 80)}`);
       // Subagent handles delivery; send keyframe as a direct follow-up if available
@@ -118,9 +118,9 @@ export class Notifier {
     try {
       const { runId } = await this.deps.subagentRun({
         sessionKey,
-        message: `ReflectWorld identification result — relay to user concisely:\n${text}`,
+        message: `Cortex identification result — relay to user concisely:\n${text}`,
         deliver: true,
-        idempotencyKey: `reflectworld:identify:${randomUUID()}`,
+        idempotencyKey: `cortex:identify:${randomUUID()}`,
       });
       this.deps.logger.info(`[notifier:subagent] dispatched identify (runId=${runId}): ${text.slice(0, 80)}`);
       if (keyframePath) {

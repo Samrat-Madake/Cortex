@@ -8,7 +8,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { resolveFfmpegBin, resolveFfprobeBin } from "@reflectworld/cam";
+import { resolveFfmpegBin, resolveFfprobeBin } from "@cortex/cam";
 import { streamFrames } from "./frame-stream.js";
 
 export interface ExtractedFrame {
@@ -124,7 +124,7 @@ export class RecordingFrameSource implements VideoFrameSource {
       const remaining = maxFrames - allFrames.length;
       const vf = scaleFilter ? `fps=${fps},${scaleFilter}` : `fps=${fps}`;
 
-      const frameDir = mkdtempSync(join(tmpdir(), "reflectworld-vfs-"));
+      const frameDir = mkdtempSync(join(tmpdir(), "cortex-vfs-"));
       try {
         execFileSync(resolveFfmpegBin(), [
           "-y",

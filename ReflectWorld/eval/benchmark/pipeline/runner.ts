@@ -1,5 +1,5 @@
 // eval/benchmark/pipeline/runner.ts
-// Offline video benchmark runner for ReflectWorld perception + memory + Agent QA evaluation.
+// Offline video benchmark runner for Cortex perception + memory + Agent QA evaluation.
 
 import dotenv from "dotenv";
 import { resolve, dirname, join, basename, extname } from "node:path";
@@ -9,12 +9,12 @@ import { execSync } from "node:child_process";
 const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 dotenv.config({ path: resolve(__root, ".env") });
 
-import { monitorBus, resolveReflectWorldHome, resolveReflectWorldStateDir } from "@reflectworld/shared";
-import { createPipelineDeps, resolvePerceptionConfig, VlmAnalyzer } from "@reflectworld/percept";
-import { ReflectWorldClient } from "@reflectworld/mem";
-import { PipelineStore } from "../../../packages/reflectworld/src/store.js";
-import { QdrantService } from "../../../packages/reflectworld/src/services/qdrant-service.js";
-import { ReflectWorldService } from "../../../packages/reflectworld/src/services/reflectworld-service.js";
+import { monitorBus, resolveCortexHome, resolveCortexStateDir } from "@cortex/shared";
+import { createPipelineDeps, resolvePerceptionConfig, VlmAnalyzer } from "@cortex/percept";
+import { CortexClient } from "@cortex/mem";
+import { PipelineStore } from "../../../packages/cortex/src/store.js";
+import { QdrantService } from "../../../packages/cortex/src/services/qdrant-service.js";
+import { CortexService } from "../../../packages/cortex/src/services/cortex-service.js";
 import { runVideoPipeline } from "./video-pipeline.js";
 import { runAgentQA } from "./agent-qa.js";
 import { countEpisodicMemories, countSemanticMemories, dumpMemories } from "./memory-dump.js";
@@ -23,7 +23,7 @@ import { wireBenchmarkReidMemory } from "./pipeline-memory.js";
 import { recordBenchmarkSemanticContextObservation, wireBenchmarkSemanticContext } from "./semantic-context.js";
 import { buildVisionControllerConsultationPrompt, parseVisionControllerConsultationResponse } from "./consultation.js";
 import type { BenchmarkDataset, RunMeta, VideoQAOutput } from "./types.js";
-import { createBenchmarkVisionControllerConfig } from "../../../packages/reflectworld/src/vision-controller/default-config.js";
+import { createBenchmarkVisionControllerConfig } from "../../../packages/cortex/src/vision-controller/default-config.js";
 import { SingleFileFrameSource } from "./video-frame-source.js";
 import { loadSrtFile, type SrtEntry } from "./srt-provider.js";
 
@@ -89,7 +89,7 @@ if (!datasetPath) {
 const fps = parseInt(getArg("fps", "1")!, 10);
 const framesPerSegment = parseInt(getArg("frames-per-segment", "15")!, 10);
 const runId = `run_${Date.now().toString(36)}`;
-const outputDir = resolve(getArg("output") ?? join(resolveReflectWorldStateDir(), "benchmark", runId));
+const outputDir = resolve(getArg("output") ?? join(resolveCortexStateDir(), "benchmark", runId));
 const videoFilter = getArg("videos")?.split(",");
 const reuseRunDir = getArg("reuse-run");
 const doCleanup = hasFlag("cleanup");
@@ -155,7 +155,7 @@ async function main() {
   console.error(`Collection prefix: ${collectionPrefix}`);
 
   // ── Start Qdrant (reuse external or setup-prepared binary) ──
-  const stateDir = resolveReflectWorldHome();
+  const stateDir = resolveCortexHome();
   const qdrantPort = parseInt(process.env.QDRANT_PORT ?? process.env.BENCH_QDRANT_PORT ?? "6333", 10);
   const qdrantGrpcPort = parseInt(process.env.QDRANT_GRPC_PORT ?? process.env.BENCH_QDRANT_GRPC_PORT ?? String(qdrantPort + 1), 10);
   const qdrantService = new QdrantService({ stateDir, httpPort: qdrantPort, grpcPort: qdrantGrpcPort });
@@ -164,16 +164,16 @@ async function main() {
   console.error(`[benchmark] Qdrant ready (mode=${qdrantService.mode}, endpoint=${qdrantService.endpoint})`);
 
   // ── Start Mem service (managed lifecycle) ──
-  const memPort = parseInt(process.env.BENCH_REFLECTWORLD_PORT ?? "18219", 10);
+  const memPort = parseInt(process.env.BENCH_CORTEX_PORT ?? "18219", 10);
 
-  // ReflectWorldService.start() handles port conflicts: if the port is occupied
+  // CortexService.start() handles port conflicts: if the port is occupied
   // and a custom collectionName is set, it auto-finds a free port instead of
   // killing the existing process.
 
   // Create output dir before Mem service starts — Mem needs it for SQLite history db
   mkdirSync(join(outputDir, "mem-storage"), { recursive: true });
 
-  const memService = new ReflectWorldService({
+  const memService = new CortexService({
     stateDir,
     port: memPort,
     qdrantPort,
@@ -197,7 +197,7 @@ async function main() {
   await memService.start();
   console.error(`[benchmark] Mem service ready (mode=${memService.mode}, endpoint=${memService.endpoint})`);
 
-  const memClient = new ReflectWorldClient({
+  const memClient = new CortexClient({
     baseUrl: memService.endpoint,
     timeoutMs: parseInt(process.env.BENCH_MEM_TIMEOUT_MS ?? "120000", 10),
   });
@@ -266,7 +266,7 @@ async function main() {
       || basename(outputDir);
     const store = new PipelineStore(videoOutputDir);
 
-    const { NarrativeMemory } = await import("@reflectworld/percept");
+    const { NarrativeMemory } = await import("@cortex/percept");
 
     if (!reuseRunDir) {
       // Phase 1: Perception pipeline

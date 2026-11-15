@@ -330,7 +330,7 @@ function displayServiceEntries(services: Record<string, string>): Array<{ label:
 
 function displayServiceName(raw: string): string {
   const name = raw.toLowerCase();
-  if (name.includes("reflect") || name.includes("host")) return "ReflectWorld";
+  if (name.includes("reflect") || name.includes("host")) return "Cortex";
   if (name.includes("database") || name.includes("sqlite") || name.includes("qdrant") || name.includes("memory") || name.includes("db")) return "Database";
   if (name.includes("go2rtc") || name.includes("stream") || name.includes("rtsp") || name.includes("video")) return "Video Stream";
   if (name.includes("monitor") || name.includes("dashboard")) return "Monitor";
@@ -338,7 +338,7 @@ function displayServiceName(raw: string): string {
 }
 
 function serviceSortRank(label: string): number {
-  if (label === "ReflectWorld") return 0;
+  if (label === "Cortex") return 0;
   if (label === "Database") return 1;
   if (label === "Video Stream") return 2;
   if (label === "Monitor") return 3;

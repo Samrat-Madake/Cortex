@@ -2,7 +2,7 @@
  * SegmentBuilder — converts Cam's FrameResult[] into a shared Segment.
  */
 
-import type { Segment, Frame, SpeechSegment, AudioData } from "@reflectworld/shared";
+import type { Segment, Frame, SpeechSegment, AudioData } from "@cortex/shared";
 import type { FrameResult } from "./types.js";
 
 let segmentCounter = 0;

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { DatabaseSync } from "node:sqlite";
 import { PipelineStore } from "../store.js";
-import type { LlmCallRecord, PipelineTrace } from "@reflectworld/shared";
+import type { LlmCallRecord, PipelineTrace } from "@cortex/shared";
 
 const DAY_MS = 86_400_000;
 

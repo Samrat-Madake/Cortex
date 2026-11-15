@@ -1,11 +1,11 @@
 /**
- * ReflectWorld Host — loads the all-in-one plugin and exposes HTTP API.
+ * Cortex Host — loads the all-in-one plugin and exposes HTTP API.
  *
  * Usage:
  *   VLM_API_KEY=xxx npx tsx packages/host/src/server.ts
  *
  * Everything else is managed after setup:
- *   - Qdrant, ReflectWorld → auto-start as plugin services
+ *   - Qdrant, Cortex → auto-start as plugin services
  *   - go2rtc, ffmpeg → resolved from setup-prepared binaries
  *   - Eye → Perception → Memory pipeline → auto-wired
  *
@@ -19,24 +19,24 @@ import { createServer } from "node:http";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveReflectWorldStateDir } from "@reflectworld/shared";
+import { resolveCortexStateDir } from "@cortex/shared";
 import { MiniHost } from "./mini-host.js";
 import { attachMonitorWs } from "./ws-server.js";
 import { serveStatic } from "./static-server.js";
 
 const __hostDir = dirname(fileURLToPath(import.meta.url));
 const DASHBOARD_DIST = resolve(__hostDir, "../../dashboard/dist");
-import reflectworldPlugin from "@reflectworld/reflectworld";
+import cortexPlugin from "@cortex/cortex";
 
 const PORT = parseInt(process.env.PORT ?? "3210", 10);
 const GO2RTC_PORT = parseInt(process.env.GO2RTC_API_PORT ?? "1984", 10);
-const STATE_DIR = resolveReflectWorldStateDir();
+const STATE_DIR = resolveCortexStateDir();
 const DASHBOARD_PORT = parseInt(process.env.DASHBOARD_PORT ?? process.env.DASHBOARD_PORT ?? "3211", 10);
 
 const host = new MiniHost({
   stateDir: STATE_DIR,
   pluginConfigs: {
-    reflectworld: {
+    cortex: {
       cam: {
         sources_dir: `${STATE_DIR}/sources`,
         recordings_dir: `${STATE_DIR}/recordings`,
@@ -57,12 +57,12 @@ const host = new MiniHost({
   },
 });
 
-console.log("\n  Booting ReflectWorld...\n");
+console.log("\n  Booting Cortex...\n");
 
 // Load plugin → register tools + services
-await host.loadPlugin(reflectworldPlugin);
+await host.loadPlugin(cortexPlugin);
 
-// Start all services (Qdrant → ReflectWorld → go2rtc)
+// Start all services (Qdrant → Cortex → go2rtc)
 await host.startServices();
 
 // HTTP server
@@ -103,7 +103,7 @@ const server = createServer(async (req, res) => {
 
     // POST /api/monitor/inject — inject events into EventBus (for testing/mock)
     if (url.pathname === "/api/monitor/inject" && method === "POST") {
-      const { monitorBus } = await import("@reflectworld/shared");
+      const { monitorBus } = await import("@cortex/shared");
       const body = await readBody(req);
       const events = JSON.parse(body || "[]");
       const list = Array.isArray(events) ? events : [events];
@@ -196,7 +196,7 @@ function readBody(req: import("node:http").IncomingMessage): Promise<string> {
 attachMonitorWs(server);
 
 server.listen(PORT, () => {
-  console.log(`\n  ReflectWorld ready on http://localhost:${PORT}`);
+  console.log(`\n  Cortex ready on http://localhost:${PORT}`);
   console.log(`  Tools: ${host.listTools().map(t => t.name).join(", ")}`);
   console.log(`  State: ${STATE_DIR}\n`);
 });

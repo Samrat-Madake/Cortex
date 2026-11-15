@@ -1,4 +1,4 @@
-import { writeStderr, type Segment, type PipelineTrace } from "@reflectworld/shared";
+import { writeStderr, type Segment, type PipelineTrace } from "@cortex/shared";
 import { VlmAnalysisError, type VlmAnalyzer, type VlmSegmentAnalyzeOptions } from "../analyzers/vlm-analyzer.js";
 import type { AnalyzerResult, DetectionOutput, SttOutput } from "../types.js";
 import type { VlmFrameResizeOptions } from "./types.js";

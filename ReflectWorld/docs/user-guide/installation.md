@@ -1,6 +1,6 @@
 # Installation
 
-> What ReflectWorld needs and how to install it. After this page you should
+> What Cortex needs and how to install it. After this page you should
 > have a local environment that can start.
 >
 > For the first end-to-end run, see [quickstart.md](./quickstart.md). For CLI
@@ -11,11 +11,11 @@
 ## TL;DR
 
 - **Fastest path**: install Node.js >= 22, then run
-  `npx @reflectworld/reflectworld start`. First startup downloads the binaries
+  `npx @cortex/cortex start`. First startup downloads the binaries
   and models required at runtime.
-- ReflectWorld **manages its own runtime dependencies**. `setup` downloads
+- Cortex **manages its own runtime dependencies**. `setup` downloads
   pinned versions of ffmpeg, Qdrant, go2rtc, and `uv` into
-  `~/.reflectworld/bin`. You do not need to install them yourself.
+  `~/.cortex/bin`. You do not need to install them yourself.
 - **Level 0** needs Node.js and one VLM API key. **Level 1** adds local
   detection and face recognition, so it needs additional models and native
   inference dependencies.
@@ -30,7 +30,7 @@
 |---|---|---|---|
 | **Node.js >= 22** | Yes | You | The only hard prerequisite. |
 | A VLM API key | Yes for Level 0 | You | OpenAI-compatible endpoint or Gemini. |
-| ffmpeg / Qdrant / go2rtc / uv | No manual install | `setup` | Downloaded as pinned binaries into `~/.reflectworld/bin`. |
+| ffmpeg / Qdrant / go2rtc / uv | No manual install | `setup` | Downloaded as pinned binaries into `~/.cortex/bin`. |
 | Python | No manual install | `uv` | The memory service is Python FastAPI and runs in an isolated uv environment. |
 | onnxruntime-node / sharp / local models | Level 1 only | `enable-level1` and `setup --level 1 --accept-model-licenses` | Required for local detection and ReID. |
 
@@ -41,18 +41,18 @@ the supported path.
 
 ## 2. One-Command Install and Start
 
-ReflectWorld treats first-time setup as part of `start`. If setup is missing,
+Cortex treats first-time setup as part of `start`. If setup is missing,
 stale, or incomplete, `start` runs it automatically.
 
 ```bash
 # After npm publication
-npm install @reflectworld/reflectworld
+npm install @cortex/cortex
 
 # Create a .env with your Level 0 VLM key.
 $EDITOR .env
 
 # Start the whole stack.
-npx @reflectworld/reflectworld start
+npx @cortex/cortex start
 # -> http://localhost:3210
 ```
 
@@ -61,12 +61,12 @@ Open `http://localhost:3210` after startup.
 For source checkout development:
 
 ```bash
-git clone <repo> reflectworld
-cd reflectworld
+git clone <repo> cortex
+cd cortex
 npm install
 npm run build
 cp .env.example .env
-npx @reflectworld/reflectworld start --dev
+npx @cortex/cortex start --dev
 ```
 
 `--dev` runs the memory service from the local source tree.
@@ -75,7 +75,7 @@ npx @reflectworld/reflectworld start --dev
 
 `setup` has three phases:
 
-1. **Binaries**, always downloaded into `~/.reflectworld/bin`:
+1. **Binaries**, always downloaded into `~/.cortex/bin`:
 
    | Binary | Version | Purpose |
    |---|---|---|
@@ -86,13 +86,13 @@ npx @reflectworld/reflectworld start --dev
    | `uv` | 0.7.12 | Python runner for the memory service |
 
    The packaged Python memory service source is copied to
-   `~/.reflectworld/services/mem`.
+   `~/.cortex/services/mem`.
 
-2. **Perception models**, downloaded into `~/.reflectworld/models` according to
+2. **Perception models**, downloaded into `~/.cortex/models` according to
    the selected level.
 
 3. **Validation**, which verifies that required binaries exist, records the
-   achieved level, and writes `~/.reflectworld/.setup.json`.
+   achieved level, and writes `~/.cortex/.setup.json`.
 
 `setup` is idempotent. Existing binaries and models are skipped, so it is safe
 to run repeatedly.
@@ -121,24 +121,24 @@ Level 1 requires both native peer dependencies and model files:
 
 ```bash
 # Install native peer dependencies.
-npx @reflectworld/reflectworld enable-level1
+npx @cortex/cortex enable-level1
 # --gpu       accepted for old scripts; CUDA is detected by onnxruntime-node
 # --with-stt  also installs sherpa-onnx-node for speech transcription
 
 # Download + build Level 1 model files (accepts the models' AGPL / non-commercial licenses).
-npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses
+npx @cortex/cortex setup --level 1 --yes --accept-model-licenses
 ```
 
-If model files are present, ReflectWorld enables the local analysis path
+If model files are present, Cortex enables the local analysis path
 automatically. If models or engines are missing, the system warns and degrades
 to Level 0 instead of crashing. To make missing Level 1 support fatal for a
 deployment, set `perception.required_level=1` or
-`REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL=1`.
+`CORTEX_PERCEPTION_REQUIRED_LEVEL=1`.
 
 For Linux GPU deployments, use `onnxruntime-node`; do not install
 `onnxruntime-node-gpu`. Ensure the NVIDIA driver, CUDA 12 runtime, and cuDNN 9
 are visible to the Node dynamic linker. Use system linker paths, `LD_LIBRARY_PATH`,
-or `REFLECTWORLD_CUDNN_LIB_DIR` when necessary.
+or `CORTEX_CUDNN_LIB_DIR` when necessary.
 
 `setup --level 1` acquires each Level 1 model the way its license allows, in three
 categories: (1) **license-clean** models (Silero/Moonshine, MIT) download directly;
@@ -146,12 +146,12 @@ categories: (1) **license-clean** models (Silero/Moonshine, MIT) download direct
 RTMPose via MMPose — non-commercial) download directly but require accepting their
 license; (3) **restricted models shipped only as training weights** (YOLO26m,
 RetinaFace, CLIP-ReID) have their open-source weights downloaded and converted to
-ONNX locally (in a throwaway Python env managed by the bundled `uv`). ReflectWorld
+ONNX locally (in a throwaway Python env managed by the bundled `uv`). Cortex
 never redistributes weights. The runtime uses the highest level supported by the
 models that are actually present.
 
 RTMPose and CLIP-ReID are installed only when Body ReID is requested. Set
-`REFLECTWORLD_BODY_REID_ENABLED=true` before running `setup --level 1` to include
+`CORTEX_BODY_REID_ENABLED=true` before running `setup --level 1` to include
 those two models.
 
 Level 1 models are governed by their upstream licenses. Check license terms
@@ -161,22 +161,22 @@ before redistributing or using them commercially.
 
 ## 4. Directory Layout
 
-ReflectWorld separates shared assets from per-instance state:
+Cortex separates shared assets from per-instance state:
 
 | Purpose | Default path | Environment variable | Contents |
 |---|---|---|---|
-| **Shared assets** | `~/.reflectworld/` | `REFLECTWORLD_HOME` | `bin/`, `models/`, copied Python service source, `.setup.json` |
-| **Instance state** | `./.reflectworld-state/` | `REFLECTWORLD_STATE_DIR` | Qdrant storage, recordings, media, source config, SQLite |
+| **Shared assets** | `~/.cortex/` | `CORTEX_HOME` | `bin/`, `models/`, copied Python service source, `.setup.json` |
+| **Instance state** | `./.cortex-state/` | `CORTEX_STATE_DIR` | Qdrant storage, recordings, media, source config, SQLite |
 
 Multiple clones or instances can share binaries and models while keeping runtime
 state separate.
 
 ```bash
-PORT=3211 QDRANT_PORT=6334 npx @reflectworld/reflectworld start
+PORT=3211 QDRANT_PORT=6334 npx @cortex/cortex start
 ```
 
-For a clean setup, keep shared assets in `REFLECTWORLD_HOME` and runtime data
-in `REFLECTWORLD_STATE_DIR`. This documentation uses only ReflectWorld directory
+For a clean setup, keep shared assets in `CORTEX_HOME` and runtime data
+in `CORTEX_STATE_DIR`. This documentation uses only Cortex directory
 names.
 
 ---
@@ -202,7 +202,7 @@ names.
 ffmpeg comes from third-party static-build hosts: evermeet.cx on macOS and
 johnvansickle.com on Linux. Qdrant, go2rtc, and uv come from their upstream
 GitHub releases. If your network blocks these hosts, pre-place the binaries in
-`~/.reflectworld/bin`; `setup` skips files that already exist.
+`~/.cortex/bin`; `setup` skips files that already exist.
 
 ---
 
@@ -224,7 +224,7 @@ Seeing `starting` or `degraded` on the first Dashboard load is normal:
 - The first `uv run` for the memory service can take several minutes.
 - `curl http://localhost:3210/api/health` shows `starting` with HTTP 503 until
   the stack becomes `ready` with HTTP 200.
-- Non-critical service failures do not crash the UI. ReflectWorld keeps the
+- Non-critical service failures do not crash the UI. Cortex keeps the
   usable subset available in degraded mode.
 
 Later startups are faster because binaries, models, and Python dependencies are

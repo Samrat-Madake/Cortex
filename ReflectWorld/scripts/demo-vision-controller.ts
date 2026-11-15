@@ -1,5 +1,5 @@
 /**
- * Semi-automated ReflectWorld VisionController demo script.
+ * Semi-automated Cortex VisionController demo script.
  *
  * Three-act showcase (~10 minutes):
  *   Act 1: Basic security — baseline -> person frame boost -> Agent consultation -> baseline recovery
@@ -13,17 +13,17 @@
 
 import { resolve, join } from "node:path";
 import { existsSync } from "node:fs";
-import { resolveReflectWorldHome } from "@reflectworld/shared";
+import { resolveCortexHome } from "@cortex/shared";
 
 // ── Config ──
 
 const HOST_URL = process.env.HOST_URL ?? "http://localhost:3210";
 const MONITOR_WS_URL = process.env.MONITOR_WS_URL ?? "ws://localhost:3211";
 const GO2RTC_URL = process.env.GO2RTC_URL ?? "http://localhost:1984";
-const REFLECTWORLD_URL = process.env.REFLECTWORLD_URL ?? "http://localhost:8219";
+const CORTEX_URL = process.env.CORTEX_URL ?? "http://localhost:8219";
 
 const VIDEO_DIR = resolve("eval/video-runner/fixtures/videos");
-const MODEL_DIR = join(resolveReflectWorldHome(), "models");
+const MODEL_DIR = join(resolveCortexHome(), "models");
 
 // ── Types ──
 
@@ -274,9 +274,9 @@ async function preflight(): Promise<boolean> {
 
   const portChecks = await Promise.all([
     checkPort(`${GO2RTC_URL}/api/streams`, "go2rtc"),
-    checkPort(`${HOST_URL}/api/health`, "ReflectWorld Host"),
+    checkPort(`${HOST_URL}/api/health`, "Cortex Host"),
     checkPort(`${MONITOR_WS_URL.replace("ws", "http")}`, "Monitor"),
-    checkPort(`${REFLECTWORLD_URL}/health`, "ReflectWorld Python"),
+    checkPort(`${CORTEX_URL}/health`, "Cortex Python"),
   ]);
 
   console.log();
@@ -359,7 +359,7 @@ function connectMonitor(): Promise<WebSocket> {
 async function configureVisionController(config: Record<string, unknown>): Promise<void> {
   console.log(`  Configuring VisionController...`);
   try {
-    await callTool("reflectworld_perception", {
+    await callTool("cortex_perception", {
       action: "configure",
       vc_rules_json: JSON.stringify(config.auto_rules),
       vc_segment_policy_json: config.segment_policy
@@ -376,9 +376,9 @@ async function switchVideo(camera: string, videoFile: string): Promise<void> {
   console.log(`  Switching ${camera} to ${videoFile}`);
   try {
     // Remove existing source, then re-add with new video
-    await callTool("reflectworld_cam", { action: "remove_source", name: camera }).catch(() => {});
+    await callTool("cortex_cam", { action: "remove_source", name: camera }).catch(() => {});
     await sleep(500);
-    await callTool("reflectworld_cam", {
+    await callTool("cortex_cam", {
       action: "add_source",
       name: camera,
       url: videoPath,
@@ -476,7 +476,7 @@ async function main(): Promise<void> {
 
   if (!ok) {
     console.error("\nPre-flight checks failed. Start all services first:");
-    console.error("  npx @reflectworld/reflectworld start\n");
+    console.error("  npx @cortex/cortex start\n");
     process.exit(1);
   }
 
@@ -484,7 +484,7 @@ async function main(): Promise<void> {
   const ws = await connectMonitor();
 
   stats.startTime = Date.now();
-  banner("ReflectWorld VisionController Demo");
+  banner("Cortex VisionController Demo");
   console.log("\n  Open Monitor: http://localhost:3211/\n");
 
   // Run all phases

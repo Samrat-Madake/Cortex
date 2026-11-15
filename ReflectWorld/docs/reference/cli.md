@@ -1,18 +1,18 @@
 # CLI Reference
 
-> Reference for the `@reflectworld/reflectworld` CLI. This page is intended for
+> Reference for the `@cortex/cortex` CLI. This page is intended for
 > integrators and contributors.
 >
-> Entry point: `packages/reflectworld/src/cli/index.ts`, dispatching to
+> Entry point: `packages/cortex/src/cli/index.ts`, dispatching to
 > `start`, `setup`, `configure`, and `enable-level1`.
 
 ```text
-Usage: npx @reflectworld/reflectworld <command>
+Usage: npx @cortex/cortex <command>
 
 Commands:
   setup [--yes] [--level 0|1] [--home-dir DIR] [--accept-model-licenses]   download binaries and models
   enable-level1 [--gpu] [--with-stt]              install Level 1 native peer dependencies
-  start [--dev] [--port N] [--home-dir DIR]       start ReflectWorld
+  start [--dev] [--port N] [--home-dir DIR]       start Cortex
   configure                                       configure OpenClaw plugin model providers
 ```
 
@@ -21,10 +21,10 @@ help and exit with code 1.
 
 ---
 
-## `start` - Start ReflectWorld
+## `start` - Start Cortex
 
 ```bash
-npx @reflectworld/reflectworld start
+npx @cortex/cortex start
 ```
 
 Starts the local all-in-one stack. The HTTP UI becomes visible first, while
@@ -52,18 +52,18 @@ Flags:
 |---|---|---|
 | `--dev` | Development mode. The Python memory service source comes from `./services/mem` instead of the copied home directory. | off |
 | `--port N` | Dashboard / HTTP port. Equivalent to `PORT`. | 3210 |
-| `--home-dir DIR` | Binary and model installation directory. Equivalent to `REFLECTWORLD_HOME`. | see directory resolution |
-| `--state-dir DIR` | Runtime state directory. Equivalent to `REFLECTWORLD_STATE_DIR`. | `./.reflectworld-state/` |
+| `--home-dir DIR` | Binary and model installation directory. Equivalent to `CORTEX_HOME`. | see directory resolution |
+| `--state-dir DIR` | Runtime state directory. Equivalent to `CORTEX_STATE_DIR`. | `./.cortex-state/` |
 
 Related environment variables: `QDRANT_PORT` (6333), `QDRANT_GRPC_PORT`
-(`QDRANT_PORT + 1`), `REFLECTWORLD_MEM_PORT` (8219), `GO2RTC_API_PORT` (1984),
+(`QDRANT_PORT + 1`), `CORTEX_MEM_PORT` (8219), `GO2RTC_API_PORT` (1984),
 `GO2RTC_RTSP_PORT` (8554), `GO2RTC_WEBRTC_PORT` (8555),
 `GO2RTC_LISTEN_ADDR` (`127.0.0.1`), and `GO2RTC_REUSE_EXTERNAL` (true).
 
 Directory resolution: `--home-dir` and `--state-dir` are canonicalized. When
-not passed explicitly, the CLI uses `REFLECTWORLD_HOME` and
-`REFLECTWORLD_STATE_DIR`, then falls back to `~/.reflectworld` and
-`./.reflectworld-state/`. Public documentation treats these ReflectWorld paths
+not passed explicitly, the CLI uses `CORTEX_HOME` and
+`CORTEX_STATE_DIR`, then falls back to `~/.cortex` and
+`./.cortex-state/`. Public documentation treats these Cortex paths
 as the runtime contract.
 
 See [http-api.md](./http-api.md) for runtime endpoints.
@@ -73,7 +73,7 @@ See [http-api.md](./http-api.md) for runtime endpoints.
 ## `setup` - Download Binaries and Models
 
 ```bash
-npx @reflectworld/reflectworld setup [--yes] [--level 0|1] [--home-dir DIR] [--accept-model-licenses]
+npx @cortex/cortex setup [--yes] [--level 0|1] [--home-dir DIR] [--accept-model-licenses]
 ```
 
 Downloads and verifies runtime binaries and model files, then writes the
@@ -97,7 +97,7 @@ Levels:
 | **1** | Scene Understanding + Local Recognition | L0 plus YOLO26m, RetinaFace ResNet50, and ArcFace MBF, about 200 MB+ | Adds local detection, coordinates, and face ReID. Identity evidence stays local. |
 
 RTMPose and CLIP-ReID ViT-B are optional Body ReID models. Set
-`REFLECTWORLD_BODY_REID_ENABLED=true` before `setup --level 1` to include them;
+`CORTEX_BODY_REID_ENABLED=true` before `setup --level 1` to include them;
 otherwise setup skips them.
 
 Flags:
@@ -106,7 +106,7 @@ Flags:
 |---|---|
 | `--yes` / `-y` | Non-interactive mode; skip level selection prompts. |
 | `--level 0|1` | Select perception level. In non-TTY or `--yes` mode, the default is 0. |
-| `--home-dir DIR` | Installation directory; default `~/.reflectworld`. |
+| `--home-dir DIR` | Installation directory; default `~/.cortex`. |
 | `--accept-model-licenses` | Accept the upstream licenses required to download or locally convert restricted Level 1 models. |
 
 Setup is idempotent. Existing binaries and models are skipped. Missing required
@@ -119,7 +119,7 @@ existence, and recorded model existence to decide whether setup must rerun.
 ## `enable-level1` - Install Level 1 Native Peers
 
 ```bash
-npx @reflectworld/reflectworld enable-level1 [--gpu] [--with-stt]
+npx @cortex/cortex enable-level1 [--gpu] [--with-stt]
 ```
 
 Installs native npm peer dependencies required for Level 1 inference. These are
@@ -127,7 +127,7 @@ C++ addons and are separate from model files downloaded by `setup`. Source:
 `cli/enable-level1.ts`.
 
 Installed packages are resolved from peer dependency ranges in
-`@reflectworld/percept` and `@reflectworld/cam`:
+`@cortex/percept` and `@cortex/cam`:
 
 - `onnxruntime-node`, required inference runtime,
 - `sharp`, required image processing,
@@ -155,18 +155,18 @@ Flags:
 | `--yes` / `-y` | Accepted for script symmetry; the command is already non-interactive. |
 
 After completion, ensure Level 1 model files are present, run
-`reflectworld setup --level 1 --yes --accept-model-licenses`, and restart the gateway.
+`cortex setup --level 1 --yes --accept-model-licenses`, and restart the gateway.
 
 ---
 
 ## `configure` - Configure OpenClaw Plugin Providers
 
 ```bash
-npx @reflectworld/reflectworld configure
+npx @cortex/cortex configure
 ```
 
 Interactively configures VLM, LLM, embedder, and STT providers for the
-ReflectWorld OpenClaw plugin, writes OpenClaw config, validates it, and restarts
+Cortex OpenClaw plugin, writes OpenClaw config, validates it, and restarts
 the gateway. Source: `cli/configure.ts`; write plan:
 `cli/configure-plan.ts`. In non-interactive mode, answers are read line by line
 from stdin.

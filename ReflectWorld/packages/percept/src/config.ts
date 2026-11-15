@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { normalizeSecretInput } from "@reflectworld/shared";
+import { normalizeSecretInput } from "@cortex/shared";
 
 const VlmProviderEnum = z.enum(["gemini", "openai"]).default("openai");
 const PerceptionRuntimeModeEnum = z.enum(["offline_quality", "live_latency"]).default("offline_quality");
@@ -28,7 +28,7 @@ function expandHomePath(path: string | undefined): string | undefined {
 }
 
 /**
- * Runtime configuration for @reflectworld/percept.
+ * Runtime configuration for @cortex/percept.
  *
  * Model API configuration is intentionally minimal:
  * - VLM_* configures visual analysis.
@@ -87,9 +87,9 @@ export const PerceptionConfigSchema = z.object({
   /** Custom security criteria. */
   security_rules: z.string().optional(),
 
-  // ── ReflectWorld (memory client) ──
-  /** ReflectWorld API base URL. */
-  reflectworld_endpoint: z.string().url().default("http://localhost:8219"),
+  // ── Cortex (memory client) ──
+  /** Cortex API base URL. */
+  cortex_endpoint: z.string().url().default("http://localhost:8219"),
 
   // ── Working Memory ──
   /** Seconds of inactivity before an open event is closed. */
@@ -104,9 +104,9 @@ export const PerceptionConfigSchema = z.object({
   required_level: z.number().int().min(0).max(2).default(0),
 
   // ── Models ──
-  /** Directory for ONNX model files. Default: ~/.reflectworld/models/ */
+  /** Directory for ONNX model files. Default: ~/.cortex/models/ */
   models_dir: z.string().optional(),
-  /** Enable experimental body ReID + pose filtering. Resolved only from REFLECTWORLD_BODY_REID_ENABLED. */
+  /** Enable experimental body ReID + pose filtering. Resolved only from CORTEX_BODY_REID_ENABLED. */
   body_reid_enabled: z.boolean().default(false),
 
   // ── STT ──
@@ -158,16 +158,16 @@ export function resolvePerceptionConfig(
     vlm_max_retries: parseIntEnv("VLM_MAX_RETRIES"),
     vlm_retry_base_delay_ms: parseIntEnv("VLM_RETRY_BASE_DELAY_MS"),
     vlm_retry_max_delay_ms: parseIntEnv("VLM_RETRY_MAX_DELAY_MS"),
-    source_concurrency: parseIntEnv("REFLECTWORLD_PERCEPTION_SOURCE_CONCURRENCY"),
-    max_queued_per_source: parseIntEnv("REFLECTWORLD_PERCEPTION_MAX_QUEUED_PER_SOURCE"),
-    live_backlog_skip_after_ms: parseIntEnv("REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS"),
-    required_level: parseIntEnv("REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL"),
-    local_file_pacing: process.env.REFLECTWORLD_LOCAL_FILE_PACING,
-    runtime_mode: process.env.REFLECTWORLD_PERCEPTION_RUNTIME_MODE,
-    reflectworld_endpoint: process.env.REFLECTWORLD_ENDPOINT,
+    source_concurrency: parseIntEnv("CORTEX_PERCEPTION_SOURCE_CONCURRENCY"),
+    max_queued_per_source: parseIntEnv("CORTEX_PERCEPTION_MAX_QUEUED_PER_SOURCE"),
+    live_backlog_skip_after_ms: parseIntEnv("CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS"),
+    required_level: parseIntEnv("CORTEX_PERCEPTION_REQUIRED_LEVEL"),
+    local_file_pacing: process.env.CORTEX_LOCAL_FILE_PACING,
+    runtime_mode: process.env.CORTEX_PERCEPTION_RUNTIME_MODE,
+    cortex_endpoint: process.env.CORTEX_ENDPOINT,
     working_memory_event_timeout_sec: parseIntEnv("WORKING_MEMORY_EVENT_TIMEOUT_SEC"),
     working_memory_max_event_segments: parseIntEnv("WORKING_MEMORY_MAX_EVENT_SEGMENTS"),
-    models_dir: expandHomePath(process.env.REFLECTWORLD_MODELS_DIR),
+    models_dir: expandHomePath(process.env.CORTEX_MODELS_DIR),
     stubs_only: process.env.STUBS_ONLY === "false" ? false : undefined,
     scene_description: process.env.SCENE_DESCRIPTION,
     stt_provider: process.env.STT_PROVIDER,
@@ -187,7 +187,7 @@ export function resolvePerceptionConfig(
     ...filteredEnv,
     ...normalizeRawSecrets(raw),
     // body_reid_enabled is env-only: runtime/API overrides cannot change the legacy perception path.
-    body_reid_enabled: process.env.REFLECTWORLD_BODY_REID_ENABLED === "true",
+    body_reid_enabled: process.env.CORTEX_BODY_REID_ENABLED === "true",
   };
 
   // Auto-infer stt_provider from stt_model_dir for backward compatibility:

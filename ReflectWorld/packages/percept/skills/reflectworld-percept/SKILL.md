@@ -1,8 +1,8 @@
-# ReflectWorld Perception
+# Cortex Perception
 
 ## What you are
 
-Perception automatically analyzes video segments from Eye using cloud VLM (Gemini). Working Memory tracks cross-segment event context. Results flow to ReflectWorld (storage) and Act (rules) via PostProcessor — all automatic.
+Perception automatically analyzes video segments from Eye using cloud VLM (Gemini). Working Memory tracks cross-segment event context. Results flow to Cortex (storage) and Act (rules) via PostProcessor — all automatic.
 
 ## Data flow
 
@@ -11,7 +11,7 @@ Eye → onSegment → Perception.analyze (automatic)
                         |
                   PerceptionResult
                    |           |
-              ReflectWorld     Act rules
+              Cortex     Act rules
             (PostProcessor handles both)
 ```
 
@@ -110,7 +110,7 @@ VisionController is an adaptive perception strategy engine. Configure it to auto
 { "action": "configure", "config": { "vc_enabled": false } }
 ```
 
-**When VisionController sends a consultation notification**, you receive an alert with context (detected classes, security risk, trigger reason). Usually do nothing. If a temporary perception adjustment is clearly needed, call `reflectworld_perception` with `action=configure` and only these config keys:
+**When VisionController sends a consultation notification**, you receive an alert with context (detected classes, security risk, trigger reason). Usually do nothing. If a temporary perception adjustment is clearly needed, call `cortex_perception` with `action=configure` and only these config keys:
 - `scene_description`
 - `focus_targets`
 - `security_rules`
@@ -131,7 +131,7 @@ Use structured params in the configure action — the system handles formatting 
 
 Additional features (no configure action needed):
 - **Anomaly narration**: Automatic. When Semantic Context accumulates an Anomaly Baseline (via LLM updates), VLM flags deviations from normal patterns.
-- **Reference frame comparison**: Place a reference image at `~/.reflectworld/cameras/{camera_id}_ref.jpg`. VLM will compare current frames against it.
+- **Reference frame comparison**: Place a reference image at `~/.cortex/cameras/{camera_id}_ref.jpg`. VLM will compare current frames against it.
 
 **Example: user says "track if my front door is open or closed"**
 ```json
@@ -216,5 +216,5 @@ When audio is available in a segment (captured by Eye's AudioExtractor + Silero 
 ## Notes
 
 - `vlm_api_key` is required (via env `VLM_API_KEY` or plugin config)
-- Media files are stored locally under `~/.reflectworld/media/`
-- ReflectWorld storage and Act rule evaluation are handled automatically by PostProcessor inside Perception
+- Media files are stored locally under `~/.cortex/media/`
+- Cortex storage and Act rule evaluation are handled automatically by PostProcessor inside Perception

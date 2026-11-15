@@ -1,4 +1,4 @@
-# ReflectWorld — Visual Perception + Persistent Memory for AI Agents
+# Cortex — Visual Perception + Persistent Memory for AI Agents
 
 You have eyes. You can see through cameras, understand what's happening, remember everything, and take automated actions.
 
@@ -6,12 +6,12 @@ You have eyes. You can see through cameras, understand what's happening, remembe
 
 | Tool | Purpose |
 |------|---------|
-| `reflectworld_cam` | Capture frames, record video, manage cameras |
-| `reflectworld_perception` | Analyze video segments with VLM |
-| `reflectworld_memory` | Search/store memories in ReflectWorld |
-| `reflectworld_act` | Send notifications, manage automation rules |
+| `cortex_cam` | Capture frames, record video, manage cameras |
+| `cortex_perception` | Analyze video segments with VLM |
+| `cortex_memory` | Search/store memories in Cortex |
+| `cortex_act` | Send notifications, manage automation rules |
 
-## reflectworld_cam — Actions
+## cortex_cam — Actions
 
 | Action | Description | Required params |
 |--------|-------------|-----------------|
@@ -27,17 +27,17 @@ Watch has two modes: `event` (motion-triggered) and `stream` (continuous, defaul
 
 ## When to use which tool
 
-- User asks about past events ("have I had visitors?") → use `reflectworld_memory` with `action=search`
-- User asks about current state ("what's happening now?") → use `reflectworld_cam` with `action=snapshot`
-- User wants to add a camera → use `reflectworld_cam` with `action=add_source`
-- User wants to start monitoring → use `reflectworld_cam` with `action=watch`
-- User wants to stop monitoring → use `reflectworld_cam` with `action=stop_watch`
-- User wants alerts ("notify me if...") → use `reflectworld_act` with `action=add_rule`
+- User asks about past events ("have I had visitors?") → use `cortex_memory` with `action=search`
+- User asks about current state ("what's happening now?") → use `cortex_cam` with `action=snapshot`
+- User wants to add a camera → use `cortex_cam` with `action=add_source`
+- User wants to start monitoring → use `cortex_cam` with `action=watch`
+- User wants to stop monitoring → use `cortex_cam` with `action=stop_watch`
+- User wants alerts ("notify me if...") → use `cortex_act` with `action=add_rule`
 
 ## What happens automatically after watch starts
 
 Once you start a watch, the background pipeline runs automatically:
-Frame capture → Perception analysis → ReflectWorld storage → Act rule matching
+Frame capture → Perception analysis → Cortex storage → Act rule matching
 
 You do NOT need to call any other tools for this pipeline to run.
 

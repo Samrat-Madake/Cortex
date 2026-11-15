@@ -2,7 +2,7 @@
 // Streaming frame extractor — yields JPEG frames one at a time from the unified
 // local-file media source. No disk I/O, no batch memory accumulation.
 
-import { LocalFileMediaSource, resolveFfmpegBin, resolveFfprobeBin } from "@reflectworld/cam";
+import { LocalFileMediaSource, resolveFfmpegBin, resolveFfprobeBin } from "@cortex/cam";
 
 export interface StreamFrame {
   /** JPEG image buffer (NOT base64). */

@@ -10,7 +10,7 @@
  */
 
 import type { SttOutput } from "../types.js";
-import type { AudioData } from "@reflectworld/shared";
+import type { AudioData } from "@cortex/shared";
 
 // ── Public interface ──
 

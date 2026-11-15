@@ -1,6 +1,6 @@
 // packages/percept/src/models/model-manifest.ts
 import { join } from "node:path";
-import { resolveReflectWorldHome, canonicalize } from "@reflectworld/shared";
+import { resolveCortexHome, canonicalize } from "@cortex/shared";
 
 /** Supported model identifiers. */
 export type ModelId =
@@ -96,7 +96,7 @@ export const MODEL_MANIFEST: Record<ModelId, ModelDefinition> = {
 
 /** Default model storage directory. */
 export function getModelsDir(): string {
-  const configured = process.env.REFLECTWORLD_MODELS_DIR;
+  const configured = process.env.CORTEX_MODELS_DIR;
   if (configured) return canonicalize(configured);
-  return join(resolveReflectWorldHome(), "models");
+  return join(resolveCortexHome(), "models");
 }

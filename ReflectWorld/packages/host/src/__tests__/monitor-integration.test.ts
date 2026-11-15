@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { createServer, type Server } from "node:http";
 import { WebSocket } from "ws";
 import { attachMonitorWs } from "../ws-server.js";
-import { monitorBus } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
 
 describe("Monitor integration", () => {
   let server: Server;

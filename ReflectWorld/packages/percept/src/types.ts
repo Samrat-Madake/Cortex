@@ -1,8 +1,8 @@
 // packages/percept/src/types.ts
-import type { PerceptionLevel, BoundingBox, PerceptionDialogueLine } from "@reflectworld/shared";
+import type { PerceptionLevel, BoundingBox, PerceptionDialogueLine } from "@cortex/shared";
 import type { FacePose } from "./analyzers/face-pose.js";
 
-/** @deprecated Use BoundingBox from @reflectworld/shared. Kept as alias for backward compat. */
+/** @deprecated Use BoundingBox from @cortex/shared. Kept as alias for backward compat. */
 export type BBox = BoundingBox;
 
 // ── Detection Registry ──
@@ -423,7 +423,7 @@ export interface ReIdOutput {
   matches: Array<{
     /** Temporary subject label this match belongs to when a caller can provide one. */
     track_id?: string;
-    /** Stable entity ID from ReflectWorld when ReID matched or created one. */
+    /** Stable entity ID from Cortex when ReID matched or created one. */
     entity_id?: string;
     subject_index?: number | null;
     name?: string | null;
@@ -431,7 +431,7 @@ export interface ReIdOutput {
     confidence: number;
     /** Whether this is a newly created entity (first time seen). */
     is_new?: boolean;
-    /** Semantic history from ReflectWorld for the matched entity. */
+    /** Semantic history from Cortex for the matched entity. */
     history_behavior?: string;
   }>;
 }

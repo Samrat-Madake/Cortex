@@ -11,7 +11,7 @@ This template starts a service compatible with the `memory_api` lmms-eval backen
 ## Quick Start
 
 ```bash
-cd $HOME/reflectworld-benchmark/lmms-memory-plugin/service_template
+cd $HOME/cortex-benchmark/lmms-memory-plugin/service_template
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate <your-conda-env>
 pip install -r requirements.txt
@@ -24,7 +24,7 @@ Alternatively, copy `.env.example` to `.env` and set `CONDA_ENV` plus
 Then run lmms-eval with:
 
 ```bash
-cd $HOME/reflectworld-benchmark/lmms-eval
+cd $HOME/cortex-benchmark/lmms-eval
 python -m lmms_eval \
   --model memory_api \
   --model_args "endpoint=http://127.0.0.1:8000/v1/lmms_eval/generate,api_key=EMPTY,model_version=your-model" \

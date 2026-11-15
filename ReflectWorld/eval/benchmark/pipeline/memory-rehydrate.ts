@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { ReflectWorldClient, type AddMemoryRequest, type CaptureMode, type MemoryItem, type AddSchemaRequest, type UpsertContextRequest } from "@reflectworld/mem";
+import { CortexClient, type AddMemoryRequest, type CaptureMode, type MemoryItem, type AddSchemaRequest, type UpsertContextRequest } from "@cortex/mem";
 import { countEpisodicMemories, countSemanticMemories, dumpMemories, type MemoryDump } from "./memory-dump.js";
 
 type DumpMemoryItem = MemoryItem & {
@@ -38,7 +38,7 @@ export interface RehydrateResult {
  * order so get_history(position="earliest") remains useful.
  */
 export async function rehydrateMemoriesFromDump(
-  client: ReflectWorldClient,
+  client: CortexClient,
   cameraId: string,
   userId: string,
   dumpPath: string,

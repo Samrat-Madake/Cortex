@@ -1,6 +1,6 @@
 // packages/mem/src/__tests__/client.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ReflectWorldClient, ReflectWorldClientError } from "../client.js";
+import { CortexClient, CortexClientError } from "../client.js";
 import type { AddMemoryResponse, SearchResponse, AddSchemaRequest, UpsertContextRequest } from "../types.js";
 
 const BASE_URL = "http://localhost:8219";
@@ -16,11 +16,11 @@ function mockFetch(status: number, body: unknown): void {
   );
 }
 
-describe("ReflectWorldClient", () => {
-  let client: ReflectWorldClient;
+describe("CortexClient", () => {
+  let client: CortexClient;
 
   beforeEach(() => {
-    client = new ReflectWorldClient({ baseUrl: BASE_URL, timeoutMs: 5_000 });
+    client = new CortexClient({ baseUrl: BASE_URL, timeoutMs: 5_000 });
   });
 
   afterEach(() => {
@@ -91,7 +91,7 @@ describe("ReflectWorldClient", () => {
 
     it("resolves dynamic baseUrl at request time", async () => {
       let baseUrl = "http://localhost:8219";
-      client = new ReflectWorldClient({ baseUrl: () => baseUrl, timeoutMs: 5_000 });
+      client = new CortexClient({ baseUrl: () => baseUrl, timeoutMs: 5_000 });
       mockFetch(200, { results: [] });
 
       baseUrl = "http://localhost:28220";
@@ -102,7 +102,7 @@ describe("ReflectWorldClient", () => {
 
     it("uses a 60s default timeout when none is configured", async () => {
       const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
-      client = new ReflectWorldClient({ baseUrl: BASE_URL });
+      client = new CortexClient({ baseUrl: BASE_URL });
       mockFetch(200, { status: "healthy" });
 
       await client.health();
@@ -265,7 +265,7 @@ describe("ReflectWorldClient", () => {
       mockFetch(200, {
         status: "healthy",
         version: "1.1.0",
-        service: "ReflectWorld Memory",
+        service: "Cortex Memory",
         memory_types: ["episodic_trace", "episodic_entity", "episodic_schema", "episodic_visual", "semantic_entity", "semantic_context", "procedural"],
         reid_collections: ["reid_entity", "reid_face"],
         vector_store: "qdrant",
@@ -292,7 +292,7 @@ describe("ReflectWorldClient", () => {
       mockFetch(200, {
         status: "healthy",
         version: "1.1.0",
-        service: "ReflectWorld Memory",
+        service: "Cortex Memory",
         memory_types: ["episodic_trace"],
         reid_collections: ["reid_entity", "reid_face"],
         vector_store: "qdrant",
@@ -354,10 +354,10 @@ describe("ReflectWorldClient", () => {
   // -- Error handling ---------------------------------------------------------
 
   describe("error handling", () => {
-    it("throws ReflectWorldClientError on non-2xx response", async () => {
+    it("throws CortexClientError on non-2xx response", async () => {
       mockFetch(500, { detail: "internal server error" });
 
-      await expect(client.health()).rejects.toThrow(ReflectWorldClientError);
+      await expect(client.health()).rejects.toThrow(CortexClientError);
     });
 
     it("includes status code in the error", async () => {
@@ -366,15 +366,15 @@ describe("ReflectWorldClient", () => {
       try {
         await client.health();
       } catch (err) {
-        expect(err).toBeInstanceOf(ReflectWorldClientError);
-        expect((err as ReflectWorldClientError).statusCode).toBe(404);
+        expect(err).toBeInstanceOf(CortexClientError);
+        expect((err as CortexClientError).statusCode).toBe(404);
       }
     });
 
     it("throws on network error", async () => {
       vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("ECONNREFUSED")));
 
-      await expect(client.health()).rejects.toThrow(ReflectWorldClientError);
+      await expect(client.health()).rejects.toThrow(CortexClientError);
     });
 
     it("wraps malformed successful JSON responses", async () => {
@@ -387,7 +387,7 @@ describe("ReflectWorldClient", () => {
         }),
       );
 
-      await expect(client.health()).rejects.toThrow(ReflectWorldClientError);
+      await expect(client.health()).rejects.toThrow(CortexClientError);
       await expect(client.health()).rejects.toThrow("malformed JSON");
     });
   });

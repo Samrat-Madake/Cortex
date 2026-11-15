@@ -1241,7 +1241,7 @@ wheels = [
 ]
 
 [[package]]
-name = "reflectworld-mem"
+name = "cortex-mem"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [

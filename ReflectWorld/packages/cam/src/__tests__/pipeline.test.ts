@@ -2,7 +2,7 @@ import { afterEach, describe, it, expect, vi } from "vitest";
 import { CamPipeline } from "../pipeline.js";
 import { FixedWindowSegmenter } from "../segmenter/fixed-window.js";
 import type { FrameResult } from "../types.js";
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 import type { CutSignal, Segmenter } from "../segmenter/types.js";
 
 function makeFrame(ts = Date.now()): FrameResult {

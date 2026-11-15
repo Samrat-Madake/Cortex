@@ -1,7 +1,7 @@
 // packages/percept/src/__tests__/vlm-analyzer.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
 import { VlmAnalyzer } from "../analyzers/vlm-analyzer.js";
-import type { Frame } from "@reflectworld/shared";
+import type { Frame } from "@cortex/shared";
 
 function makeFrames(count: number): Frame[] {
   return Array.from({ length: count }, (_, i) => ({

@@ -19,7 +19,7 @@ function warnSecretInput(message: string): void {
  */
 export function normalizeSecretInput(
   value: unknown,
-  logPrefix = "reflectworld",
+  logPrefix = "cortex",
   warn: (message: string) => void = warnSecretInput,
 ): string | undefined {
   if (typeof value === "string") return value || undefined;

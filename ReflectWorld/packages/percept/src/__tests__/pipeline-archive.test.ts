@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 import { buildSegmentArchive } from "../pipeline/observability.js";
 
 describe("buildSegmentArchive", () => {

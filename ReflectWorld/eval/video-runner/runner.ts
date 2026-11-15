@@ -1,13 +1,13 @@
 /**
- * Video Runner — run the full ReflectWorld pipeline on a video file and validate results.
+ * Video Runner — run the full Cortex pipeline on a video file and validate results.
  *
  * Runs the full pipeline (go2rtc → Cam → Percept → Mem → VisionController) without
  * a real OpenClaw runtime, using MiniHost + SimAgent as an OpenClaw test double.
  *
  * Usage:
- *   REFLECTWORLD_E2E_VIDEO=/path/to/video.mp4 npx tsx eval/video-runner/runner.ts
- *   REFLECTWORLD_E2E_VIDEO=/path/to/video.mp4 npx tsx eval/video-runner/runner.ts --preflight-only
- *   REFLECTWORLD_E2E_VIDEO=/path/to/video.mp4 npx tsx eval/video-runner/runner.ts --services=reuse
+ *   CORTEX_E2E_VIDEO=/path/to/video.mp4 npx tsx eval/video-runner/runner.ts
+ *   CORTEX_E2E_VIDEO=/path/to/video.mp4 npx tsx eval/video-runner/runner.ts --preflight-only
+ *   CORTEX_E2E_VIDEO=/path/to/video.mp4 npx tsx eval/video-runner/runner.ts --services=reuse
  */
 
 // Load .env from monorepo root
@@ -19,17 +19,17 @@ import { existsSync, writeFileSync, mkdirSync, rmSync, readdirSync } from "node:
 const __root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 dotenv.config({ path: resolve(__root, ".env") });
 
-import { monitorBus, resolveReflectWorldHome, resolveReflectWorldStateDir } from "@reflectworld/shared";
-import type { PipelineTrace } from "@reflectworld/shared";
-import { VlmAnalyzer } from "@reflectworld/percept";
+import { monitorBus, resolveCortexHome, resolveCortexStateDir } from "@cortex/shared";
+import type { PipelineTrace } from "@cortex/shared";
+import { VlmAnalyzer } from "@cortex/percept";
 import { MiniHost } from "../../packages/host/src/mini-host.js";
-import reflectworldPlugin from "../../packages/reflectworld/index.js";
+import cortexPlugin from "../../packages/cortex/index.js";
 import { createSimAgent } from "./sim-agent.js";
 import { cleanupAll } from "./cleanup.js";
 import { assertStructure, assertSemantic, assertMemState, assertTrace, logResult } from "./assertion-engine.js";
 import type { AssertionResult } from "./assertion-engine.js";
-import { PipelineStore } from "../../packages/reflectworld/src/store.js";
-import { DashboardServer } from "../../packages/reflectworld/src/services/dashboard-server.js";
+import { PipelineStore } from "../../packages/cortex/src/store.js";
+import { DashboardServer } from "../../packages/cortex/src/services/dashboard-server.js";
 import { generateReport } from "./report-generator.js";
 import type {
   VisionControllerTimelineEntry,
@@ -39,45 +39,45 @@ import type {
   SkillTestResult,
 } from "./report-generator.js";
 import { runSkillTests, getSkillTestCount } from "./skill-tester.js";
-import { createBenchmarkVisionControllerLegacyConfig } from "../../packages/reflectworld/src/vision-controller/default-config.js";
+import { createBenchmarkVisionControllerLegacyConfig } from "../../packages/cortex/src/vision-controller/default-config.js";
 import {
   buildVisionControllerConsultationPrompt,
   parseVisionControllerConsultationResponse,
-} from "../../packages/reflectworld/src/vision-controller/consultation.js";
+} from "../../packages/cortex/src/vision-controller/consultation.js";
 
 // ── Config ──
 
 const GO2RTC_URL = process.env.GO2RTC_URL ?? "http://localhost:1984";
 const QDRANT_URL = process.env.QDRANT_URL ?? "http://localhost:6333";
 // E2E runs on a dedicated mem-service port (default 28219) so it never
-// shares :8219 with a user's own ReflectWorld instance — that sharing used to
+// shares :8219 with a user's own Cortex instance — that sharing used to
 // silently pollute production data, or leave E2E dead when :8219 was idle.
-// Override via E2E_MEM_PORT or REFLECTWORLD_URL as needed.
+// Override via E2E_MEM_PORT or CORTEX_URL as needed.
 const E2E_MEM_PORT = parseInt(process.env.E2E_MEM_PORT ?? "28219", 10);
-const MEM_URL = process.env.REFLECTWORLD_URL ?? `http://127.0.0.1:${E2E_MEM_PORT}`;
-const memUrl = () => process.env.REFLECTWORLD_URL ?? MEM_URL;
+const MEM_URL = process.env.CORTEX_URL ?? `http://127.0.0.1:${E2E_MEM_PORT}`;
+const memUrl = () => process.env.CORTEX_URL ?? MEM_URL;
 // Broadcast the chosen endpoint to every subprocess/helper that reads
-// REFLECTWORLD_URL or REFLECTWORLD_ENDPOINT (assertion-engine, tool-executor,
+// CORTEX_URL or CORTEX_ENDPOINT (assertion-engine, tool-executor,
 // percept config, ...). Without this they silently default to :8219 and
 // crash at cleanup with ECONNREFUSED.
-process.env.REFLECTWORLD_URL = MEM_URL;
-process.env.REFLECTWORLD_ENDPOINT = MEM_URL;
+process.env.CORTEX_URL = MEM_URL;
+process.env.CORTEX_ENDPOINT = MEM_URL;
 const CAMERA_ID = "e2e-front-door";
 const E2E_RUN_ID = `run-${Date.now().toString(36)}`;
-process.env.REFLECTWORLD_ARCHIVE_LEVEL ??= "full";
-process.env.REFLECTWORLD_RUN_ID ??= E2E_RUN_ID;
-process.env.REFLECTWORLD_SNAPSHOT_VERSION ??= E2E_RUN_ID;
-const E2E_RUNTIME_DIR = resolve(resolveReflectWorldStateDir(), "e2e-runtime", E2E_RUN_ID);
+process.env.CORTEX_ARCHIVE_LEVEL ??= "full";
+process.env.CORTEX_RUN_ID ??= E2E_RUN_ID;
+process.env.CORTEX_SNAPSHOT_VERSION ??= E2E_RUN_ID;
+const E2E_RUNTIME_DIR = resolve(resolveCortexStateDir(), "e2e-runtime", E2E_RUN_ID);
 const E2E_HOST_STATE_DIR = join(E2E_RUNTIME_DIR, "host-state");
 const E2E_SOURCES_DIR = join(E2E_RUNTIME_DIR, "sources");
 const E2E_RECORDINGS_DIR = join(E2E_RUNTIME_DIR, "recordings");
 const E2E_MEMORY_STORAGE_DIR = join(E2E_RUNTIME_DIR, "memory-storage");
-const E2E_COLLECTION_NAME = `reflectworld_test_${E2E_RUN_ID.replace(/[^a-zA-Z0-9_]/g, "_")}`;
+const E2E_COLLECTION_NAME = `cortex_test_${E2E_RUN_ID.replace(/[^a-zA-Z0-9_]/g, "_")}`;
 
 function resolveRequiredE2eVideo(): string {
-  const video = process.env.REFLECTWORLD_E2E_VIDEO?.trim();
+  const video = process.env.CORTEX_E2E_VIDEO?.trim();
   if (!video) {
-    console.error("REFLECTWORLD_E2E_VIDEO is required. Set it to an authorized local test video.");
+    console.error("CORTEX_E2E_VIDEO is required. Set it to an authorized local test video.");
     process.exit(2);
   }
   return resolve(video);
@@ -85,7 +85,7 @@ function resolveRequiredE2eVideo(): string {
 
 const VIDEO_FILE = resolveRequiredE2eVideo();
 const VIDEO_USER_ID = basename(VIDEO_FILE, extname(VIDEO_FILE));
-const MODEL_DIR = join(resolveReflectWorldHome(), "models");
+const MODEL_DIR = join(resolveCortexHome(), "models");
 const REPORT_PATH = resolve(__root, "eval/video-runner/fixtures/e2e-report.md");
 const GLOBAL_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 const SERVICE_STOP_TIMEOUT_MS = 5_000;
@@ -98,10 +98,10 @@ const SEARCH_MIN_SCORE_VEHICLE = 0.2;
 const E2E_DASHBOARD_PORT = parseInt(process.env.E2E_DASHBOARD_PORT ?? process.env.E2E_MONITOR_PORT ?? "3213", 10);
 const SERVICE_MODE = parseServiceMode(process.argv.slice(2));
 const SKILL_PATHS = [
-  resolve(__root, "packages/reflectworld/skills/reflectworld-vision-controller/SKILL.md"),
-  resolve(__root, "packages/cam/skills/reflectworld-cam/SKILL.md"),
-  resolve(__root, "packages/percept/skills/reflectworld-percept/SKILL.md"),
-  resolve(__root, "packages/mem/skills/reflectworld-mem/SKILL.md"),
+  resolve(__root, "packages/cortex/skills/cortex-vision-controller/SKILL.md"),
+  resolve(__root, "packages/cam/skills/cortex-cam/SKILL.md"),
+  resolve(__root, "packages/percept/skills/cortex-percept/SKILL.md"),
+  resolve(__root, "packages/mem/skills/cortex-mem/SKILL.md"),
 ];
 
 // ── Preflight ──
@@ -138,7 +138,7 @@ async function preflight(): Promise<boolean> {
 
   const results = await Promise.all([
     checkEndpoint(`${QDRANT_URL}/collections`, "Qdrant"),
-    checkEndpoint(`${memUrl()}/health`, "ReflectWorld Python"),
+    checkEndpoint(`${memUrl()}/health`, "Cortex Python"),
     checkEndpoint(`${GO2RTC_URL}/api/streams`, "go2rtc"),
   ]);
 
@@ -147,7 +147,7 @@ async function preflight(): Promise<boolean> {
 
   if (SERVICE_MODE !== "reuse") {
     if (!qdrantOk) console.log("  ~ Qdrant not running yet — runner will try to start or reuse it");
-    if (!memOk) console.log("  ~ ReflectWorld Python not running yet — runner will try to start or reuse it");
+    if (!memOk) console.log("  ~ Cortex Python not running yet — runner will try to start or reuse it");
     if (!go2rtcOk) console.log("  ~ go2rtc not running yet — runner will try to start or reuse it");
   }
 
@@ -301,7 +301,7 @@ interface CollectedEvents {
   serviceOrigins?: {
     timestamp: number;
     qdrant?: string;
-    reflectworld?: string;
+    cortex?: string;
   };
   // Debug: per-frame detector details.
   frameDetections: Array<Record<string, unknown>>;
@@ -434,7 +434,7 @@ function createEventCollector(): CollectedEvents {
         events.serviceOrigins = {
           timestamp: event.timestamp,
           qdrant: typeof event.data.qdrant === "string" ? event.data.qdrant : undefined,
-          reflectworld: typeof event.data.reflectworld === "string" ? event.data.reflectworld : undefined,
+          cortex: typeof event.data.cortex === "string" ? event.data.cortex : undefined,
         };
         break;
     }
@@ -573,12 +573,12 @@ async function run(): Promise<void> {
       },
     };
 
-    // 2. Create MiniHost + load ReflectWorld plugin with SimAgent injected
-    console.log("── Loading ReflectWorld plugin via MiniHost ──");
+    // 2. Create MiniHost + load Cortex plugin with SimAgent injected
+    console.log("── Loading Cortex plugin via MiniHost ──");
     host = new MiniHost({
       stateDir: E2E_HOST_STATE_DIR,
       pluginConfigs: {
-        reflectworld: {
+        cortex: {
           cam: {
             sources_dir: E2E_SOURCES_DIR,
             recordings_dir: E2E_RECORDINGS_DIR,
@@ -596,7 +596,7 @@ async function run(): Promise<void> {
       },
     });
 
-    await host.loadPlugin(reflectworldPlugin);
+    await host.loadPlugin(cortexPlugin);
 
     // 3. Set up event collection BEFORE startServices so we capture
     //    service_origins and other events emitted during startup.
@@ -607,11 +607,11 @@ async function run(): Promise<void> {
 
     // Start E2E Dashboard — reuses the same dashboard/dist, separate port from production (3211)
     const dashboardDistDir = resolve(__root, "packages", "dashboard", "dist");
-    const e2eStore = new PipelineStore(join(E2E_HOST_STATE_DIR, "reflectworld"));
+    const e2eStore = new PipelineStore(join(E2E_HOST_STATE_DIR, "cortex"));
     const e2eDashboard = new DashboardServer({
       distDir: dashboardDistDir,
       port: E2E_DASHBOARD_PORT,
-      reflectworldEndpoint: MEM_URL,
+      cortexEndpoint: MEM_URL,
       store: e2eStore,
     });
     await e2eDashboard.start();
@@ -622,9 +622,9 @@ async function run(): Promise<void> {
     console.log(`  Registered tools: ${tools.map((t) => t.name).join(", ")}`);
 
     // 4. Add the local video file as a Cam source.
-    // Runtime compatibility note: the current tool name is still reflectworld_cam.
+    // Runtime compatibility note: the current tool name is still cortex_cam.
     console.log("── Registering video source ──");
-    const addResult = await host.callTool("reflectworld_cam", {
+    const addResult = await host.callTool("cortex_cam", {
       action: "add_source",
       source: VIDEO_FILE,
       name: CAMERA_ID,
@@ -650,14 +650,14 @@ async function run(): Promise<void> {
 
     // 5b. Start watch (stream mode)
     console.log("── Starting watch ──");
-    const watchResult = await host.callTool("reflectworld_cam", {
+    const watchResult = await host.callTool("cortex_cam", {
       action: "watch",
       name: CAMERA_ID,
       mode: "stream",
       fps: 1,
       _stopOnInputEnd: true,
       _inputMode: "local_file",
-      _localFilePacing: process.env.REFLECTWORLD_LOCAL_FILE_PACING === "fast" ? "fast" : "realtime",
+      _localFilePacing: process.env.CORTEX_LOCAL_FILE_PACING === "fast" ? "fast" : "realtime",
     });
     const watchParsed = tryParseJson(watchResult);
     const a2 = assertStructure(2, "Cam", "watch started", watchParsed, []);
@@ -699,8 +699,8 @@ async function run(): Promise<void> {
     //   1. segmentQueue.waitForIdle() — all segment handlers finished
     //   2. memoryWriteQueue.waitForIdle() — all fire-and-forget /memories POSTs completed
     const DRAIN_TIMEOUT = 180_000;
-    const waitPipeline = (globalThis as any).__reflectworld_waitForPipelineIdle as (() => Promise<void>) | undefined;
-    const waitMemory = (globalThis as any).__reflectworld_waitForMemoryIdle as (() => Promise<void>) | undefined;
+    const waitPipeline = (globalThis as any).__cortex_waitForPipelineIdle as (() => Promise<void>) | undefined;
+    const waitMemory = (globalThis as any).__cortex_waitForMemoryIdle as (() => Promise<void>) | undefined;
 
     if (waitPipeline) {
       console.log("── Waiting for pipeline to drain ──");
@@ -794,7 +794,7 @@ async function run(): Promise<void> {
     console.log("── Memory verification ──");
 
     // Debug: verify URLs and camera IDs match between write and read paths
-    console.log(`  [mem-debug] REFLECTWORLD_URL=${process.env.REFLECTWORLD_URL} CAMERA_ID=${CAMERA_ID}`);
+    console.log(`  [mem-debug] CORTEX_URL=${process.env.CORTEX_URL} CAMERA_ID=${CAMERA_ID}`);
     // Quick direct check: hit the same endpoint assertions will use
     try {
       const debugResp = await fetch(`${memUrl()}/memories?memory_type=episodic&camera_id=${CAMERA_ID}`);
@@ -1004,9 +1004,9 @@ async function run(): Promise<void> {
     assertions.push(a16);
 
     const consultationToolCalls = events.toolInvoked.filter((event) =>
-      event.tool === "reflectworld_cam"
-      || event.tool === "reflectworld_perception"
-      || event.tool === "reflectworld_memory",
+      event.tool === "cortex_cam"
+      || event.tool === "cortex_perception"
+      || event.tool === "cortex_memory",
     );
 
     // 17. OpenClaw consultation -> tool effect (verify success, not just count)
@@ -1204,7 +1204,7 @@ async function run(): Promise<void> {
     console.log("── SQLite store verification ──");
     let verifyStore: PipelineStore | null = null;
     try {
-      verifyStore = new PipelineStore(join(E2E_HOST_STATE_DIR, "reflectworld"));
+      verifyStore = new PipelineStore(join(E2E_HOST_STATE_DIR, "cortex"));
 
       // 24. Pipeline log populated — SQLite pipeline_log has entries for processed segments
       const pipelineLogEntries = verifyStore.getRecent(CAMERA_ID);
@@ -1261,19 +1261,19 @@ async function run(): Promise<void> {
     const STARTED_MODES = ["managed", "external", "uv", "python"];
     const origins = events.serviceOrigins;
     const qdrantMode = origins?.qdrant;
-    const reflectworldMode = origins?.reflectworld;
+    const cortexMode = origins?.cortex;
     const hasValidOrigins = !!origins
       && typeof qdrantMode === "string" && STARTED_MODES.includes(qdrantMode)
-      && typeof reflectworldMode === "string" && STARTED_MODES.includes(reflectworldMode);
+      && typeof cortexMode === "string" && STARTED_MODES.includes(cortexMode);
     const a27: AssertionResult = {
       id: 27,
       category: "Lifecycle",
       name: "service origins captured",
       passed: hasValidOrigins,
       details: hasValidOrigins
-        ? `qdrant=${qdrantMode}, reflectworld=${reflectworldMode}`
+        ? `qdrant=${qdrantMode}, cortex=${cortexMode}`
         : origins
-          ? `Invalid modes: qdrant=${qdrantMode ?? "missing"}, reflectworld=${reflectworldMode ?? "missing"}`
+          ? `Invalid modes: qdrant=${qdrantMode ?? "missing"}, cortex=${cortexMode ?? "missing"}`
           : "system:service_origins event not received",
       severity: "required",
     };
@@ -1340,7 +1340,7 @@ async function run(): Promise<void> {
     console.log("\n── Final cleanup ──");
     try {
       if (host) {
-        await host.callTool("reflectworld_cam", { action: "stop_watch", name: CAMERA_ID }).catch(() => {});
+        await host.callTool("cortex_cam", { action: "stop_watch", name: CAMERA_ID }).catch(() => {});
         console.log(`  Waiting ${FINAL_DRAIN_MS / 1000}s for late async memory writes to drain...`);
         await sleep(FINAL_DRAIN_MS);
         await Promise.race([
@@ -1849,7 +1849,7 @@ function flattenMemoryListResponse(data: unknown): unknown[] {
 
 function parseServiceMode(args: string[]): "start-missing" | "reuse" {
   const raw = args.find((arg) => arg.startsWith("--services="))?.split("=")[1]
-    ?? process.env.REFLECTWORLD_E2E_SERVICES
+    ?? process.env.CORTEX_E2E_SERVICES
     ?? "start-missing";
   return raw === "reuse" ? "reuse" : "start-missing";
 }

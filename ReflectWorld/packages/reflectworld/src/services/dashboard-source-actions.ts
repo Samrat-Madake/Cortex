@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { monitorBus, writeStderr } from "@reflectworld/shared";
-import type { ActiveSourceStatus, MonitorEvent } from "@reflectworld/shared";
+import { monitorBus, writeStderr } from "@cortex/shared";
+import type { ActiveSourceStatus, MonitorEvent } from "@cortex/shared";
 import type { PipelineStore } from "../store.js";
 import type {
   AnalysisStatusItem,

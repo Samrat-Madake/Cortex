@@ -2,8 +2,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, chmodSync, createWriteStream, unlinkSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { get as httpsGet } from "node:https";
-import { resolveReflectWorldHome } from "@reflectworld/shared";
-import { writeStdout } from "@reflectworld/shared";
+import { resolveCortexHome } from "@cortex/shared";
+import { writeStdout } from "@cortex/shared";
 
 const GO2RTC_VERSION = "1.9.14";
 const FFMPEG_VERSION = "6.0.1";
@@ -113,7 +113,7 @@ function extractFfmpeg(archivePath: string, format: "zip" | "tar.xz", binDir: st
 }
 
 export function getBinDir(): string {
-  return join(resolveReflectWorldHome(), "bin");
+  return join(resolveCortexHome(), "bin");
 }
 
 const SILERO_VAD_URL = "https://github.com/snakers4/silero-vad/raw/master/src/silero_vad/data/silero_vad.onnx";
@@ -126,7 +126,7 @@ function missingBinaryError(name: string, path: string): Error {
 }
 
 export function getSileroVadModelPath(): string {
-  return join(resolveReflectWorldHome(), "models", "silero_vad.onnx");
+  return join(resolveCortexHome(), "models", "silero_vad.onnx");
 }
 
 export function resolveGo2rtcBin(binDir = getBinDir()): string {
@@ -242,7 +242,7 @@ export async function setupFfmpeg(binDir = getBinDir()): Promise<string> {
 }
 
 async function downloadSileroVad(): Promise<string> {
-  const modelsDir = join(resolveReflectWorldHome(), "models");
+  const modelsDir = join(resolveCortexHome(), "models");
   if (!existsSync(modelsDir)) mkdirSync(modelsDir, { recursive: true });
   const dest = join(modelsDir, "silero_vad.onnx");
   if (existsSync(dest)) return dest;

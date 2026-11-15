@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { analyze, type PipelineDeps } from "../pipeline.js";
 import { WorkingMemoryManager } from "../working-memory.js";
 import { StrategyManager } from "../strategy-manager.js";
-import { monitorBus } from "@reflectworld/shared";
-import type { Segment, PipelineTrace } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { Segment, PipelineTrace } from "@cortex/shared";
 import type { VlmOutput } from "../types.js";
 
 function makeSegment(mode: Segment["mode"], frameCount: number): Segment {

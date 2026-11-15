@@ -33,7 +33,7 @@ QUESTION_IDS="${QUESTION_IDS:-}"
 LMMS_INCLUDE_PATH="${LMMS_INCLUDE_PATH:-$REPO_ROOT/eval/benchmark/lmms/tasks}"
 GPU="${GPU:-auto}"
 PORT="${PORT:-8400}"
-RUN_ROOT="${RUN_ROOT:-$HOME/.reflectworld/benchmark_results}"
+RUN_ROOT="${RUN_ROOT:-$HOME/.cortex/benchmark_results}"
 RUN_DIR="${RUN_DIR:-}"
 REUSE_OUTPUT_ROOT="${REUSE_OUTPUT_ROOT:-}"
 WORKER_LABEL="${WORKER_LABEL:-}"
@@ -56,7 +56,7 @@ Options:
   --offset N              lmms-eval offset. Default: 0
   --limit N               lmms-eval limit. Default: 3
   --video-ids IDS         Comma-separated VideoMME video_id list. Auto-selects
-                          reflectworld_videomme_long_subset for default task.
+                          cortex_videomme_long_subset for default task.
   --question-id ID        Run one VideoMME question_id, e.g. 601-2.
   --question-ids IDS      Comma-separated VideoMME question_id list.
   --include-path DIR      Extra lmms-eval task path. Default: eval/benchmark/lmms/tasks
@@ -123,20 +123,20 @@ fi
 if [ -n "$VIDEO_IDS" ]; then
   [[ "$VIDEO_IDS" =~ ^[A-Za-z0-9._,-]+$ ]] || die "--video-ids may only contain letters, numbers, dot, underscore, dash, and comma"
   if [ "$TASK" = "videomme_long" ]; then
-    TASK="reflectworld_videomme_long_subset"
+    TASK="cortex_videomme_long_subset"
   fi
 fi
 if [ -n "$QUESTION_IDS" ]; then
   [[ "$QUESTION_IDS" =~ ^[A-Za-z0-9._,-]+$ ]] || die "--question-ids may only contain letters, numbers, dot, underscore, dash, and comma"
   if [ "$TASK" = "videomme_long" ]; then
-    TASK="reflectworld_videomme_long_subset"
+    TASK="cortex_videomme_long_subset"
   fi
 fi
 [ -d "$LMMS_INCLUDE_PATH" ] || die "lmms-eval include path not found: $LMMS_INCLUDE_PATH"
 
 repo_task_yaml_for() {
   case "$1" in
-    reflectworld_videomme_long_subset) printf '%s\n' "$REPO_ROOT/eval/benchmark/lmms/tasks/videomme_subset/reflectworld_videomme_long_subset.yaml" ;;
+    cortex_videomme_long_subset) printf '%s\n' "$REPO_ROOT/eval/benchmark/lmms/tasks/videomme_subset/cortex_videomme_long_subset.yaml" ;;
     hippovlog) printf '%s\n' "$REPO_ROOT/eval/benchmark/lmms/tasks/hippovlog/hippovlog.yaml" ;;
     hippovlog_smoke) printf '%s\n' "$REPO_ROOT/eval/benchmark/lmms/tasks/hippovlog/hippovlog_smoke.yaml" ;;
     egolife_qa) printf '%s\n' "$REPO_ROOT/eval/benchmark/lmms/tasks/egolife_qa/egolife_qa.yaml" ;;
@@ -208,7 +208,7 @@ if [ "$MODE" = "qa-only" ]; then
 fi
 COLLECTION_PREFIX="${EVAL_COLLECTION_PREFIX:-$(slugify "${SNAPSHOT_VERSION}_${WORKER_SLUG}")}"
 QDRANT_STATE_DIR="${EVAL_QDRANT_STATE_DIR:-$STATE_ROOT/qdrant-state}"
-MEM_STORAGE_DIR="${EVAL_REFLECTWORLD_STORAGE_PATH:-$STATE_ROOT/mem-storage}"
+MEM_STORAGE_DIR="${EVAL_CORTEX_STORAGE_PATH:-$STATE_ROOT/mem-storage}"
 EVAL_RUN_ID="eval_$(printf '%s' "$RUN_NAME" | tr -c 'A-Za-z0-9_' '_' | sed -E 's/_+/_/g; s/^_//; s/_$//')"
 
 if [ -z "${CONDA_SH:-}" ]; then
@@ -227,8 +227,8 @@ command -v node >/dev/null 2>&1 || die "node not found after activating $CONDA_E
 command -v npm >/dev/null 2>&1 || die "npm not found after activating $CONDA_ENV"
 command -v python >/dev/null 2>&1 || die "python not found after activating $CONDA_ENV"
 [ -d "$REPO_ROOT/node_modules" ] || die "node_modules not found in $REPO_ROOT"
-[ -x "$HOME/.reflectworld/bin/ffmpeg" ] || die "prepared ffmpeg not found at $HOME/.reflectworld/bin/ffmpeg"
-[ -x "$HOME/.reflectworld/bin/qdrant" ] || die "prepared qdrant not found at $HOME/.reflectworld/bin/qdrant"
+[ -x "$HOME/.cortex/bin/ffmpeg" ] || die "prepared ffmpeg not found at $HOME/.cortex/bin/ffmpeg"
+[ -x "$HOME/.cortex/bin/qdrant" ] || die "prepared qdrant not found at $HOME/.cortex/bin/qdrant"
 
 if [ "$GPU" = "auto" ]; then
   command -v nvidia-smi >/dev/null 2>&1 || die "nvidia-smi not found; pass --gpu ID only on a GPU host"
@@ -243,11 +243,11 @@ fi
 
 source "$REPO_ROOT/eval/benchmark/pipeline/cuda-runtime-env.sh"
 if [ "$MODE" = "fresh" ]; then
-  reflectworld_setup_cuda_runtime require || die "CUDA/cuDNN runtime is not ready"
+  cortex_setup_cuda_runtime require || die "CUDA/cuDNN runtime is not ready"
 else
-  reflectworld_setup_cuda_runtime warn || true
+  cortex_setup_cuda_runtime warn || true
 fi
-CUDA_RUNTIME_LIBS="${REFLECTWORLD_CUDA_RUNTIME_LIBS:-}"
+CUDA_RUNTIME_LIBS="${CORTEX_CUDA_RUNTIME_LIBS:-}"
 
 SERVER_LOG="$RUN_DIR/logs/server.log"
 WORKER_LOG="$RUN_DIR/logs/worker.log"
@@ -302,11 +302,11 @@ export LMMS_EVAL_DATASETS_CACHE=\${LMMS_EVAL_DATASETS_CACHE:-\$HOME/.cache/lmms_
 export EVAL_WORKER_GPU=$GPU
 export EVAL_WORKER_LABEL=$WORKER_SLUG
 export EVAL_OUTPUT_ROOT=$RUN_DIR
-export EVAL_REFLECTWORLD_PORT=$MEM_PORT
+export EVAL_CORTEX_PORT=$MEM_PORT
 export EVAL_QDRANT_PORT=$QDRANT_PORT
 export EVAL_QDRANT_GRPC_PORT=$QDRANT_GRPC_PORT
 export EVAL_QDRANT_STATE_DIR=$QDRANT_STATE_DIR
-export EVAL_REFLECTWORLD_STORAGE_PATH=$MEM_STORAGE_DIR
+export EVAL_CORTEX_STORAGE_PATH=$MEM_STORAGE_DIR
 export EVAL_COLLECTION_PREFIX=$COLLECTION_PREFIX
 export EVAL_CHECKPOINT_MANIFEST=$CHECKPOINT_MANIFEST
 export EVAL_MEM_CLIENT_TIMEOUT_MS=60000
@@ -318,7 +318,7 @@ if [ "$MODE" = "qa-only" ]; then
 export EVAL_REUSE_EXISTING_VIDEO_MEMORY=true
 export EVAL_REUSE_VIDEO_OUTPUT_ROOT=$REUSE_OUTPUT_ROOT
 export EVAL_QDRANT_STATE_DIR=$QDRANT_STATE_DIR
-export EVAL_REFLECTWORLD_STORAGE_PATH=$MEM_STORAGE_DIR
+export EVAL_CORTEX_STORAGE_PATH=$MEM_STORAGE_DIR
 export EVAL_COLLECTION_PREFIX=$COLLECTION_PREFIX
 export STUBS_ONLY=true
 unset EVAL_CLEAN_VIDEO_MEMORY_ON_START
@@ -336,7 +336,7 @@ export EVAL_REQUIRE_NARRATIVE_FLUSH=false
 EOF_ENV
 fi
 
-MODEL_ARGS="endpoint=http://127.0.0.1:$PORT/evaluate,api_key=EMPTY,model_version=reflectworld,num_concurrent=1,timeout=$REQUEST_TIMEOUT,max_retries=2,retry_backoff_s=3"
+MODEL_ARGS="endpoint=http://127.0.0.1:$PORT/evaluate,api_key=EMPTY,model_version=cortex,num_concurrent=1,timeout=$REQUEST_TIMEOUT,max_retries=2,retry_backoff_s=3"
 WORKER_CMD=(python -m lmms_eval eval
   --include_path "$LMMS_INCLUDE_PATH"
   --model memory_api

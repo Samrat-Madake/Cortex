@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { monitorBus } from "@reflectworld/shared";
-import type { MonitorEvent } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { MonitorEvent } from "@cortex/shared";
 import {
   MEMORY_WEBHOOK_EVENT_TYPES,
   isRecord,
@@ -10,7 +10,7 @@ import type { DashboardSessionScope } from "./dashboard-common.js";
 import type { DashboardMemoryProxy } from "./dashboard-memory-proxy.js";
 
 export interface DashboardProxyRoutesOptions {
-  reflectworldEndpoint: string;
+  cortexEndpoint: string;
   internalWebhookToken?: string;
   requireInternalWebhookToken: boolean;
   sessionEnabled: () => boolean;
@@ -28,11 +28,11 @@ export interface DashboardProxyRoutesOptions {
 export class DashboardProxyRoutes {
   constructor(private readonly options: DashboardProxyRoutesOptions) {}
 
-  async handleReflectWorldProxy(req: IncomingMessage, res: ServerResponse, url: URL): Promise<void> {
+  async handleCortexProxy(req: IncomingMessage, res: ServerResponse, url: URL): Promise<void> {
     const scope = this.options.requireDashboardSession(req, res, undefined, url);
     if (this.options.sessionEnabled() && !scope) return;
     const upstreamUrl = new URL(url.toString());
-    upstreamUrl.pathname = url.pathname.replace("/api/reflectworld", "");
+    upstreamUrl.pathname = url.pathname.replace("/api/cortex", "");
     upstreamUrl.searchParams.delete("session_id");
     upstreamUrl.searchParams.delete("user_id");
     if (this.options.sessionEnabled() && scope) {
@@ -74,20 +74,20 @@ export class DashboardProxyRoutes {
           requestBody = Buffer.from(JSON.stringify(sanitizedBody));
         }
       }
-      const reflectworldPath = `${upstreamUrl.pathname}${upstreamUrl.search}`;
-      const reflectworldUrl = `${this.options.reflectworldEndpoint}${reflectworldPath}`;
-      const upstream = await fetch(reflectworldUrl, {
+      const cortexPath = `${upstreamUrl.pathname}${upstreamUrl.search}`;
+      const cortexUrl = `${this.options.cortexEndpoint}${cortexPath}`;
+      const upstream = await fetch(cortexUrl, {
         method: req.method,
         headers: { "Content-Type": contentType },
         body: requestBody,
       });
       const upstreamBody = await upstream.text();
-      this.options.memoryProxy.publishProxyEvent(reflectworldPath, req.method ?? "GET", upstream.status, requestBody, upstreamBody);
-      const responseBody = this.options.memoryProxy.rewriteProxyResponse(reflectworldPath, req.method ?? "GET", upstream.status, upstreamBody, scope);
+      this.options.memoryProxy.publishProxyEvent(cortexPath, req.method ?? "GET", upstream.status, requestBody, upstreamBody);
+      const responseBody = this.options.memoryProxy.rewriteProxyResponse(cortexPath, req.method ?? "GET", upstream.status, upstreamBody, scope);
       res.writeHead(upstream.status, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
       res.end(responseBody);
     } catch {
-      res.writeHead(502); res.end('{"error":"ReflectWorld unreachable"}');
+      res.writeHead(502); res.end('{"error":"Cortex unreachable"}');
     }
   }
 

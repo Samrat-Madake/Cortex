@@ -2,7 +2,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, statSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { toRtspSafeName } from "./go2rtc-manager.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 /** Default per-camera recording quota: 2 GB. */
 const DEFAULT_QUOTA_MB = 2048;

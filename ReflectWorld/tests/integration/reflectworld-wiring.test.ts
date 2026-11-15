@@ -1,11 +1,11 @@
 /**
- * Integration test: @reflectworld/reflectworld automatic wiring.
+ * Integration test: @cortex/cortex automatic wiring.
  *
  * Verifies that the all-in-one plugin correctly wires:
  *   Cam.onSegment → Perception.analyze → Memory.add → Act webhook
  *
  * External services are mocked. Focus is on data flow correctness
- * through the reflectworld register() wiring.
+ * through the cortex register() wiring.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type {
@@ -14,14 +14,14 @@ import type {
   AnyAgentTool,
   Segment,
   Frame,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 
 // We test by importing the onSegment wiring indirectly:
-// Load reflectworld plugin → it registers cam with onSegment → we invoke it.
-import { analyze } from "@reflectworld/percept";
-import { createPipelineDeps, resolvePerceptionConfig } from "@reflectworld/percept";
-import { ReflectWorldClient } from "@reflectworld/mem";
-import type { PipelineDeps } from "@reflectworld/percept";
+// Load cortex plugin → it registers cam with onSegment → we invoke it.
+import { analyze } from "@cortex/percept";
+import { createPipelineDeps, resolvePerceptionConfig } from "@cortex/percept";
+import { CortexClient } from "@cortex/mem";
+import type { PipelineDeps } from "@cortex/percept";
 import { WorkingMemoryManager } from "../../packages/percept/src/working-memory.js";
 import { StrategyManager } from "../../packages/percept/src/strategy-manager.js";
 import type { VlmOutput } from "../../packages/percept/src/types.js";
@@ -105,7 +105,7 @@ function makeMockUploader() {
 
 // ── Tests ──
 
-describe("@reflectworld/reflectworld onSegment wiring", () => {
+describe("@cortex/cortex onSegment wiring", () => {
   let pipelineDeps: PipelineDeps;
   let mockVlm: ReturnType<typeof makeMockVlm>;
   let mockUploader: ReturnType<typeof makeMockUploader>;
@@ -157,11 +157,11 @@ describe("@reflectworld/reflectworld onSegment wiring", () => {
     expect(result.perception_memory.entities![0]!.appearance).toContain("dark clothing");
   });
 
-  it("onSegment: result has correct shape for ReflectWorld add()", async () => {
+  it("onSegment: result has correct shape for Cortex add()", async () => {
     const segment = makeSegment("cam_01", 1);
     const result = await analyze(segment, pipelineDeps);
 
-    // Simulate what reflectworld/index.ts does in onSegment callback
+    // Simulate what cortex/index.ts does in onSegment callback
     const pm = result.perception_memory;
     const addRequest = {
       video_data: {
@@ -183,7 +183,7 @@ describe("@reflectworld/reflectworld onSegment wiring", () => {
       infer: true,
     };
 
-    // Validate shape for ReflectWorld
+    // Validate shape for Cortex
     expect(addRequest.video_data.summary).toBeTruthy();
     expect(addRequest.camera_id).toBe("cam_01");
     expect(addRequest.mode).toBe("periodic");
@@ -197,7 +197,7 @@ describe("@reflectworld/reflectworld onSegment wiring", () => {
     const segment = makeSegment("cam_02", 1);
     const result = await analyze(segment, pipelineDeps);
 
-    // Simulate what reflectworld/index.ts does for act webhook
+    // Simulate what cortex/index.ts does for act webhook
     const event = {
       segment_id: result.segment_id,
       camera_id: result.camera_id,

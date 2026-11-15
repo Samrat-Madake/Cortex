@@ -1,10 +1,10 @@
-# @reflectworld/dashboard
+# @cortex/dashboard
 
-> React real-time dashboard for ReflectWorld sources, perception, memory, and chat.
+> React real-time dashboard for Cortex sources, perception, memory, and chat.
 
 ## Overview
 
-The Dashboard is a single-page web application for operating ReflectWorld locally.
+The Dashboard is a single-page web application for operating Cortex locally.
 It connects to the Host server through HTTP APIs and WebSocket streams, renders
 source state, live previews, segments, entities, semantic memory, rules, and chat,
 and supports multiple camera or uploaded-video sources.
@@ -24,8 +24,8 @@ npm run build    # Production build → dist/
 npm run preview  # Preview production build
 ```
 
-The built `dist/` directory is served by `@reflectworld/host` and by the
-all-in-one `@reflectworld/reflectworld` CLI.
+The built `dist/` directory is served by `@cortex/host` and by the
+all-in-one `@cortex/cortex` CLI.
 
 ## Dashboard Components
 
@@ -41,7 +41,7 @@ all-in-one `@reflectworld/reflectworld` CLI.
 ## Event Types
 
 The dashboard consumes the shared `MonitorEventType` contract from
-`@reflectworld/shared`. Canonical UI state is delivered through
+`@cortex/shared`. Canonical UI state is delivered through
 `dashboard:source_state` and `dashboard:segment_state`; raw
 cam/perception/memory/system events remain available for diagnostics and
 compatibility.

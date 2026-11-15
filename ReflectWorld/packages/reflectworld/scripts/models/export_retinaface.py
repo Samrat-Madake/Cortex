@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export RetinaFace-ResNet50 to ONNX for ReflectWorld Level-1 face detection.
+"""Export RetinaFace-ResNet50 to ONNX for Cortex Level-1 face detection.
 
 Architecture: standard RetinaFace with a ResNet50 backbone, adapted from
 biubug6/Pytorch_Retinaface (MIT-licensed code). Self-contained: no external

@@ -1,5 +1,5 @@
 /**
- * ReflectWorld service manager — auto-start Python FastAPI service.
+ * Cortex service manager — auto-start Python FastAPI service.
  *
  * Strategies (tried in order):
  * 1. Already running on target port → skip
@@ -10,21 +10,21 @@ import { spawn, execFileSync, type ChildProcess } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveReflectWorldHome } from "@reflectworld/shared";
+import { resolveCortexHome } from "@cortex/shared";
 import { commandExists } from "./download.js";
-import { writeStderr, writeStdout } from "@reflectworld/shared";
+import { writeStderr, writeStdout } from "@cortex/shared";
 
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
 
-// Walk up from current file to find the @reflectworld/reflectworld package root.
+// Walk up from current file to find the @cortex/cortex package root.
 function findVmPkgRoot(startDir: string): string {
   let dir = startDir;
   while (dir !== dirname(dir)) {
     if (existsSync(join(dir, "package.json"))) {
       try {
         const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
-        if (pkg.name === "@reflectworld/reflectworld") return dir;
+        if (pkg.name === "@cortex/cortex") return dir;
       } catch { /* skip unreadable package.json */ }
     }
     dir = dirname(dir);
@@ -34,14 +34,14 @@ function findVmPkgRoot(startDir: string): string {
 const __vmPkgRoot = findVmPkgRoot(__dirname_local);
 const MANAGED_SERVICE_HOST = "127.0.0.1";
 
-export interface ReflectWorldServiceOptions {
+export interface CortexServiceOptions {
   stateDir: string;
-  /** Read-only asset root (~/.reflectworld). Binaries live under homeDir/bin/. */
+  /** Read-only asset root (~/.cortex). Binaries live under homeDir/bin/. */
   homeDir?: string;
   port?: number;
   qdrantHost?: string;
   qdrantPort?: number;
-  /** Path to ReflectWorld source directory (default: auto-detect from monorepo). */
+  /** Path to Cortex source directory (default: auto-detect from monorepo). */
   sourceDir?: string;
   /** Optional isolated storage path for history DB and local memory artifacts. */
   storagePath?: string;
@@ -53,7 +53,7 @@ export interface ReflectWorldServiceOptions {
   loadDotEnv?: boolean;
 }
 
-export type ReflectWorldRuntimeMode = "stopped" | "external" | "uv" | "python";
+export type CortexRuntimeMode = "stopped" | "external" | "uv" | "python";
 
 interface ManagedLogTail {
   stdout: string;
@@ -70,21 +70,21 @@ class ManagedServiceStartupError extends Error {
   }
 }
 
-interface ReflectWorldHealth {
+interface CortexHealth {
   ok: boolean;
   collectionPrefix?: string;
 }
 
-function isReflectWorldDebugEnabled(): boolean {
-  const values = [process.env.REFLECTWORLD_DEBUG, process.env.DEBUG].filter(Boolean).map((v) => String(v).toLowerCase());
+function isCortexDebugEnabled(): boolean {
+  const values = [process.env.CORTEX_DEBUG, process.env.DEBUG].filter(Boolean).map((v) => String(v).toLowerCase());
   return values.some((value) =>
     value === "1" ||
     value === "true" ||
     value === "yes" ||
     value === "on" ||
-    value === "reflectworld" ||
-    value.includes("reflectworld:*") ||
-    value.includes("reflectworld:mem")
+    value === "cortex" ||
+    value.includes("cortex:*") ||
+    value.includes("cortex:mem")
   );
 }
 
@@ -92,9 +92,9 @@ function appendTail(current: string, chunk: Buffer): string {
   return (current + chunk.toString("utf8")).slice(-4096);
 }
 
-export class ReflectWorldService {
+export class CortexService {
   private process: ChildProcess | null = null;
-  private modeValue: ReflectWorldRuntimeMode = "stopped";
+  private modeValue: CortexRuntimeMode = "stopped";
   private port: number;
   private readonly qdrantHost: string;
   private readonly qdrantPort: number;
@@ -107,8 +107,8 @@ export class ReflectWorldService {
   private readonly verboseLogs: boolean;
   private readonly loadDotEnvEnabled: boolean;
 
-  constructor(options: ReflectWorldServiceOptions) {
-    this.homeDir = options.homeDir ?? resolveReflectWorldHome();
+  constructor(options: CortexServiceOptions) {
+    this.homeDir = options.homeDir ?? resolveCortexHome();
     this.stateDir = options.stateDir;
     this.port = options.port ?? 8219;
     this.qdrantHost = options.qdrantHost ?? "127.0.0.1";
@@ -117,15 +117,15 @@ export class ReflectWorldService {
     this.sourceDir = options.sourceDir ?? this.detectSourceDir();
     this.storagePath = options.storagePath;
     this.collectionName = options.collectionName;
-    this.verboseLogs = options.verboseLogs ?? isReflectWorldDebugEnabled();
-    this.loadDotEnvEnabled = options.loadDotEnv ?? process.env.REFLECTWORLD_SERVICE_LOAD_DOTENV === "1";
+    this.verboseLogs = options.verboseLogs ?? isCortexDebugEnabled();
+    this.loadDotEnvEnabled = options.loadDotEnv ?? process.env.CORTEX_SERVICE_LOAD_DOTENV === "1";
   }
 
   get endpoint(): string {
     return `http://127.0.0.1:${this.port}`;
   }
 
-  get mode(): ReflectWorldRuntimeMode {
+  get mode(): CortexRuntimeMode {
     return this.modeValue;
   }
 
@@ -137,7 +137,7 @@ export class ReflectWorldService {
       if (this.collectionName) {
         if (health.collectionPrefix === this.collectionName) {
           this.modeValue = "external";
-          writeStdout(`[reflectworld] Reusing external service on port ${this.port} for collection prefix ${this.collectionName}`);
+          writeStdout(`[cortex] Reusing external service on port ${this.port} for collection prefix ${this.collectionName}`);
           await this.ensureCollections({ required: true });
           return;
         }
@@ -145,10 +145,10 @@ export class ReflectWorldService {
         // own service without killing the existing process.
         const origPort = this.port;
         this.port = await this.findFreePort(this.port + 1);
-        writeStdout(`[reflectworld] Port ${origPort} occupied by prefix ${health.collectionPrefix ?? "unknown"}, using ${this.port} for collection prefix ${this.collectionName}`);
+        writeStdout(`[cortex] Port ${origPort} occupied by prefix ${health.collectionPrefix ?? "unknown"}, using ${this.port} for collection prefix ${this.collectionName}`);
       } else {
         this.modeValue = "external";
-        writeStdout(`[reflectworld] Reusing external service on port ${this.port}`);
+        writeStdout(`[cortex] Reusing external service on port ${this.port}`);
         return;
       }
     }
@@ -163,7 +163,7 @@ export class ReflectWorldService {
         started = true;
       } catch (err) {
         lastStartError = err;
-        writeStderr(`[reflectworld] uv start failed: ${err instanceof Error ? err.message : err}`);
+        writeStderr(`[cortex] uv start failed: ${err instanceof Error ? err.message : err}`);
         if (err instanceof ManagedServiceStartupError && !err.allowFallback) throw err;
       }
     }
@@ -176,7 +176,7 @@ export class ReflectWorldService {
         started = true;
       } catch (err) {
         lastStartError = err;
-        writeStderr(`[reflectworld] python3 start failed: ${err instanceof Error ? err.message : err}`);
+        writeStderr(`[cortex] python3 start failed: ${err instanceof Error ? err.message : err}`);
         if (err instanceof ManagedServiceStartupError && !err.allowFallback) throw err;
       }
     }
@@ -184,11 +184,11 @@ export class ReflectWorldService {
     if (!started) {
       if (lastStartError) {
         const detail = lastStartError instanceof Error ? lastStartError.message : String(lastStartError);
-        throw new Error(`Cannot start ReflectWorld managed memory service. Last error: ${detail}`);
+        throw new Error(`Cannot start Cortex managed memory service. Last error: ${detail}`);
       }
       throw new Error(
-        "Cannot start ReflectWorld. Install uv (recommended) or Python 3.10+. " +
-        `Or start ReflectWorld manually on port ${this.port}.`,
+        "Cannot start Cortex. Install uv (recommended) or Python 3.10+. " +
+        `Or start Cortex manually on port ${this.port}.`,
       );
     }
 
@@ -200,7 +200,7 @@ export class ReflectWorldService {
     }
   }
 
-  private async fetchHealth(timeoutMs = 2000): Promise<ReflectWorldHealth> {
+  private async fetchHealth(timeoutMs = 2000): Promise<CortexHealth> {
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -227,7 +227,7 @@ export class ReflectWorldService {
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         if (options.required) throw new Error(`ensure-collections failed: ${message}`);
-        writeStderr(`[reflectworld] ensure-collections failed: ${message}`);
+        writeStderr(`[cortex] ensure-collections failed: ${message}`);
       }
     }
   }
@@ -259,7 +259,7 @@ export class ReflectWorldService {
     this.modeValue = "stopped";
   }
 
-  /** Detect ReflectWorld Python source dir — works both in monorepo and after npm install. */
+  /** Detect Cortex Python source dir — works both in monorepo and after npm install. */
   private detectSourceDir(): string | null {
     const candidates = [
       this.configuredSourceDir,
@@ -382,8 +382,8 @@ export class ReflectWorldService {
       cwd: this.sourceDir!,
     });
 
-    const logs = this.attachProcessLogs("reflectworld:uv");
-    this.process.on("error", (err) => { writeStderr(`[reflectworld:uv] spawn error: ${err.message}`); });
+    const logs = this.attachProcessLogs("cortex:uv");
+    this.process.on("error", (err) => { writeStderr(`[cortex:uv] spawn error: ${err.message}`); });
 
     // First run: `uv run` resolves + downloads the entire dep tree on demand
     // (openai + google-generativeai + grpcio + numpy + ...), which on a cold
@@ -391,7 +391,7 @@ export class ReflectWorldService {
     // first-install time to finish. Subsequent runs hit the cache and return
     // in seconds.
     await this.waitForManagedHealth("uv", logs);
-    writeStdout(`[reflectworld] Running via uv on port ${this.port}`);
+    writeStdout(`[cortex] Running via uv on port ${this.port}`);
   }
 
   private async startPython(): Promise<void> {
@@ -401,16 +401,16 @@ export class ReflectWorldService {
 
     // Create venv if needed
     if (!existsSync(join(venvDir, "bin", "python"))) {
-      writeStdout("[reflectworld] Creating Python venv...");
+      writeStdout("[cortex] Creating Python venv...");
       execFileSync("python3", ["-m", "venv", venvDir], { timeout: 30_000, stdio: "ignore" });
       // python -m venv ships an old bundled pip (often 21.2) that cannot
       // editable-install a pyproject.toml-only project. Upgrade pip /
       // setuptools / wheel first so PEP 660 editable installs work.
-      writeStdout("[reflectworld] Upgrading pip + setuptools + wheel...");
+      writeStdout("[cortex] Upgrading pip + setuptools + wheel...");
       execFileSync(join(venvDir, "bin", "pip"), [
         "install", "--quiet", "--upgrade", "pip", "setuptools", "wheel",
       ], { timeout: 60_000, stdio: ["ignore", "pipe", "pipe"] });
-      writeStdout("[reflectworld] Installing dependencies...");
+      writeStdout("[cortex] Installing dependencies...");
       execFileSync(join(venvDir, "bin", "pip"), [
         "install", "-e", this.sourceDir!,
       ], { timeout: 300_000, stdio: ["ignore", "pipe", "pipe"] });
@@ -425,17 +425,17 @@ export class ReflectWorldService {
       cwd: this.sourceDir!,
     });
 
-    const logs = this.attachProcessLogs("reflectworld:python");
-    this.process.on("error", (err) => { writeStderr(`[reflectworld:python] spawn error: ${err.message}`); });
+    const logs = this.attachProcessLogs("cortex:python");
+    this.process.on("error", (err) => { writeStderr(`[cortex:python] spawn error: ${err.message}`); });
 
     await this.waitForManagedHealth("python", logs);
-    writeStdout(`[reflectworld] Running via python venv on port ${this.port}`);
+    writeStdout(`[cortex] Running via python venv on port ${this.port}`);
   }
 
   private async waitForManagedHealth(kind: "uv" | "python", logs: ManagedLogTail): Promise<void> {
     const child = this.process;
     if (!child) {
-      throw new ManagedServiceStartupError(`ReflectWorld (${kind}) process was not started`, kind === "uv");
+      throw new ManagedServiceStartupError(`Cortex (${kind}) process was not started`, kind === "uv");
     }
 
     type WaitResult =
@@ -471,12 +471,12 @@ export class ReflectWorldService {
 
     if (result.type === "timeout") {
       child.kill("SIGTERM");
-      throw new Error(`ReflectWorld (${kind}) failed to become healthy within 300s${detail}`);
+      throw new Error(`Cortex (${kind}) failed to become healthy within 300s${detail}`);
     }
 
     if (result.type === "error") {
       throw new ManagedServiceStartupError(
-        `ReflectWorld (${kind}) failed to spawn: ${result.error.message}${detail}`,
+        `Cortex (${kind}) failed to spawn: ${result.error.message}${detail}`,
         kind === "uv",
       );
     }
@@ -485,7 +485,7 @@ export class ReflectWorldService {
       ? `signal=${result.signal}`
       : `code=${result.code === null ? "unknown" : result.code}`;
     throw new ManagedServiceStartupError(
-      `ReflectWorld (${kind}) exited during startup (${exitStatus})${detail}`,
+      `Cortex (${kind}) exited during startup (${exitStatus})${detail}`,
       false,
     );
   }

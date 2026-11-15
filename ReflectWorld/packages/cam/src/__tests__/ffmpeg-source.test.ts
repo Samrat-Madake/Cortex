@@ -11,7 +11,7 @@ vi.mock("node:child_process", () => ({
 }));
 
 vi.mock("../binary-installer.js", () => ({
-  resolveFfmpegBin: () => "/tmp/reflectworld-test-ffmpeg",
+  resolveFfmpegBin: () => "/tmp/cortex-test-ffmpeg",
 }));
 
 describe("FFmpegSource", () => {

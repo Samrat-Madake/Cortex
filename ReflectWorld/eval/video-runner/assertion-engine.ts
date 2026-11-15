@@ -3,16 +3,16 @@
  * Four assertion types: structure, semantic, state (Mem verification), and trace.
  */
 
-import type { PipelineTrace } from "@reflectworld/shared";
+import type { PipelineTrace } from "@cortex/shared";
 
 const logger = {
   info: (msg: string) => console.log(`[e2e:assertion] ${msg}`),
 };
 // Lazy getter: top-level const freezes the value at module-import time, but
-// e2e-runner.ts sets process.env.REFLECTWORLD_URL AFTER its imports resolve —
+// e2e-runner.ts sets process.env.CORTEX_URL AFTER its imports resolve —
 // that means any module-level `const MEM_URL = process.env...` gets the old
 // default and silently talks to :8219. Read on each call instead.
-const memUrl = () => process.env.REFLECTWORLD_URL ?? "http://127.0.0.1:8219";
+const memUrl = () => process.env.CORTEX_URL ?? "http://127.0.0.1:8219";
 
 interface MemoryItemLike {
   id?: string;
@@ -128,7 +128,7 @@ export function assertSemantic(
 }
 
 /**
- * State assertion: verifies ReflectWorld memory state via HTTP API.
+ * State assertion: verifies Cortex memory state via HTTP API.
  */
 export async function assertMemState(
   id: number,
@@ -190,7 +190,7 @@ export async function assertMemState(
       return { id, category, name, passed: false, details: `POST /search failed: ${resp.status}`, severity: "required" };
     }
     const result = (await resp.json()) as Record<string, unknown>;
-    // ReflectWorld search returns { results: [...] } or nested structure
+    // Cortex search returns { results: [...] } or nested structure
     const results = extractSearchResults(result);
 
     if (results.length === 0) {
@@ -210,7 +210,7 @@ export async function assertMemState(
 }
 
 /**
- * Extract flat array of search results from ReflectWorld response.
+ * Extract flat array of search results from Cortex response.
  * Response may be { results: [...] } or { episodic: [...], semantic: [...] }.
  */
 function extractSearchResults(

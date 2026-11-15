@@ -102,10 +102,10 @@ import("onnxruntime-node").then(async (ort) => {
 JS
 }
 
-reflectworld_setup_cuda_runtime() {
+cortex_setup_cuda_runtime() {
   local mode="${1:-warn}" # warn | require | quiet
-  REFLECTWORLD_CUDA_RUNTIME_LIBS=""
-  export REFLECTWORLD_CUDA_RUNTIME_LIBS
+  CORTEX_CUDA_RUNTIME_LIBS=""
+  export CORTEX_CUDA_RUNTIME_LIBS
 
   if [ "$(uname -s)" != "Linux" ]; then
     return 0
@@ -130,11 +130,11 @@ reflectworld_setup_cuda_runtime() {
   )
 
   local explicit_paths=()
-  if [ -n "${REFLECTWORLD_CUDNN_LIB_DIR:-}" ]; then
-    if [ -d "$REFLECTWORLD_CUDNN_LIB_DIR" ]; then
-      explicit_paths+=("$REFLECTWORLD_CUDNN_LIB_DIR")
+  if [ -n "${CORTEX_CUDNN_LIB_DIR:-}" ]; then
+    if [ -d "$CORTEX_CUDNN_LIB_DIR" ]; then
+      explicit_paths+=("$CORTEX_CUDNN_LIB_DIR")
     else
-      [ "$mode" = "quiet" ] || _vm_cuda_msg warn "REFLECTWORLD_CUDNN_LIB_DIR does not exist: $REFLECTWORLD_CUDNN_LIB_DIR"
+      [ "$mode" = "quiet" ] || _vm_cuda_msg warn "CORTEX_CUDNN_LIB_DIR does not exist: $CORTEX_CUDNN_LIB_DIR"
     fi
   fi
 
@@ -143,8 +143,8 @@ reflectworld_setup_cuda_runtime() {
   if [ -n "$joined" ]; then
     LD_LIBRARY_PATH="$joined:${LD_LIBRARY_PATH:-}"
     export LD_LIBRARY_PATH
-    REFLECTWORLD_CUDA_RUNTIME_LIBS="$joined"
-    export REFLECTWORLD_CUDA_RUNTIME_LIBS
+    CORTEX_CUDA_RUNTIME_LIBS="$joined"
+    export CORTEX_CUDA_RUNTIME_LIBS
   fi
 
   local has_cudnn=0

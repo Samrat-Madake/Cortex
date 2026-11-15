@@ -2,7 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { analyze } from "../../packages/percept/src/pipeline.js";
 import { createE2eDeps, makeSegment, MOCK_VLM_OUTPUT } from "./helpers.js";
-import type { Segment, Frame } from "@reflectworld/shared";
+import type { Segment, Frame } from "@cortex/shared";
 
 describe("E2E: degraded mode", () => {
   it("pipeline completes when VLM rejects", async () => {

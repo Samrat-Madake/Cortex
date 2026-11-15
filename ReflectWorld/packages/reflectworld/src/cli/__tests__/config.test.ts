@@ -21,15 +21,15 @@ describe("CLI config", () => {
   let tmpRoot = "";
 
   beforeEach(() => {
-    tmpRoot = mkdtempSync(join(tmpdir(), "reflectworld-cli-config-"));
+    tmpRoot = mkdtempSync(join(tmpdir(), "cortex-cli-config-"));
     mockHome.value = join(tmpRoot, "home");
     mkdirSync(mockHome.value, { recursive: true });
     process.chdir(tmpRoot);
 
     for (const key of Object.keys(process.env)) delete process.env[key];
     Object.assign(process.env, originalEnv);
-    delete process.env.REFLECTWORLD_HOME;
-    delete process.env.REFLECTWORLD_STATE_DIR;
+    delete process.env.CORTEX_HOME;
+    delete process.env.CORTEX_STATE_DIR;
   });
 
   afterEach(() => {
@@ -43,10 +43,10 @@ describe("CLI config", () => {
   it("resolves default runtime directories", () => {
     const config = resolveCliConfig([]);
 
-    expect(config.homeDir).toBe(join(mockHome.value, ".reflectworld"));
-    expect(config.stateDir).toBe(join(process.cwd(), ".reflectworld-state"));
-    expect(process.env.REFLECTWORLD_HOME).toBe(config.homeDir);
-    expect(process.env.REFLECTWORLD_STATE_DIR).toBe(config.stateDir);
+    expect(config.homeDir).toBe(join(mockHome.value, ".cortex"));
+    expect(config.stateDir).toBe(join(process.cwd(), ".cortex-state"));
+    expect(process.env.CORTEX_HOME).toBe(config.homeDir);
+    expect(process.env.CORTEX_STATE_DIR).toBe(config.stateDir);
   });
 
   it("resolves explicit runtime directories from CLI args", () => {
@@ -58,15 +58,15 @@ describe("CLI config", () => {
     expect(config.homeDir).toBe(homeDir);
     expect(config.stateDir).toBe(stateDir);
     expect(config.port).toBe(4123);
-    expect(process.env.REFLECTWORLD_HOME).toBe(homeDir);
-    expect(process.env.REFLECTWORLD_STATE_DIR).toBe(stateDir);
+    expect(process.env.CORTEX_HOME).toBe(homeDir);
+    expect(process.env.CORTEX_STATE_DIR).toBe(stateDir);
     expect(process.env.PORT).toBe("4123");
   });
 
   it("resolves setup home directory", () => {
     const homeDir = resolveHomeDir([]);
 
-    expect(homeDir).toBe(join(mockHome.value, ".reflectworld"));
-    expect(process.env.REFLECTWORLD_HOME).toBe(homeDir);
+    expect(homeDir).toBe(join(mockHome.value, ".cortex"));
+    expect(process.env.CORTEX_HOME).toBe(homeDir);
   });
 });

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { monitorBus } from "@reflectworld/shared";
-import type { MonitorEvent } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { MonitorEvent } from "@cortex/shared";
 
 describe("service_health heartbeat", () => {
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe("service_health heartbeat", () => {
     // Simulate the health check logic from index.ts
     // (We test the publish mechanism, not actual HTTP calls)
     const health: Record<string, string> = {
-      ReflectWorld: "ok",
+      Cortex: "ok",
       Qdrant: "ok",
       Go2RTC: "down",
       Monitor: "ok",
@@ -60,7 +60,7 @@ describe("service_health heartbeat", () => {
 
     // Simulate all services down
     const health: Record<string, string> = {
-      ReflectWorld: "down",
+      Cortex: "down",
       Qdrant: "down",
       Go2RTC: "down",
       Monitor: "down",
@@ -70,7 +70,7 @@ describe("service_health heartbeat", () => {
 
     expect(events).toHaveLength(1);
     const services = events[0]!.data.services as Record<string, string>;
-    expect(services.ReflectWorld).toBe("down");
+    expect(services.Cortex).toBe("down");
     expect(services.Qdrant).toBe("down");
     expect(services.Go2RTC).toBe("down");
     expect(services.Monitor).toBe("down");
@@ -81,10 +81,10 @@ describe("service_health heartbeat", () => {
     monitorBus.on("monitor", (e) => events.push(e));
 
     monitorBus.publish("system:service_health", {
-      services: { ReflectWorld: "ok", Qdrant: "ok", Go2RTC: "ok", Monitor: "ok" },
+      services: { Cortex: "ok", Qdrant: "ok", Go2RTC: "ok", Monitor: "ok" },
     });
 
     const services = events[0]!.data.services as Record<string, string>;
-    expect(Object.keys(services).sort()).toEqual(["Go2RTC", "Monitor", "Qdrant", "ReflectWorld"]);
+    expect(Object.keys(services).sort()).toEqual(["Go2RTC", "Monitor", "Qdrant", "Cortex"]);
   });
 });

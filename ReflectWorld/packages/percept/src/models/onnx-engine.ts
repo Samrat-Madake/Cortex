@@ -3,7 +3,7 @@ import { readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { ModelId } from "./model-manifest.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 // Without any mitigation, each InferenceSession on CoreML EP writes a fresh
 // ~45-95MB `.mlmodelc` directory into $TMPDIR and never cleans it up.

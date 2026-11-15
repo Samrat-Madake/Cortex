@@ -1,10 +1,10 @@
 # Quickstart
 
-Run ReflectWorld for the first time, from configuration to a working Dashboard
+Run Cortex for the first time, from configuration to a working Dashboard
 with video analysis, memory, and chat.
 
 Expected time is about 10 minutes after Node.js is installed. First startup can
-take longer because ReflectWorld prepares local runtime binaries and the Python
+take longer because Cortex prepares local runtime binaries and the Python
 memory service environment.
 
 For the full install model, see [installation.md](./installation.md).
@@ -19,12 +19,12 @@ The fastest path is the standalone Dashboard:
 video source -> segmentation -> perception -> memory -> Dashboard + chat
 ```
 
-Standalone mode starts the ReflectWorld runtime and serves the Dashboard from
+Standalone mode starts the Cortex runtime and serves the Dashboard from
 one local process. It reads configuration from `.env`.
 
 Use this quickstart if you want to:
 
-- upload a local video and inspect what ReflectWorld remembers,
+- upload a local video and inspect what Cortex remembers,
 - connect an RTSP/phone/webcam source,
 - test entity and memory behavior locally,
 - ask chat questions over stored visual memory.
@@ -48,7 +48,7 @@ Optional:
 - Level 1 local perception models for detection and ReID
 - ElevenLabs or local STT if you want speech transcription
 
-ReflectWorld manages Qdrant, go2rtc, ffmpeg, and the Python memory service
+Cortex manages Qdrant, go2rtc, ffmpeg, and the Python memory service
 environment during setup. You do not need to install those manually.
 
 ---
@@ -96,7 +96,7 @@ ELEVENLABS_LANGUAGE_CODE=en  # optional; leave empty for auto-detect
 
 # Or local STT after `enable-level1 --with-stt`.
 # STT_PROVIDER=moonshine
-# STT_MODEL_DIR=~/.reflectworld/models/sherpa-onnx-moonshine-tiny-en-int8
+# STT_MODEL_DIR=~/.cortex/models/sherpa-onnx-moonshine-tiny-en-int8
 # STT_NUM_THREADS=1
 ```
 
@@ -114,16 +114,16 @@ Gemini does not expose an OpenAI-compatible embedding endpoint, so configure a
 separate OpenAI-compatible embedder if you want semantic search.
 
 Standalone mode reads `.env`. OpenClaw plugin mode does not; use
-`npx @reflectworld/reflectworld configure` instead.
+`npx @cortex/cortex configure` instead.
 
 ---
 
-## 2. Start ReflectWorld
+## 2. Start Cortex
 
 From an npm package:
 
 ```bash
-npx @reflectworld/reflectworld start
+npx @cortex/cortex start
 ```
 
 From a source checkout:
@@ -131,7 +131,7 @@ From a source checkout:
 ```bash
 npm install
 npm run build
-npx @reflectworld/reflectworld start --dev
+npx @cortex/cortex start --dev
 ```
 
 Open:
@@ -189,7 +189,7 @@ As the source is analyzed, the Dashboard should begin to show:
 - **semantic memory** about the scene and recurring subjects,
 - **service health** for runtime components.
 
-With Level 0, ReflectWorld relies on VLM analysis. With Level 1, local detection
+With Level 0, Cortex relies on VLM analysis. With Level 1, local detection
 and ReID add stronger subject and identity continuity.
 
 If segment cards appear but descriptions do not, check:
@@ -225,15 +225,15 @@ Level 1 adds local detection and ReID before VLM analysis. It is useful when you
 want recurring entities, identity continuity, and local evidence grounding.
 
 ```bash
-npx @reflectworld/reflectworld enable-level1
-npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses
+npx @cortex/cortex enable-level1
+npx @cortex/cortex setup --level 1 --yes --accept-model-licenses
 ```
 
 `--accept-model-licenses` acknowledges the AGPL / non-commercial licenses of the
 Level 1 models; without it (or an interactive confirmation) those models are
 skipped and setup stays at Level 0.
 
-No further configuration is needed. ReflectWorld auto-detects the models and
+No further configuration is needed. Cortex auto-detects the models and
 enables local inference on the next `start`; you do not need to set
 `STUBS_ONLY` manually. (The `STUBS_ONLY` env var still exists as an override,
 but an empty models directory simply keeps Level 0 and degrades gracefully.)
@@ -243,20 +243,20 @@ installs `sherpa-onnx-node`) and set `STT_PROVIDER=moonshine` in `.env` *before*
 running setup, so setup fetches the Moonshine model:
 
 ```bash
-npx @reflectworld/reflectworld enable-level1 --with-stt
-npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses
+npx @cortex/cortex enable-level1 --with-stt
+npx @cortex/cortex setup --level 1 --yes --accept-model-licenses
 ```
 
 If you enable local STT later, run those two commands again after setting
 `STT_PROVIDER=moonshine`; they are idempotent.
 
-Level 1 populates `~/.reflectworld/models` per each model's license: license-clean
+Level 1 populates `~/.cortex/models` per each model's license: license-clean
 models (Silero/Moonshine, MIT) download directly; restricted models with a ready
 upstream ONNX (ArcFace, RTMPose — non-commercial) download directly but require
 accepting their license; restricted models shipped only as training weights
 (YOLO26m, RetinaFace, CLIP-ReID) are downloaded and converted to ONNX locally (in
 a throwaway Python env via the bundled `uv`). Model weights are never committed to
-the source tree or redistributed by ReflectWorld.
+the source tree or redistributed by Cortex.
 
 See [installation.md#level-0-vs-level-1](./installation.md#level-0-vs-level-1).
 
@@ -264,12 +264,12 @@ See [installation.md#level-0-vs-level-1](./installation.md#level-0-vs-level-1).
 
 ## Optional: Use OpenClaw Plugin Mode
 
-Use this path when OpenClaw is your agent runtime and ReflectWorld should be
+Use this path when OpenClaw is your agent runtime and Cortex should be
 loaded as a plugin:
 
 ```bash
-openclaw plugins install @reflectworld/reflectworld
-npx @reflectworld/reflectworld configure
+openclaw plugins install @cortex/cortex
+npx @cortex/cortex configure
 openclaw gateway restart
 ```
 
@@ -286,7 +286,7 @@ npm install
 cp .env.example .env
 # Fill VLM_*, LLM_MODEL, QA_MODEL, and optionally QA_API_KEY / QA_BASE_URL.
 npm run build
-npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses
+npx @cortex/cortex setup --level 1 --yes --accept-model-licenses
 npm run benchmark:setup
 npm run benchmark:run -- --dataset ~/benchmark-data/dataset.json --smoke
 ```
@@ -305,7 +305,7 @@ See [eval/benchmark/README.md](../../eval/benchmark/README.md).
 | Semantic search is weak or unavailable | Configure `EMBEDDER_*` and keep `EMBEDDING_DIMS` consistent with the collection. |
 | Uploaded video does not analyze | Check source permissions and the bundled ffmpeg/ffprobe setup logs. |
 | Live source does not preview | Check stream URL, go2rtc health, and source security settings. |
-| Plugin mode ignores `.env` | Expected; use `reflectworld configure`. |
+| Plugin mode ignores `.env` | Expected; use `cortex configure`. |
 
 ---
 

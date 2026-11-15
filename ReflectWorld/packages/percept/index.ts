@@ -1,5 +1,5 @@
 // packages/percept/index.ts
-import type { OpenClawPluginApi } from "@reflectworld/shared";
+import type { OpenClawPluginApi } from "@cortex/shared";
 import { PerceptionToolSchema } from "./src/schema.js";
 import { executeToolAction } from "./src/tool.js";
 import { createPipelineDeps, logPipelineSelfCheck } from "./src/pipeline.js";
@@ -53,8 +53,8 @@ export type { NarrativeMemoryConfig, EpisodicSchemaWriter } from "./src/narrativ
 export type { EventCloseSummary, NarrativeCallbacks } from "./src/types.js";
 
 export default {
-  id: "reflectworld-percept",
-  name: "ReflectWorld Perception",
+  id: "cortex-percept",
+  name: "Cortex Perception",
   description:
     "Visual perception pipeline: VLM analysis, working memory event tracking, " +
     "local media storage, code-driven notifications.",
@@ -69,7 +69,7 @@ export default {
         depsPromise = createPipelineDeps(config, noopSaver).then((deps) => {
           logPipelineSelfCheck(deps, {
             mode: "percept-plugin",
-            label: "reflectworld_perception",
+            label: "cortex_perception",
             throwOnFatal: true,
             logger: (message) => api.logger.info(message),
           });
@@ -80,7 +80,7 @@ export default {
     };
 
     api.registerTool({
-      name: "reflectworld_perception",
+      name: "cortex_perception",
       description: `Perception configuration and analysis tool.
 
 Primary action:

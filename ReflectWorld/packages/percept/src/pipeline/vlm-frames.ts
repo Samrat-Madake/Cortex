@@ -1,4 +1,4 @@
-import type { BoundingBox, Segment } from "@reflectworld/shared";
+import type { BoundingBox, Segment } from "@cortex/shared";
 import { renderDIdAnnotations } from "../set-of-mark.js";
 import type { DetectionRegistry } from "../did-registry.js";
 import type { DIdEntry } from "../types.js";

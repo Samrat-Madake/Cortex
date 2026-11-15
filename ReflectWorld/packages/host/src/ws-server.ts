@@ -3,8 +3,8 @@
 
 import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "node:http";
-import { monitorBus } from "@reflectworld/shared";
-import type { MonitorEvent } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { MonitorEvent } from "@cortex/shared";
 
 export function attachMonitorWs(server: Server): WebSocketServer {
   const wss = new WebSocketServer({ server, path: "/ws/monitor" });

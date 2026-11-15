@@ -4,7 +4,7 @@
 
 // ── Config interfaces ──
 
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 export interface FaceQualityConfig {
   minDetectionConfidence: number;

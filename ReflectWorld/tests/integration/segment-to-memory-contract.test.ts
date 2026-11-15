@@ -1,12 +1,12 @@
 // tests/integration/segment-to-memory-contract.test.ts
-// E2E: Verify the full data contract from Segment → PerceptionResult → ReflectWorld payload.
-// Ensures all required fields for ReflectWorld add() are present and correctly typed.
+// E2E: Verify the full data contract from Segment → PerceptionResult → Cortex payload.
+// Ensures all required fields for Cortex add() are present and correctly typed.
 import { describe, it, expect, afterAll } from "vitest";
 import { analyze } from "../../packages/percept/src/pipeline.js";
 import { createE2eDeps, makeSegment, MOCK_VLM_OUTPUT } from "./helpers.js";
 import type { VlmOutput } from "../../packages/percept/src/types.js";
 
-describe("E2E: Segment → PerceptionResult → ReflectWorld contract", () => {
+describe("E2E: Segment → PerceptionResult → Cortex contract", () => {
   // VLM mock with richer output to test all contract fields
   const richVlmOutput: VlmOutput = {
     summary: "Delivery driver dropped a package at the front porch.",
@@ -39,7 +39,7 @@ describe("E2E: Segment → PerceptionResult → ReflectWorld contract", () => {
     mediaSaver.cleanup();
   });
 
-  it("snapshot segment produces all required ReflectWorld fields", async () => {
+  it("snapshot segment produces all required Cortex fields", async () => {
     const segment = makeSegment("snapshot", "cam_contract_1", 1);
     const result = await analyze(segment, deps);
 

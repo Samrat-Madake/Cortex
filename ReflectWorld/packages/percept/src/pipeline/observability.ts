@@ -3,7 +3,7 @@ import type {
   PipelineTrace,
   Segment,
   SegmentArchive,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 import type { PipelineProfiler } from "../profiling.js";
 import type { AnalyzerResult, VlmOutput } from "../types.js";
 import type { PipelineDeps } from "./types.js";

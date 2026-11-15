@@ -13,7 +13,7 @@
  */
 
 import type { FrameResult } from "../types.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 import type { Segmenter, CutSignal, SegmenterHints } from "./types.js";
 
 export interface CompositeSegmenterOptions {

@@ -1,0 +1,12 @@
+{
+  "id": "video-mvtpy425",
+  "name": "video-mvtpy425",
+  "input": "C:\\Users\\DELL\\Desktop\\Mega Project folder\\ReflectWorld\\.reflectworld-state\\uploads\\Test_video_1.mp4",
+  "protocol": "ffmpeg",
+  "created_at": 1793288963598,
+  "dashboard_status": "stopped",
+  "dashboard_config": {
+    "mode": "stream",
+    "fps": 1
+  }
+}

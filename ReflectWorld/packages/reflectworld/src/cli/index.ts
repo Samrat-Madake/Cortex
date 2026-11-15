@@ -3,9 +3,9 @@ const args = process.argv.slice(2);
 const command = args[0];
 
 function printHelp(): void {
-  console.log(`ReflectWorld CLI
+  console.log(`Cortex CLI
 
-Usage: npx @reflectworld/reflectworld <command>
+Usage: npx @cortex/cortex <command>
 
 Commands:
   setup [--yes] [--level 0|1] [--home-dir DIR] [--accept-model-licenses]
@@ -15,7 +15,7 @@ Commands:
                                                  (or interactive confirmation) to install them.
   enable-level1 [--gpu] [--with-stt]              Install native Level 1 peer deps
                                                    (--gpu is compatibility-only; CUDA is auto-detected)
-  start [--dev] [--port N] [--home-dir DIR]       Start ReflectWorld
+  start [--dev] [--port N] [--home-dir DIR]       Start Cortex
   configure                                      Configure OpenClaw plugin providers
 `);
 }

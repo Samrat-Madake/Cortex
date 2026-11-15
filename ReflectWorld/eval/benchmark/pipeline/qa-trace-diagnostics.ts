@@ -197,8 +197,8 @@ export function summarizeQaTraceDiagnostics(trace: AgentQATrace | undefined): Qa
 
   return {
     tool_counts,
-    memory_search_calls: tool_counts.reflectworld_memory_search ?? 0,
-    memory_get_calls: tool_counts.reflectworld_memory_get ?? 0,
+    memory_search_calls: tool_counts.cortex_memory_search ?? 0,
+    memory_get_calls: tool_counts.cortex_memory_get ?? 0,
     visual_evidence_calls: tool_counts.view_visual_evidence ?? 0,
     candidate_coverage_counts: candidateCounts,
     candidate_coverage_bucket: candidateCounts

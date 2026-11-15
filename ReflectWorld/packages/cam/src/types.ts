@@ -30,8 +30,8 @@ export interface WatchMode {
 }
 
 // Import + re-export canonical FrameDetection from shared
-import type { FrameDetection as _FrameDetection } from "@reflectworld/shared";
-export type { FrameDetection } from "@reflectworld/shared";
+import type { FrameDetection as _FrameDetection } from "@cortex/shared";
+export type { FrameDetection } from "@cortex/shared";
 
 export interface FrameResult {
   data: string;

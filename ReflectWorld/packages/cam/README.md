@@ -1,4 +1,4 @@
-# @reflectworld/cam
+# @cortex/cam
 
 > Video capture, frame extraction, motion detection, and audio VAD via go2rtc.
 
@@ -9,18 +9,18 @@ The Cam package manages video sources (RTSP, webcam, phone, HTTP) through go2rtc
 ## Installation
 
 ```bash
-npm install @reflectworld/cam
+npm install @cortex/cam
 ```
 
-Runtime assets are prepared by `npx @reflectworld/reflectworld setup`: go2rtc,
-ffmpeg, ffprobe, Qdrant, and uv are installed under `~/.reflectworld/bin`, while
-the Silero VAD model is installed under `~/.reflectworld/models`. Runtime only
+Runtime assets are prepared by `npx @cortex/cortex setup`: go2rtc,
+ffmpeg, ffprobe, Qdrant, and uv are installed under `~/.cortex/bin`, while
+the Silero VAD model is installed under `~/.cortex/models`. Runtime only
 resolves prepared assets.
 
 ## Quick Start
 
 ```typescript
-import { Go2rtcManager, FrameExtractor, MotionFilter, SourceManager } from "@reflectworld/cam";
+import { Go2rtcManager, FrameExtractor, MotionFilter, SourceManager } from "@cortex/cam";
 
 const go2rtc = new Go2rtcManager({ binPath: "/path/to/go2rtc", apiPort: 1984 });
 await go2rtc.start();
@@ -55,7 +55,7 @@ const frames = await extractor.extract("camera_1", { fps: 1, width: 1280, durati
 
 ### OpenClaw Plugin
 
-The default export registers as an OpenClaw plugin with the `reflectworld_cam` tool, supporting actions: `add_source`, `list_sources`, `remove_source`, `snapshot`, `watch`, `stop_watch`, `set_sampling`, `switch_mode`, `live_view`, `list_recordings`.
+The default export registers as an OpenClaw plugin with the `cortex_cam` tool, supporting actions: `add_source`, `list_sources`, `remove_source`, `snapshot`, `watch`, `stop_watch`, `set_sampling`, `switch_mode`, `live_view`, `list_recordings`.
 
 ## See Also
 

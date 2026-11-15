@@ -13,8 +13,8 @@ describe("parseMemoryConfig", () => {
   });
 
   it("accepts valid custom baseUrl", () => {
-    const config = parseMemoryConfig({ baseUrl: "http://reflectworld-svc:8219" });
-    expect(config.baseUrl).toBe("http://reflectworld-svc:8219");
+    const config = parseMemoryConfig({ baseUrl: "http://cortex-svc:8219" });
+    expect(config.baseUrl).toBe("http://cortex-svc:8219");
   });
 
   it("rejects non-URL baseUrl", () => {

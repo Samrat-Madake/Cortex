@@ -9,8 +9,8 @@ import type {
   PluginLogger,
   PluginService,
   ToolFactory,
-} from "@reflectworld/shared";
-import { resolveReflectWorldStateDir } from "@reflectworld/shared";
+} from "@cortex/shared";
+import { resolveCortexStateDir } from "@cortex/shared";
 import { mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -45,7 +45,7 @@ export class MiniHost {
   private readonly logger = createLogger("host");
 
   constructor(options?: HostOptions) {
-    this.stateDir = options?.stateDir ?? resolveReflectWorldStateDir();
+    this.stateDir = options?.stateDir ?? resolveCortexStateDir();
     this.flatStateDir = options?.flatStateDir ?? false;
     this.pluginConfigs = options?.pluginConfigs ?? {};
     if (!existsSync(this.stateDir)) mkdirSync(this.stateDir, { recursive: true });

@@ -3,8 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { analyze, type PipelineDeps } from "../pipeline.js";
 import { WorkingMemoryManager } from "../working-memory.js";
 import { StrategyManager } from "../strategy-manager.js";
-import type { Segment, AudioData } from "@reflectworld/shared";
-import { monitorBus, type MonitorEvent } from "@reflectworld/shared";
+import type { Segment, AudioData } from "@cortex/shared";
+import { monitorBus, type MonitorEvent } from "@cortex/shared";
 import type { VlmOutput } from "../types.js";
 
 // ── Helpers ──

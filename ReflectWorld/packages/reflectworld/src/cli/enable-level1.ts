@@ -12,7 +12,7 @@ interface EnableLevel1Options {
   dryRun: boolean;
 }
 
-type PeerPackageName = "@reflectworld/percept" | "@reflectworld/cam";
+type PeerPackageName = "@cortex/percept" | "@cortex/cam";
 
 interface PackageManifest {
   name?: string;
@@ -45,19 +45,19 @@ function parseArgs(args: string[]): EnableLevel1Options {
   return opts;
 }
 
-function findReflectWorldPackageRoot(startDir: string): string {
+function findCortexPackageRoot(startDir: string): string {
   let dir = startDir;
   while (dir !== dirname(dir)) {
     const pkgPath = join(dir, "package.json");
     if (existsSync(pkgPath)) {
       try {
         const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { name?: string };
-        if (pkg.name === "@reflectworld/reflectworld") return dir;
+        if (pkg.name === "@cortex/cortex") return dir;
       } catch { /* continue */ }
     }
     dir = dirname(dir);
   }
-  throw new Error("Cannot locate @reflectworld/reflectworld package root. Pass --package-dir <dir>.");
+  throw new Error("Cannot locate @cortex/cortex package root. Pass --package-dir <dir>.");
 }
 
 function findNearestPackageRoot(startDir: string): string | undefined {
@@ -82,7 +82,7 @@ function readPackageJson(path: string): PackageManifest | undefined {
 function dependencyPackageJson(root: string, packageName: PeerPackageName): PackageManifest | undefined {
   const [, shortName] = packageName.split("/");
   const candidates = [
-    join(root, "node_modules", "@reflectworld", shortName!, "package.json"),
+    join(root, "node_modules", "@cortex", shortName!, "package.json"),
     join(root, "..", shortName!, "package.json"),
     join(root, "..", "..", "packages", shortName!, "package.json"),
   ];
@@ -201,7 +201,7 @@ function dependencySpec(dependency: NativeDependency): string {
 
 export async function runEnableLevel1(args: string[]): Promise<void> {
   const opts = parseArgs(args);
-  const runtimeRoot = findReflectWorldPackageRoot(dirname(fileURLToPath(import.meta.url)));
+  const runtimeRoot = findCortexPackageRoot(dirname(fileURLToPath(import.meta.url)));
   const installRoot = resolveInstallRoot(opts, runtimeRoot);
   const resolvedNpmRoot = resolveNpmRoot(installRoot);
   const physicalInstallRoot = realpathSync(installRoot);
@@ -213,15 +213,15 @@ export async function runEnableLevel1(args: string[]): Promise<void> {
   const npmRoot = workspacePath === "" ? installRoot : resolvedNpmRoot;
 
   const dependencies = [
-    nativeDependency(installRoot, runtimeRoot, "@reflectworld/percept", "onnxruntime-node"),
-    nativeDependency(installRoot, runtimeRoot, "@reflectworld/percept", "sharp"),
+    nativeDependency(installRoot, runtimeRoot, "@cortex/percept", "onnxruntime-node"),
+    nativeDependency(installRoot, runtimeRoot, "@cortex/percept", "sharp"),
     ...(opts.withStt
-      ? [nativeDependency(installRoot, runtimeRoot, "@reflectworld/cam", "sherpa-onnx-node")]
+      ? [nativeDependency(installRoot, runtimeRoot, "@cortex/cam", "sherpa-onnx-node")]
       : []),
   ];
 
   const npmArgs = ["install"];
-  console.log("\nReflectWorld Level 1 native dependency setup\n");
+  console.log("\nCortex Level 1 native dependency setup\n");
   console.log(`Install project: ${installRoot}`);
   if (npmRoot !== installRoot) console.log(`npm project root: ${npmRoot}`);
   console.log(`Dependencies: ${dependencies.map(dependencySpec).join(" ")}`);
@@ -229,7 +229,7 @@ export async function runEnableLevel1(args: string[]): Promise<void> {
   console.log(`Command: npm ${npmArgs.join(" ")}\n`);
   if (opts.gpu) {
     console.log(
-      "--gpu is now a compatibility flag. ReflectWorld uses onnxruntime-node for both CPU/CoreML and CUDA; " +
+      "--gpu is now a compatibility flag. Cortex uses onnxruntime-node for both CPU/CoreML and CUDA; " +
       "CUDA is detected at runtime when NVIDIA driver, CUDA runtime, and cuDNN 9 are visible to Node.\n",
     );
   }
@@ -262,8 +262,8 @@ export async function runEnableLevel1(args: string[]): Promise<void> {
 
   console.log(opts.dryRun ? "\nDry run complete; no packages were installed." : "\nNative dependencies are installed.");
   console.log("Next steps:");
-  console.log("  1. Ensure Level 1 model files exist under REFLECTWORLD_MODELS_DIR or ~/.reflectworld/models.");
-  console.log("  2. Run: reflectworld setup --level 1 --yes --accept-model-licenses");
+  console.log("  1. Ensure Level 1 model files exist under CORTEX_MODELS_DIR or ~/.cortex/models.");
+  console.log("  2. Run: cortex setup --level 1 --yes --accept-model-licenses");
   console.log("     (--accept-model-licenses acknowledges the AGPL / non-commercial model licenses;");
   console.log("      without it, Level 1 models are skipped and setup stays at Level 0.)");
   console.log("  3. For Linux GPU hosts, ensure CUDA 12 runtime + cuDNN 9 are on the dynamic library path.");

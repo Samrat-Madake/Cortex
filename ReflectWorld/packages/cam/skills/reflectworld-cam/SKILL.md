@@ -1,4 +1,4 @@
-# ReflectWorld Cam — Video Source Management
+# Cortex Cam — Video Source Management
 
 Manage video sources: add cameras, capture snapshots, start/stop monitoring, adjust settings, switch modes, watch live, list recordings.
 
@@ -75,7 +75,7 @@ When the user wants to see a camera's live feed ("show me the camera", "let me s
 ## Pipeline (automatic)
 
 Once a watch is started, the background pipeline runs automatically:
-FrameExtractor → Segmenter → Perception (VLM) → ReflectWorld → Act
+FrameExtractor → Segmenter → Perception (VLM) → Cortex → Act
 
 You do NOT need to call perception/memory/act manually. Analysis results are pushed to the user as notifications automatically.
 

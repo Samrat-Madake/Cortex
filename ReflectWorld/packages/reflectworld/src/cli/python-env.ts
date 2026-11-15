@@ -2,7 +2,7 @@ import { existsSync, cpSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { ensureDir } from "./download.js";
 
-/** Copy Python service source from npm package's bundled-services/ to ~/.reflectworld/services/. */
+/** Copy Python service source from npm package's bundled-services/ to ~/.cortex/services/. */
 export function copyServices(stateDir: string, serviceNames: string[]): void {
   const servicesDir = join(stateDir, "services");
   ensureDir(servicesDir);

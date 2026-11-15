@@ -1,8 +1,8 @@
-export type { MonitorEvent, MonitorEventType } from "@reflectworld/shared";
+export type { MonitorEvent, MonitorEventType } from "@cortex/shared";
 
 /** A stable display alias for a face-matched entity. */
 export interface EntityAlias {
-  /** Canonical entity id from ReflectWorld (never shown to user). */
+  /** Canonical entity id from Cortex (never shown to user). */
   entity_id: string;
   /** Human-readable name: "Person A", "Person B", ... (or user-edited). */
   display_name: string;

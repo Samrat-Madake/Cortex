@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { FrameDetection, Segment } from "@reflectworld/shared";
+import type { FrameDetection, Segment } from "@cortex/shared";
 import { WorkingMemoryManager } from "../working-memory.js";
 import type { DetectionOutput, VlmOutput } from "../types.js";
 import type { PipelineDeps } from "../pipeline.js";

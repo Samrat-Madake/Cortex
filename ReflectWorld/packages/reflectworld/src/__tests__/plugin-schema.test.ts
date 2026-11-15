@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-describe("reflectworld plugin schema", () => {
+describe("cortex plugin schema", () => {
   it("declares required_level for all-in-one perception config", () => {
     const plugin = JSON.parse(
       readFileSync(new URL("../../openclaw.plugin.json", import.meta.url), "utf8"),

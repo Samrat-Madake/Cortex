@@ -1,4 +1,4 @@
-import type { Segment, PerceptionResult } from "@reflectworld/shared";
+import type { Segment, PerceptionResult } from "@cortex/shared";
 import { PerCameraSegmentScheduler } from "../utils/per-camera-segment-scheduler.js";
 
 export interface PerceptionRuntimeConfig {

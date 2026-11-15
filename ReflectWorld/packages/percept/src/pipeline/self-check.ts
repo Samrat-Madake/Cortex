@@ -1,4 +1,4 @@
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 import type { PerceptionConfig } from "../config.js";
 import { MODEL_MANIFEST } from "../models/model-manifest.js";
 import { OnnxInferenceEngine } from "../models/onnx-engine.js";
@@ -95,7 +95,7 @@ export function collectPipelineSelfCheckComponents(
       name: "local_model_capabilities",
       status: belowRequiredLevel ? "error" : maxLevel >= 1 ? "ok" : "warn",
       required: belowRequiredLevel ? true : undefined,
-      detail: `max_level=${maxLevel} required_level=${requiredLevel} capabilities=${(deps.router?.getAvailableCapabilities() ?? []).join(",") || "none"} models_dir=${config.models_dir ?? "default"}${maxLevel >= requiredLevel && maxLevel >= 1 ? "" : " install native runtime with: reflectworld enable-level1"}`,
+      detail: `max_level=${maxLevel} required_level=${requiredLevel} capabilities=${(deps.router?.getAvailableCapabilities() ?? []).join(",") || "none"} models_dir=${config.models_dir ?? "default"}${maxLevel >= requiredLevel && maxLevel >= 1 ? "" : " install native runtime with: cortex enable-level1"}`,
     });
 
     for (const provider of deps.router?.getProviderStatuses() ?? []) {
@@ -140,7 +140,7 @@ export function formatPipelineSelfCheckReport(deps: PipelineDeps, options: Pipel
   const fatal = components.filter((c) => c.required && c.status === "error");
   const abnormal = components.filter((c) => c.status === "warn" || c.status === "error");
   const header = [
-    "========== ReflectWorld Pipeline Self-Check ==========",
+    "========== Cortex Pipeline Self-Check ==========",
     `mode=${options.mode ?? "unknown"} label=${options.label ?? "pipeline"} status=${worst.toUpperCase()} abnormal=${abnormal.length} fatal=${fatal.length}`,
   ];
   const body = components.map((c) => {

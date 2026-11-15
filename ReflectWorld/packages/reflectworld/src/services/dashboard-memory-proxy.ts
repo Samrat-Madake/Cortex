@@ -1,8 +1,8 @@
-import { monitorBus } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
 import { isRecord, type DashboardSessionScope } from "./dashboard-common.js";
 
 export interface DashboardMemoryProxyOptions {
-  reflectworldEndpoint: string;
+  cortexEndpoint: string;
   buildEntityRefMap: (limit: number, cameraId?: string, scope?: DashboardSessionScope | null) => Record<string, string>;
 }
 
@@ -25,7 +25,7 @@ export class DashboardMemoryProxy {
     memoryType: string | null,
     scope: DashboardSessionScope,
   ): Promise<{ ok: true } | { ok: false; status: number; body: Record<string, unknown> }> {
-    const lookup = new URL(`/memories/${encodeURIComponent(memoryId)}`, this.options.reflectworldEndpoint);
+    const lookup = new URL(`/memories/${encodeURIComponent(memoryId)}`, this.options.cortexEndpoint);
     if (memoryType) lookup.searchParams.set("memory_type", memoryType);
     try {
       const upstream = await fetch(lookup);
@@ -38,7 +38,7 @@ export class DashboardMemoryProxy {
       }
       return { ok: true };
     } catch {
-      return { ok: false, status: 502, body: { error: "ReflectWorld unreachable" } };
+      return { ok: false, status: 502, body: { error: "Cortex unreachable" } };
     }
   }
 

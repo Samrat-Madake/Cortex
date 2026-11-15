@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { PerceptionResult, Segment } from "@reflectworld/shared";
+import type { PerceptionResult, Segment } from "@cortex/shared";
 import { buildPerceptionAddRequest, buildSourceTimeMetadata, createMemoryReidAdapter } from "../memory-adapter.js";
 
 function makeSegment(): Segment {

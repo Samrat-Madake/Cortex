@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import type { MonitorEvent } from "@reflectworld/shared";
+import type { MonitorEvent } from "@cortex/shared";
 
 export const DEFAULT_PORT = 3211;
 export const VIDEO_EXTENSIONS = new Set([".mp4", ".avi", ".mkv", ".mov", ".webm", ".mpg", ".mpeg", ".flv", ".ts"]);

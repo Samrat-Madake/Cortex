@@ -1,5 +1,5 @@
 /**
- * Mock event injector — sends simulated ReflectWorld pipeline events
+ * Mock event injector — sends simulated Cortex pipeline events
  * via HTTP POST to /api/monitor/inject for UI testing.
  *
  * Usage: npx tsx scripts/mock-events.ts
@@ -172,7 +172,7 @@ async function main() {
   initEvents.push({
     type: "system:service_health",
     timestamp: Date.now(),
-    data: { services: { qdrant: "ok", reflectworld: "ok", go2rtc: "ok" } },
+    data: { services: { qdrant: "ok", cortex: "ok", go2rtc: "ok" } },
   });
 
   await inject(initEvents);
@@ -193,7 +193,7 @@ async function main() {
         await inject([{
           type: "system:service_health",
           timestamp: Date.now(),
-          data: { services: { qdrant: "ok", reflectworld: "ok", go2rtc: "ok" } },
+          data: { services: { qdrant: "ok", cortex: "ok", go2rtc: "ok" } },
         }]);
       }
     } catch (err) {

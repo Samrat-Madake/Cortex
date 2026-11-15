@@ -3,7 +3,7 @@
 // DetectionRegistry: assigns cross-frame continuous D{id} labels to detection boxes.
 // Part of subject proposal.
 
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 import type { DIdEntry } from "./types.js";
 import type { FacePose } from "./analyzers/face-pose.js";
 

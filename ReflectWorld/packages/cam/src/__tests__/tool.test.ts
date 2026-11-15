@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { monitorBus } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
 import jpeg from "jpeg-js";
 import { existsSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -134,11 +134,11 @@ describe("executeCamAction v3", () => {
   it("warns once when public mode allows private source targets", async () => {
     vi.clearAllMocks();
     _resetSourceSecurityWarningsForTests();
-    const previousPublicMode = process.env.REFLECTWORLD_PUBLIC_MODE;
-    const previousPrivateSource = process.env.REFLECTWORLD_ALLOW_PRIVATE_SOURCE;
+    const previousPublicMode = process.env.CORTEX_PUBLIC_MODE;
+    const previousPrivateSource = process.env.CORTEX_ALLOW_PRIVATE_SOURCE;
     try {
-      process.env.REFLECTWORLD_PUBLIC_MODE = "true";
-      process.env.REFLECTWORLD_ALLOW_PRIVATE_SOURCE = "true";
+      process.env.CORTEX_PUBLIC_MODE = "true";
+      process.env.CORTEX_ALLOW_PRIVATE_SOURCE = "true";
       const logger = {
         info: vi.fn(),
         warn: vi.fn(),
@@ -152,12 +152,12 @@ describe("executeCamAction v3", () => {
       expect(JSON.parse(first).success).toBe(true);
       expect(JSON.parse(second).success).toBe(true);
       expect(logger.warn).toHaveBeenCalledTimes(1);
-      expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("REFLECTWORLD_ALLOW_PRIVATE_SOURCE=true"));
+      expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("CORTEX_ALLOW_PRIVATE_SOURCE=true"));
     } finally {
-      if (previousPublicMode == null) delete process.env.REFLECTWORLD_PUBLIC_MODE;
-      else process.env.REFLECTWORLD_PUBLIC_MODE = previousPublicMode;
-      if (previousPrivateSource == null) delete process.env.REFLECTWORLD_ALLOW_PRIVATE_SOURCE;
-      else process.env.REFLECTWORLD_ALLOW_PRIVATE_SOURCE = previousPrivateSource;
+      if (previousPublicMode == null) delete process.env.CORTEX_PUBLIC_MODE;
+      else process.env.CORTEX_PUBLIC_MODE = previousPublicMode;
+      if (previousPrivateSource == null) delete process.env.CORTEX_ALLOW_PRIVATE_SOURCE;
+      else process.env.CORTEX_ALLOW_PRIVATE_SOURCE = previousPrivateSource;
       _resetSourceSecurityWarningsForTests();
     }
   });
@@ -168,7 +168,7 @@ describe("executeCamAction v3", () => {
   });
 
   it("caches persisted watch state after the initial directory load", () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-watch-state-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-watch-state-"));
     try {
       setWatchPersistDir(dir);
       writeFileSync(join(dir, "cam1.json"), JSON.stringify({
@@ -189,14 +189,14 @@ describe("executeCamAction v3", () => {
       expect(existsSync(join(dir, "cam1.json"))).toBe(true);
     } finally {
       rmSync(dir, { recursive: true, force: true });
-      const resetDir = mkdtempSync(join(tmpdir(), "reflectworld-watch-state-reset-"));
+      const resetDir = mkdtempSync(join(tmpdir(), "cortex-watch-state-reset-"));
       setWatchPersistDir(resetDir);
       rmSync(resetDir, { recursive: true, force: true });
     }
   });
 
   it("preserves existing persisted watch states when saving before the first load", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-watch-state-save-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-watch-state-save-"));
     try {
       _resetActiveWatches();
       vi.clearAllMocks();
@@ -218,7 +218,7 @@ describe("executeCamAction v3", () => {
     } finally {
       _resetActiveWatches();
       rmSync(dir, { recursive: true, force: true });
-      const resetDir = mkdtempSync(join(tmpdir(), "reflectworld-watch-state-reset-"));
+      const resetDir = mkdtempSync(join(tmpdir(), "cortex-watch-state-reset-"));
       setWatchPersistDir(resetDir);
       rmSync(resetDir, { recursive: true, force: true });
     }

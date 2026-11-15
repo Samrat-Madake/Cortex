@@ -56,7 +56,7 @@ async function main() {
 
   const currentLevel = detectInstalledLevel(modelsDir);
 
-  console.log(`\nReflectWorld Perception Setup\n`);
+  console.log(`\nCortex Perception Setup\n`);
   console.log(`Model directory: ${modelsDir}`);
   console.log(`Current level: ${currentLevel}\n`);
   console.log(`Choose your perception level:\n`);
@@ -152,7 +152,7 @@ async function main() {
   }
 
   console.log(`\nDone! Level ${selectedLevel} perception ready.`);
-  console.log(`To change level later, run: npx @reflectworld/percept install-models`);
+  console.log(`To change level later, run: npx @cortex/percept install-models`);
   rl.close();
 }
 

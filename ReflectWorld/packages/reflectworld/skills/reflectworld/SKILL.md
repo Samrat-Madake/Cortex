@@ -1,15 +1,15 @@
-# ReflectWorld — Visual Perception + Memory for AI Agents
+# Cortex — Visual Perception + Memory for AI Agents
 
-You have access to ReflectWorld, a visual perception and persistent memory system. It gives you eyes and memory for cameras.
+You have access to Cortex, a visual perception and persistent memory system. It gives you eyes and memory for cameras.
 
 ## Available Tools
 
 | Tool | Purpose |
 |------|---------|
-| `reflectworld_cam` | Camera control: add sources, snapshot, watch, stop, adjust sampling, switch mode, live view, recordings |
-| `reflectworld_perception` | VLM analysis config: set scene description, focus targets, security rules, model override |
-| `reflectworld_memory` | Memory search & storage: episodic events, semantic patterns, procedural rules |
-| `reflectworld_act` | Automation: notifications, identify requests, rule management |
+| `cortex_cam` | Camera control: add sources, snapshot, watch, stop, adjust sampling, switch mode, live view, recordings |
+| `cortex_perception` | VLM analysis config: set scene description, focus targets, security rules, model override |
+| `cortex_memory` | Memory search & storage: episodic events, semantic patterns, procedural rules |
+| `cortex_act` | Automation: notifications, identify requests, rule management |
 
 ## Scene Adaptation Workflow
 
@@ -26,9 +26,9 @@ User describes intent
 
 ### Step-by-step
 
-1. **Configure perception first** — Call `reflectworld_perception` with `action=configure` to set `scene_description` and `focus_targets` so the VLM knows what matters. This takes effect immediately on the next analyzed segment.
+1. **Configure perception first** — Call `cortex_perception` with `action=configure` to set `scene_description` and `focus_targets` so the VLM knows what matters. This takes effect immediately on the next analyzed segment.
 
-2. **Add source if needed** — Call `reflectworld_cam` with `action=add_source` if the camera isn't registered yet.
+2. **Add source if needed** — Call `cortex_cam` with `action=add_source` if the camera isn't registered yet.
 
 3. **Choose watch parameters** based on the scene:
    - Slow-changing scenes (cooking, front door): `fps=1`, `960x540`
@@ -36,9 +36,9 @@ User describes intent
    - Behavior analysis (poker, games): `mode=stream`, `fps=0.5`
    - Fast action (sports, pets playing): `fps=2-5`
 
-4. **Store procedural rules** — Call `reflectworld_memory` with `action=add_note`, `memory_type=procedural` for any persistent preferences. Procedural rules are automatically injected into the VLM prompt on every analysis cycle.
+4. **Store procedural rules** — Call `cortex_memory` with `action=add_note`, `memory_type=procedural` for any persistent preferences. Procedural rules are automatically injected into the VLM prompt on every analysis cycle.
 
-5. **Start watch** — Call `reflectworld_cam` with `action=watch`.
+5. **Start watch** — Call `cortex_cam` with `action=watch`.
 
 ## Concrete Examples
 
@@ -77,21 +77,21 @@ Use **procedural** memory for any persistent behavior the agent should follow. U
 
 | User intent | Tool | Action |
 |-------------|------|--------|
-| Describe their scene / what to focus on | `reflectworld_perception` | `configure` |
-| Add a camera | `reflectworld_cam` | `add_source` |
-| Quick look at current state | `reflectworld_cam` | `snapshot` |
-| Start continuous monitoring | `reflectworld_cam` | `watch` |
-| Change monitoring style mid-session | `reflectworld_cam` | `switch_mode` |
-| Adjust fps/resolution mid-session | `reflectworld_cam` | `set_sampling` |
-| Ask about past events | `reflectworld_memory` | `search` |
-| Set persistent alert/preference | `reflectworld_memory` | `add_note` (procedural) |
-| Create automated response rules | `reflectworld_act` | `add_rule` |
+| Describe their scene / what to focus on | `cortex_perception` | `configure` |
+| Add a camera | `cortex_cam` | `add_source` |
+| Quick look at current state | `cortex_cam` | `snapshot` |
+| Start continuous monitoring | `cortex_cam` | `watch` |
+| Change monitoring style mid-session | `cortex_cam` | `switch_mode` |
+| Adjust fps/resolution mid-session | `cortex_cam` | `set_sampling` |
+| Ask about past events | `cortex_memory` | `search` |
+| Set persistent alert/preference | `cortex_memory` | `add_note` (procedural) |
+| Create automated response rules | `cortex_act` | `add_rule` |
 
 ## Automatic pipeline
 
 After `watch` starts, the pipeline runs automatically in background:
 ```
-Frame capture → Segmenter → Perception (VLM + procedural rules) → ReflectWorld storage → Act rule matching
+Frame capture → Segmenter → Perception (VLM + procedural rules) → Cortex storage → Act rule matching
 ```
 
 No manual tool calls needed for the pipeline — just configure, start the watch, and let it run.
@@ -100,13 +100,13 @@ No manual tool calls needed for the pipeline — just configure, start the watch
 
 VisionController monitors cameras and sends you **system events** when it detects situations that need your judgment (security risks, unknown entities, scene changes). These appear as system events in your context.
 
-**When you see `[VisionController Consultation]` in a system event, inspect the context and only call `reflectworld_perception` when a temporary perception adjustment is clearly needed.**
+**When you see `[VisionController Consultation]` in a system event, inspect the context and only call `cortex_perception` when a temporary perception adjustment is clearly needed.**
 
 ### How to respond
 
 1. **Read the consultation**: it tells you the camera, what was detected, and why it triggered
 2. **Decide what to do**: usually dismiss; only adjust temporary scene guidance when the current visual context clearly needs it
-3. **Call the tool only when needed**: `reflectworld_perception` → `action=configure` with `scene_description`, `focus_targets`, or `security_rules`
+3. **Call the tool only when needed**: `cortex_perception` → `action=configure` with `scene_description`, `focus_targets`, or `security_rules`
 
 ### Response examples
 
@@ -164,7 +164,7 @@ These structured params enable per-camera smart features. The system merges them
 - **Track States** — "track if my door is open/closed" → `track_states: ["door: open/closed"]`
 - **Track Activities** — "tell me what's happening" → `track_activities: ["cooking", "resting", "working", "absent"]`
 - **Explain Decisions** — "explain why you triggered alerts" → `explain_decisions: true`
-- **Reference frame** — user takes a snapshot as "normal state" → save to `~/.reflectworld/cameras/{id}_ref.jpg`, system auto-compares
+- **Reference frame** — user takes a snapshot as "normal state" → save to `~/.cortex/cameras/{id}_ref.jpg`, system auto-compares
 - **Anomaly detection** — automatic once Semantic Context accumulates daily routine patterns
 
 Opt-in: no param = no overhead. Pass empty array to disable (e.g. `track_states: []`).

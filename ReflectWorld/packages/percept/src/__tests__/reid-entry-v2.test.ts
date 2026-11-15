@@ -3,7 +3,7 @@ import { runPerFaceReId } from "../analyzers/reid-entry.js";
 import type { QualifiedFace } from "../analyzers/subject-proposal-analyzer.js";
 import type { ModelRouter } from "../providers/model-router.js";
 import type { MemoryReIdPort } from "../analyzers/unified-reid-matcher.js";
-import type { Frame } from "@reflectworld/shared";
+import type { Frame } from "@cortex/shared";
 
 function makeFace(frameIndex = 0): QualifiedFace {
   return {

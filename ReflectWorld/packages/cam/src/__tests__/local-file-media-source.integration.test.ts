@@ -63,7 +63,7 @@ describe("LocalFileMediaSource ffmpeg integration", () => {
   const ffprobeBin = resolvedFfprobeBin ?? "ffprobe";
 
   runIfFfmpeg("does not duplicate JPEG frames when select emits sparse PTS", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-local-file-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-local-file-"));
     const videoPath = join(dir, "cfr.mp4");
     try {
       execFileSync(ffmpegBin, [
@@ -103,7 +103,7 @@ describe("LocalFileMediaSource ffmpeg integration", () => {
   });
 
   runIfFfmpeg("completes long large local files with slow frame callbacks without dropping tail media", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-local-file-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-local-file-"));
     const videoPath = join(dir, "large.mp4");
     try {
       createLongAudioVideo(ffmpegBin, videoPath, 20);
@@ -141,7 +141,7 @@ describe("LocalFileMediaSource ffmpeg integration", () => {
   }, 35_000);
 
   runIfFfmpeg("settles when closed while stdout is paused for backpressure", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-local-file-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-local-file-"));
     const videoPath = join(dir, "close-paused.mp4");
     try {
       createLongAudioVideo(ffmpegBin, videoPath, 20);
@@ -174,7 +174,7 @@ describe("LocalFileMediaSource ffmpeg integration", () => {
   }, 10_000);
 
   runIfFfmpeg("rejects cleanly when a frame callback fails while stdout is paused", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-local-file-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-local-file-"));
     const videoPath = join(dir, "fail-paused.mp4");
     try {
       createLongAudioVideo(ffmpegBin, videoPath, 20);
@@ -198,7 +198,7 @@ describe("LocalFileMediaSource ffmpeg integration", () => {
   }, 10_000);
 
   runIfFfmpeg("lets benchmark streamFrames settle when the consumer breaks early", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-local-file-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-local-file-"));
     const videoPath = join(dir, "early-break.mp4");
     try {
       createLongAudioVideo(ffmpegBin, videoPath, 20);
@@ -219,7 +219,7 @@ describe("LocalFileMediaSource ffmpeg integration", () => {
   }, 10_000);
 
   runIfFfmpeg("keeps sparse/VFR-style frame timestamps monotonic with real ffmpeg output", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-local-file-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-local-file-"));
     const videoPath = join(dir, "sparse.mp4");
     try {
       execFileSync(ffmpegBin, [
@@ -261,7 +261,7 @@ describe("LocalFileMediaSource ffmpeg integration", () => {
   });
 
   runIfFfmpeg("emits audio chunks on the video-normalized PTS timeline for delayed audio streams", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "reflectworld-local-file-"));
+    const dir = mkdtempSync(join(tmpdir(), "cortex-local-file-"));
     const videoPath = join(dir, "audio-offset.mp4");
     try {
       execFileSync(ffmpegBin, [

@@ -3,7 +3,7 @@ import { OnnxBuiltinBase } from "./onnx-builtin-base.js";
 import type { ReidProvider, InferInput, ReidOutput } from "../types.js";
 import type { ModelManager } from "../../models/model-manager.js";
 import { AdaFaceExtractor } from "../../analyzers/adaface.js";
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 
 /**
  * Builtin ONNX provider wrapping the ArcFace MobileFaceNet extractor.

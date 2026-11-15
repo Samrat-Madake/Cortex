@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import { BINARIES, resolveModelPlan } from "./manifest.js";
 import { downloadAndExtractBinary, downloadFile, extractZipMember, verifyModelFile, ensureDir } from "./download.js";
 import { copyServices } from "./python-env.js";
-import { setupSttModels, verifyOnnxLoadable } from "@reflectworld/percept";
+import { setupSttModels, verifyOnnxLoadable } from "@cortex/percept";
 import { convertModel } from "./model-converter.js";
 import { resolveHomeDir } from "./config.js";
 import { fileURLToPath } from "node:url";
@@ -28,7 +28,7 @@ function getPackageVersion(): string {
       const pkgPath = join(dir, "package.json");
       if (existsSync(pkgPath)) {
         const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
-        if (pkg.name === "@reflectworld/reflectworld") return pkg.version ?? "0.0.0";
+        if (pkg.name === "@cortex/cortex") return pkg.version ?? "0.0.0";
       }
       dir = dirname(dir);
     }
@@ -160,7 +160,7 @@ export async function runSetup(args: string[]): Promise<void> {
   const os = platform();
   const cpuArch = arch();
 
-  console.log("\n  ReflectWorld Setup\n");
+  console.log("\n  Cortex Setup\n");
   console.log(`  Home directory: ${homeDir}`);
   console.log(`  Platform: ${os}-${cpuArch}\n`);
 
@@ -253,7 +253,7 @@ export async function runSetup(args: string[]): Promise<void> {
   let licensesAccepted = opts.acceptModelLicenses;
   if (restricted.length > 0 && !licensesAccepted) {
     console.log("\n      The following models carry AGPL or non-commercial (research-only) licenses.");
-    console.log("      They are downloaded/converted on your machine; ReflectWorld does not redistribute them.");
+    console.log("      They are downloaded/converted on your machine; Cortex does not redistribute them.");
     console.log("      Continuing means you accept each license:\n");
     for (const m of restricted) console.log(`        - ${m.name}: ${m.license}`);
     const isTTY = process.stdin.isTTY && process.stdout.isTTY;
@@ -379,7 +379,7 @@ export async function runSetup(args: string[]): Promise<void> {
 
   if (level === 0) {
     console.log("  To upgrade to Level 1 (local detection + face recognition):");
-    console.log("    npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses");
+    console.log("    npx @cortex/cortex setup --level 1 --yes --accept-model-licenses");
     console.log("    (--accept-model-licenses acknowledges the AGPL / non-commercial model licenses.)\n");
   }
 }

@@ -1,5 +1,5 @@
 ====================================================================
-REFLECTWORLD ARCHITECTURE DIAGRAMS - MERMAID CODE
+CORTEX ARCHITECTURE DIAGRAMS - MERMAID CODE
 ====================================================================
 8 Complete Diagrams Ready for mermaid.live
 Copy each diagram individually into https://mermaid.live/
@@ -11,7 +11,7 @@ DIAGRAM 1: OVERALL SYSTEM ARCHITECTURE / HLD
 
 ```mermaid
 %% DIAGRAM 1: OVERALL SYSTEM ARCHITECTURE / HLD
-%% ReflectWorld - High-Level Design
+%% Cortex - High-Level Design
 
 graph TB
     subgraph "Input Layer"
@@ -20,7 +20,7 @@ graph TB
     end
     
     subgraph "Capture & Ingestion"
-        CAM["@reflectworld/cam<br/>Stream Ingestion"]
+        CAM["@cortex/cam<br/>Stream Ingestion"]
         FFM["FFmpeg<br/>Frame Extraction"]
         G2R["go2rtc<br/>Stream Routing"]
     end
@@ -31,7 +31,7 @@ graph TB
     end
     
     subgraph "Perception Pipeline"
-        PERCEPT["@reflectworld/percept<br/>Perception Orchestrator"]
+        PERCEPT["@cortex/percept<br/>Perception Orchestrator"]
         
         subgraph "Level 0"
             VLM0["VLM Reasoning<br/>(Keyframe Analysis)"]
@@ -85,7 +85,7 @@ graph TB
     end
     
     subgraph "User Interfaces"
-        DASHBOARD["@reflectworld/dashboard<br/>(React UI)"]
+        DASHBOARD["@cortex/dashboard<br/>(React UI)"]
         API["HTTP API Endpoints<br/>(REST)"]
         OPENCLAW["OpenClaw Plugin<br/>(Agent Integration)"]
         WEBSOCKET["WebSocket Events<br/>(Real-Time Updates)"]
@@ -178,7 +178,7 @@ DIAGRAM 2: HIERARCHICAL MEMORY ARCHITECTURE
 
 ```mermaid
 %% DIAGRAM 2: HIERARCHICAL MEMORY ARCHITECTURE
-%% ReflectWorld - Memory System Structure
+%% Cortex - Memory System Structure
 
 graph TB
     subgraph "EPISODIC MEMORY"
@@ -321,7 +321,7 @@ DIAGRAM 3: PERCEPTION / AI PIPELINE ARCHITECTURE
 
 ```mermaid
 %% DIAGRAM 3: PERCEPTION / AI PIPELINE ARCHITECTURE
-%% ReflectWorld - Perception Processing Pipeline
+%% Cortex - Perception Processing Pipeline
 
 graph TB
     INPUT["Segment Input<br/>(Frames + Audio)"]
@@ -451,7 +451,7 @@ DIAGRAM 4A: DATA FLOW DIAGRAM - LEVEL 0
 
 ```mermaid
 %% DIAGRAM 4A: DATA FLOW DIAGRAM - LEVEL 0
-%% ReflectWorld System - Context Diagram
+%% Cortex System - Context Diagram
 
 graph TB
     USER["👤 User<br/>(Dashboard/API)"]
@@ -461,8 +461,8 @@ graph TB
     VIDEOSRC["📹 Video Sources<br/>(File/Stream/Camera)"]
     CLOUD["☁️ Cloud Providers<br/>(VLM/Embeddings/STT)"]
     
-    subgraph "REFLECTWORLD SYSTEM"
-        SYSTEM["ReflectWorld<br/>Visual Memory Platform"]
+    subgraph "CORTEX SYSTEM"
+        SYSTEM["Cortex<br/>Visual Memory Platform"]
     end
     
     VIDEOSRC -->|Video Stream| SYSTEM
@@ -493,7 +493,7 @@ DIAGRAM 4B: DATA FLOW DIAGRAM - LEVEL 1
 
 ```mermaid
 %% DIAGRAM 4B: DATA FLOW DIAGRAM - LEVEL 1
-%% ReflectWorld - Functional Decomposition
+%% Cortex - Functional Decomposition
 
 graph TB
     VIDEO["📹 Video Input"]
@@ -592,7 +592,7 @@ DIAGRAM 5: ENTITY RESOLUTION / RE-ID ARCHITECTURE
 
 ```mermaid
 %% DIAGRAM 5: ENTITY RESOLUTION / RE-ID ARCHITECTURE
-%% ReflectWorld - Identity Linking & Matching
+%% Cortex - Identity Linking & Matching
 
 graph TB
     SEG_INPUT["Segment Analysis Results<br/>(Objects, Faces, Bodies, Speech)"]
@@ -705,7 +705,7 @@ DIAGRAM 6: MEMORY WRITE & CONSOLIDATION FLOW
 
 ```mermaid
 %% DIAGRAM 6: MEMORY WRITE & CONSOLIDATION FLOW
-%% ReflectWorld - Observation to Persistent Memory
+%% Cortex - Observation to Persistent Memory
 
 graph TB
     OBS_INPUT["Entity-Resolved Observation<br/>(segment_id, entity_id, evidence)"]
@@ -810,7 +810,7 @@ DIAGRAM 7: RETRIEVAL / QA ARCHITECTURE
 
 ```mermaid
 %% DIAGRAM 7: RETRIEVAL / QA ARCHITECTURE
-%% ReflectWorld - Query Processing & Answer Generation
+%% Cortex - Query Processing & Answer Generation
 
 graph TB
     USER_Q["User Question<br/>(Natural Language)"]
@@ -930,24 +930,24 @@ DIAGRAM 8: DEPLOYMENT / RUNTIME ARCHITECTURE
 
 ```mermaid
 %% DIAGRAM 8: DEPLOYMENT / RUNTIME ARCHITECTURE
-%% ReflectWorld - System Deployment & Component Communication
+%% Cortex - System Deployment & Component Communication
 
 graph TB
     subgraph "Local Machine (User Device)"
         subgraph "Browser/Frontend"
-            DASHBOARD["React Dashboard<br/>(@reflectworld/dashboard)"]
+            DASHBOARD["React Dashboard<br/>(@cortex/dashboard)"]
             WS_CLIENT["WebSocket Client"]
         end
         
         subgraph "Node.js Runtime"
-            HOST["Dashboard Server<br/>(@reflectworld/host)"]
+            HOST["Dashboard Server<br/>(@cortex/host)"]
             API_SERVER["HTTP API<br/>(localhost:3210)"]
             
-            REFLECT["Orchestrator<br/>(@reflectworld/reflectworld)"]
+            REFLECT["Orchestrator<br/>(@cortex/cortex)"]
             
-            CAM["Stream Capture<br/>(@reflectworld/cam)"]
-            PERCEPT["Perception<br/>(@reflectworld/percept)"]
-            MEM_CLIENT["Memory Client<br/>(@reflectworld/mem)"]
+            CAM["Stream Capture<br/>(@cortex/cam)"]
+            PERCEPT["Perception<br/>(@cortex/percept)"]
+            MEM_CLIENT["Memory Client<br/>(@cortex/mem)"]
         end
         
         subgraph "Stream Processing"
@@ -1056,7 +1056,7 @@ graph TB
 END OF ALL DIAGRAMS
 ====================================================================
 
-Total: 8 Complete Architecture Diagrams for ReflectWorld
+Total: 8 Complete Architecture Diagrams for Cortex
 
 All diagrams are ready to paste directly into https://mermaid.live/
 

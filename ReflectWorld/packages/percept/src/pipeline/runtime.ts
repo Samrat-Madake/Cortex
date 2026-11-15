@@ -1,4 +1,4 @@
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 import type { PipelineDeps, PipelineRuntimeState } from "./types.js";
 
 const STATIC_THRESHOLD_FOR_EVENT_SWITCH = 5;

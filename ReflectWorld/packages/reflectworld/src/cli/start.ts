@@ -20,22 +20,22 @@ function envNonNegativeInt(name: string, fallback: number, env: NodeJS.ProcessEn
 }
 
 export function isToolApiRestricted(env: NodeJS.ProcessEnv = process.env): boolean {
-  return envFlag("REFLECTWORLD_PUBLIC_MODE", env) || envFlag("REFLECTWORLD_TOOL_API_RESTRICTED", env);
+  return envFlag("CORTEX_PUBLIC_MODE", env) || envFlag("CORTEX_TOOL_API_RESTRICTED", env);
 }
 
 export function toolApiMaxBodyBytes(env: NodeJS.ProcessEnv = process.env): number {
-  return envNonNegativeInt("REFLECTWORLD_TOOL_API_MAX_BODY_BYTES", DEFAULT_TOOL_API_MAX_BODY_BYTES, env);
+  return envNonNegativeInt("CORTEX_TOOL_API_MAX_BODY_BYTES", DEFAULT_TOOL_API_MAX_BODY_BYTES, env);
 }
 
 export function isToolAdminAuthorized(req: IncomingMessage, env: NodeJS.ProcessEnv = process.env): boolean {
   if (!isToolApiRestricted(env)) return true;
-  const expected = env.REFLECTWORLD_TOOL_API_TOKEN || env.DASHBOARD_ADMIN_TOKEN;
+  const expected = env.CORTEX_TOOL_API_TOKEN || env.DASHBOARD_ADMIN_TOKEN;
   if (!expected) return false;
   const bearer = typeof req.headers.authorization === "string" && req.headers.authorization.startsWith("Bearer ")
     ? req.headers.authorization.slice("Bearer ".length).trim()
     : "";
   const dashboardToken = typeof req.headers["x-dashboard-admin-token"] === "string" ? req.headers["x-dashboard-admin-token"].trim() : "";
-  const toolToken = typeof req.headers["x-reflectworld-admin-token"] === "string" ? req.headers["x-reflectworld-admin-token"].trim() : "";
+  const toolToken = typeof req.headers["x-cortex-admin-token"] === "string" ? req.headers["x-cortex-admin-token"].trim() : "";
   return bearer === expected || dashboardToken === expected || toolToken === expected;
 }
 
@@ -79,12 +79,12 @@ export async function runStart(args: string[]): Promise<void> {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`\n  Setup failed: ${msg}`);
-      console.error("  Cannot start ReflectWorld without a successful setup. Exiting.\n");
+      console.error("  Cannot start Cortex without a successful setup. Exiting.\n");
       process.exit(1);
     }
   }
 
-  const { default: reflectworldPlugin } = await import("../../index.js");
+  const { default: cortexPlugin } = await import("../../index.js");
 
   // Dashboard handler — set by DashboardServer via registerHandler callback
   let dashboardHandleRequest:
@@ -96,7 +96,7 @@ export async function runStart(args: string[]): Promise<void> {
     stateDir: config.stateDir,
     flatStateDir: true,
     pluginConfigs: {
-      reflectworld: {
+      cortex: {
         _homeDir: config.homeDir,
         _stateDir: config.stateDir,
         _ports: {
@@ -136,7 +136,7 @@ export async function runStart(args: string[]): Promise<void> {
     // CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Dashboard-Admin-Token, X-ReflectWorld-Admin-Token");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Dashboard-Admin-Token, X-Cortex-Admin-Token");
     if (method === "OPTIONS") {
       res.writeHead(204);
       res.end();
@@ -189,7 +189,7 @@ export async function runStart(args: string[]): Promise<void> {
       return;
     }
 
-    // Delegate to DashboardServer handler (traces, media, reflectworld proxy, static files)
+    // Delegate to DashboardServer handler (traces, media, cortex proxy, static files)
     if (dashboardHandleRequest) {
       const handled = await dashboardHandleRequest(req, res);
       if (handled) return;
@@ -201,10 +201,10 @@ export async function runStart(args: string[]): Promise<void> {
   });
 
   // Inject server reference for DashboardServer WebSocket
-  (host as any).pluginConfigs.reflectworld.dashboard.existingServer = server;
+  (host as any).pluginConfigs.cortex.dashboard.existingServer = server;
 
   // Load plugin — registers all services and tools
-  await host.loadPlugin(reflectworldPlugin);
+  await host.loadPlugin(cortexPlugin);
 
   // Step 1: Start dashboard first so UI is immediately available
   try {
@@ -217,7 +217,7 @@ export async function runStart(args: string[]): Promise<void> {
   // Step 2: Attach WebSocket + listen — user can now access http://localhost:PORT
   attachMonitorWs(server);
   server.listen(config.port, () => {
-    console.log(`\n  ReflectWorld running at http://localhost:${config.port}`);
+    console.log(`\n  Cortex running at http://localhost:${config.port}`);
     console.log("  Starting services...\n");
   });
 

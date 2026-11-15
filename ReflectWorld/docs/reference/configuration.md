@@ -1,9 +1,9 @@
 # Reference - Complete Configuration Contract
 
-> This is the key-by-key ReflectWorld configuration reference. Each entry lists
+> This is the key-by-key Cortex configuration reference. Each entry lists
 > the name, type, default, purpose, and channel.
 >
-> ReflectWorld supports both standalone `.env` configuration and OpenClaw plugin
+> Cortex supports both standalone `.env` configuration and OpenClaw plugin
 > configuration. The channel model is:
 >
 > - **Channel A, env bridge**: `bridgePluginConfigToEnv` writes fields into
@@ -12,7 +12,7 @@
 > - **Channel B, direct pluginConfig**: same-process TypeScript consumers read
 >   the `pluginConfig` object directly.
 > - **A+B**: both pluginConfig and env fallback are connected.
-> - **Service bridge**: service objects such as `ReflectWorldService` or
+> - **Service bridge**: service objects such as `CortexService` or
 >   `QdrantService` consume values first, then translate them into child-process
 >   environment variables. These fields bypass `bridgePluginConfigToEnv`.
 >
@@ -24,7 +24,7 @@
 
 ## 1. Perception
 
-Declared in `packages/reflectworld/openclaw.plugin.json` under `perception` and
+Declared in `packages/cortex/openclaw.plugin.json` under `perception` and
 in `packages/percept/openclaw.plugin.json` for the standalone percept package.
 Validation and defaults live in `packages/percept/src/config.ts`.
 
@@ -65,18 +65,18 @@ plugin JSON:
 - `vlm_frame_resize_short_edge`, default `432`
 - `vlm_frame_resize_jpeg_quality`, default `75`
 - `source_concurrency`, schema default `1`, Dashboard runtime default `2`,
-  env `REFLECTWORLD_PERCEPTION_SOURCE_CONCURRENCY`
+  env `CORTEX_PERCEPTION_SOURCE_CONCURRENCY`
 - `max_queued_per_source`, default `6`, env
-  `REFLECTWORLD_PERCEPTION_MAX_QUEUED_PER_SOURCE`
+  `CORTEX_PERCEPTION_MAX_QUEUED_PER_SOURCE`
 - `live_backlog_skip_after_ms`, default `180000`, env
-  `REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS`
+  `CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS`
 - `local_file_pacing`, `realtime` or `fast`, default `fast`, env
-  `REFLECTWORLD_LOCAL_FILE_PACING`
+  `CORTEX_LOCAL_FILE_PACING`
 - `runtime_mode`, `offline_quality` or `live_latency`, default
-  `offline_quality`, env `REFLECTWORLD_PERCEPTION_RUNTIME_MODE`
+  `offline_quality`, env `CORTEX_PERCEPTION_RUNTIME_MODE`
 - `animated_segment_previews`, default `false`
 - `body_reid_enabled`, default `false`, env-only
-  `REFLECTWORLD_BODY_REID_ENABLED`
+  `CORTEX_BODY_REID_ENABLED`
 
 These runner fields with env entries are allowlisted in the bridge, but ordinary
 OpenClaw configuration does not expose them.
@@ -93,7 +93,7 @@ OpenClaw configuration does not expose them.
 
 | Name | Type | Default | Purpose | Channel |
 |---|---|---|---|---|
-| `reflectworld_endpoint` | URL string | `http://localhost:8219` | ReflectWorld memory API base URL | **B**, env fallback `REFLECTWORLD_ENDPOINT` |
+| `cortex_endpoint` | URL string | `http://localhost:8219` | Cortex memory API base URL | **B**, env fallback `CORTEX_ENDPOINT` |
 | `working_memory_event_timeout_sec` | number >= 1 | `30` | Close an event after this many inactive seconds | **A+B**, `WORKING_MEMORY_EVENT_TIMEOUT_SEC` |
 | `working_memory_max_event_segments` | number >= 1 | `18` | Force event rotation after this many segments | **A+B**, `WORKING_MEMORY_MAX_EVENT_SEGMENTS` |
 
@@ -106,8 +106,8 @@ internal working-memory parameter and is not exposed in schema.
 | Name | Type | Default | Purpose | Channel |
 |---|---|---|---|---|
 | `stubs_only` | boolean | `true` | Keep local detection/ReID analyzers as stubs when true | **A+B**, `STUBS_ONLY` |
-| `required_level` | number 0-2 | `0` | Minimum required perception level; 1+ makes missing local models fatal | **A+B**, `REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL` |
-| `models_dir` | string | `~/.reflectworld/models` fallback | ONNX model directory | **A+B**, `REFLECTWORLD_MODELS_DIR` |
+| `required_level` | number 0-2 | `0` | Minimum required perception level; 1+ makes missing local models fatal | **A+B**, `CORTEX_PERCEPTION_REQUIRED_LEVEL` |
+| `models_dir` | string | `~/.cortex/models` fallback | ONNX model directory | **A+B**, `CORTEX_MODELS_DIR` |
 | `stt_provider` | `moonshine`, `elevenlabs`, or `""` | `""` | STT provider; empty string explicitly disables STT | **A+B**, `STT_PROVIDER` |
 | `stt_model_dir` | string | `""` | Moonshine Tiny model directory | **A+B**, `STT_MODEL_DIR` |
 | `stt_num_threads` | number >= 1 | `1` | STT CPU thread count | **A+B**, `STT_NUM_THREADS` |
@@ -120,7 +120,7 @@ internal working-memory parameter and is not exposed in schema.
 
 ## 2. Memory
 
-Declared in `packages/reflectworld/openclaw.plugin.json` under `memory`. This
+Declared in `packages/cortex/openclaw.plugin.json` under `memory`. This
 block mixes two categories:
 
 1. TypeScript memory-client local options, parsed by
@@ -169,10 +169,10 @@ configure CLI requires an independent embedder when Gemini is selected.
 | `qdrant_port` | number | `6333` | Qdrant HTTP port | **Service bridge**; Python reads `QDRANT_PORT` |
 | `qdrant_grpc_port` | number | follows `QdrantService` | Qdrant gRPC port | **Service bridge** |
 | `source_dir` | string | none | Python memory service source directory | **B / service bridge** |
-| `storage_path` | string | `<homeDir>/memory-state`; bare Python default `~/.reflectworld/memory-state` | Local Python memory state, mainly history/counter SQLite | **Service bridge**, injected as `STORAGE_PATH` |
+| `storage_path` | string | `<homeDir>/memory-state`; bare Python default `~/.cortex/memory-state` | Local Python memory state, mainly history/counter SQLite | **Service bridge**, injected as `STORAGE_PATH` |
 
-Public configuration should use only ReflectWorld directory names and
-`REFLECTWORLD_*` variables.
+Public configuration should use only Cortex directory names and
+`CORTEX_*` variables.
 
 ---
 
@@ -202,7 +202,7 @@ these are Channel B values.
 | `motion_threshold` | number 0-1 | `0.02` | Motion detection threshold |
 | `motion_pixel_threshold` | number 0-1 | `0.1` | Motion pixel ratio threshold |
 | `default_snapshot_quality` | number 1-100 | `85` | Snapshot JPEG quality |
-| `reflectworld_endpoint` | string | `http://localhost:8219` | Downstream ReflectWorld API |
+| `cortex_endpoint` | string | `http://localhost:8219` | Downstream Cortex API |
 | `auto_analyze` | boolean | `true` | Send segments to perception automatically |
 | `restore_watches` | boolean | `true` | Restore persisted watch sessions on startup |
 | `silero_vad_model` | string | `<home>/models/silero_vad.onnx` | Silero VAD model path |
@@ -224,9 +224,9 @@ API.
 
 | Name | Type | Default | Purpose |
 |---|---|---|---|
-| `REFLECTWORLD_MEDIA_RETENTION_DAYS` / `retention.media_days` | number >= 0 | `30` | Generated media retention for `media_files`, recordings, previews, segment clip cache, and debug archives. `0` disables. |
-| `REFLECTWORLD_TEXT_RETENTION_DAYS` / `retention.text_days` | number >= 0 | `90` | Local text/diagnostic retention for `pipeline_log`, `notification_log`, `pipeline_errors`, `traces`, `llm_calls`, and `memory_write_failures`. `0` disables. |
-| `REFLECTWORLD_RETENTION_INTERVAL_HOURS` / `retention.interval_hours` | number > 0 | `24` | Retention interval; startup also schedules one async run. |
+| `CORTEX_MEDIA_RETENTION_DAYS` / `retention.media_days` | number >= 0 | `30` | Generated media retention for `media_files`, recordings, previews, segment clip cache, and debug archives. `0` disables. |
+| `CORTEX_TEXT_RETENTION_DAYS` / `retention.text_days` | number >= 0 | `90` | Local text/diagnostic retention for `pipeline_log`, `notification_log`, `pipeline_errors`, `traces`, `llm_calls`, and `memory_write_failures`. `0` disables. |
+| `CORTEX_RETENTION_INTERVAL_HOURS` / `retention.interval_hours` | number > 0 | `24` | Retention interval; startup also schedules one async run. |
 
 ### Source Security Validation
 
@@ -236,17 +236,17 @@ flags are enabled.
 
 | Name | Type | Default | Purpose |
 |---|---|---|---|
-| `REFLECTWORLD_SOURCE_SECURITY_STRICT` | bool flag | `false` | Force strict validation for all `add_source` requests |
-| `REFLECTWORLD_PUBLIC_MODE` | bool flag | `false` | Public/shared deployment switch; also enables strict source validation |
-| `REFLECTWORLD_ALLOW_INSECURE_HTTP_SOURCE` | bool flag | `false` | Allow `http://` in strict mode |
-| `REFLECTWORLD_ALLOW_PRIVATE_SOURCE` | bool flag | `false` | Allow private, loopback, link-local, and reserved targets in strict mode |
-| `REFLECTWORLD_ALLOW_LOCAL_SOURCE` | bool flag | `false` | Allow local files and local capture devices in strict mode |
+| `CORTEX_SOURCE_SECURITY_STRICT` | bool flag | `false` | Force strict validation for all `add_source` requests |
+| `CORTEX_PUBLIC_MODE` | bool flag | `false` | Public/shared deployment switch; also enables strict source validation |
+| `CORTEX_ALLOW_INSECURE_HTTP_SOURCE` | bool flag | `false` | Allow `http://` in strict mode |
+| `CORTEX_ALLOW_PRIVATE_SOURCE` | bool flag | `false` | Allow private, loopback, link-local, and reserved targets in strict mode |
+| `CORTEX_ALLOW_LOCAL_SOURCE` | bool flag | `false` | Allow local files and local capture devices in strict mode |
 
 Strict mode allows `phone`, `webcam`, `https`, `rtsp`, and `rtsps`. It rejects
 local files, `file://`, unapproved `http://`, and DNS/IP targets resolving to
 loopback, private, link-local, reserved, or multicast ranges. Uploaded video
 analysis uses an internal `_allowLocalFileSource` marker and does not require
-users to enable `REFLECTWORLD_ALLOW_LOCAL_SOURCE`.
+users to enable `CORTEX_ALLOW_LOCAL_SOURCE`.
 
 If public mode is combined with private or local source escape hatches,
 all-in-one startup prints a warning but does not block the request. Use that
@@ -283,13 +283,13 @@ backend.
 | `DASHBOARD_LIVE_AGENT_VOICE` | string | `Vega` | Voice name sent to the provider |
 | `DASHBOARD_LIVE_AGENT_LANGUAGE` | string | `zh` | Live-agent language hint |
 | `DASHBOARD_LIVE_AGENT_DEBUG` | bool flag | `false` | Print live-agent debug events to stderr |
-| `REFLECTWORLD_TOOL_API_RESTRICTED` | bool flag | `false` | Force CLI `/api/tools` and `/api/tool/:name` to require admin token |
-| `REFLECTWORLD_TOOL_API_TOKEN` | string | falls back to `DASHBOARD_ADMIN_TOKEN` | CLI tool API token |
-| `REFLECTWORLD_TOOL_API_MAX_BODY_BYTES` | number | `1048576` | CLI tool API POST body limit |
+| `CORTEX_TOOL_API_RESTRICTED` | bool flag | `false` | Force CLI `/api/tools` and `/api/tool/:name` to require admin token |
+| `CORTEX_TOOL_API_TOKEN` | string | falls back to `DASHBOARD_ADMIN_TOKEN` | CLI tool API token |
+| `CORTEX_TOOL_API_MAX_BODY_BYTES` | number | `1048576` | CLI tool API POST body limit |
 | `GO2RTC_API_PORT` | number | `1984` | go2rtc API port proxied by Dashboard |
 | `public_videos_dir` / `fixture_videos_dir` | string | `""` | Fixed public demo video directory |
 
-`REFLECTWORLD_PUBLIC_MODE=true` is the general public deployment switch. It
+`CORTEX_PUBLIC_MODE=true` is the general public deployment switch. It
 enables strict source validation, Dashboard session gates, WebSocket origin and
 connection limits, chat rate limiting, and CLI tool API admin-token gates.
 
@@ -322,8 +322,8 @@ linked below.
 
 | File | Purpose |
 |---|---|
-| `packages/reflectworld/src/config-env-bridge.ts` | Only env bridge: maps, secret fields, `bridgePluginConfigToEnv` |
-| `packages/reflectworld/openclaw.plugin.json` | All-in-one config schema |
+| `packages/cortex/src/config-env-bridge.ts` | Only env bridge: maps, secret fields, `bridgePluginConfigToEnv` |
+| `packages/cortex/openclaw.plugin.json` | All-in-one config schema |
 | `packages/percept/openclaw.plugin.json` | Percept package config schema |
 | `packages/cam/openclaw.plugin.json` | Cam package config schema |
 | `packages/mem/openclaw.plugin.json` | Memory client package config schema |
@@ -331,5 +331,5 @@ linked below.
 | `packages/mem/src/config.ts` | `MemoryConfigSchema` and `parseMemoryConfig` |
 | `packages/cam/src/config.ts` | `CamConfigSchema` and `resolveCamConfig` |
 | `services/mem/src/config.py` | Python memory service config entry point |
-| `packages/reflectworld/index.ts` | Bridge call, fallback resolution, Dashboard options |
-| `packages/reflectworld/src/services/reflectworld-service.ts` | Python spawn env and service bridge |
+| `packages/cortex/index.ts` | Bridge call, fallback resolution, Dashboard options |
+| `packages/cortex/src/services/cortex-service.ts` | Python spawn env and service bridge |

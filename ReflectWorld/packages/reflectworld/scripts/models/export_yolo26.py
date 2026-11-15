@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export YOLO26m to ONNX for ReflectWorld Level-1 object detection.
+"""Export YOLO26m to ONNX for Cortex Level-1 object detection.
 
 Thin wrapper over the official Ultralytics exporter. YOLO26 is NMS-free, so the
 ONNX natively outputs decoded top-K detections.

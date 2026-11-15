@@ -1,7 +1,7 @@
 // packages/mem/index.ts
-import { ReflectWorldClient } from "./src/client.js";
+import { CortexClient } from "./src/client.js";
 import { parseMemoryConfig, type MemoryConfig } from "./src/config.js";
-import { monitorBus } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
 import type {
   CaptureMode,
   MemoryType,
@@ -18,7 +18,7 @@ import type {
   SetIdentityAction,
   GetNarrativeAction,
 } from "./src/schema.js";
-import { ReflectWorldMemoryToolSchema } from "./src/schema.js";
+import { CortexMemoryToolSchema } from "./src/schema.js";
 import { flattenMemoriesResponse } from "./src/types.js";
 
 interface ArchiveChapter {
@@ -76,7 +76,7 @@ function asMemoryType(value: string | undefined): MemoryType | undefined {
   throw new Error(`Invalid memory_type: ${value}`);
 }
 
-export { ReflectWorldClient, type MemoryConfig };
+export { CortexClient, type MemoryConfig };
 export type {
   AddMemoryRequest,
   AddMemoryResponse,
@@ -120,28 +120,28 @@ export { flattenSearchResults, flattenMemoriesResponse } from "./src/types.js";
 export { parseMemoryConfig };
 
 /**
- * OpenClaw plugin definition for @reflectworld/mem.
+ * OpenClaw plugin definition for @cortex/mem.
  *
  * Usage:
- *   import memoryPlugin from "@reflectworld/mem";
- *   openclaw.register(memoryPlugin, { baseUrl: "http://reflectworld:8219" });
+ *   import memoryPlugin from "@cortex/mem";
+ *   openclaw.register(memoryPlugin, { baseUrl: "http://cortex:8219" });
  */
 const memoryPlugin = {
-  id: "reflectworld-mem",
-  name: "ReflectWorld Memory",
+  id: "cortex-mem",
+  name: "Cortex Memory",
   description:
-    "Search and manage ReflectWorld video memories — episodic, semantic, and procedural.",
+    "Search and manage Cortex video memories — episodic, semantic, and procedural.",
 
   register(api: { registerTool: (tool: any) => void; pluginConfig?: Record<string, unknown> }) {
     const config = parseMemoryConfig(api.pluginConfig ?? {});
-    const client = new ReflectWorldClient({
+    const client = new CortexClient({
       baseUrl: config.baseUrl,
       timeoutMs: config.timeoutMs,
     });
 
     api.registerTool({
-      name: "reflectworld_memory",
-      description: `Query and manage semantic context (ReflectWorld). You MUST call this tool to recall past events — never guess or make up memories.
+      name: "cortex_memory",
+      description: `Query and manage semantic context (Cortex). You MUST call this tool to recall past events — never guess or make up memories.
 
 Actions:
 - search: Semantic search for past events. Requires: query (English), camera_id. Best for "what happened" questions.
@@ -153,9 +153,9 @@ Actions:
 - get_narrative: Get current narrative, scene index, and selected archived narrative chapters for a camera. Requires: camera_id. Pass query to select relevant older chapters; limit controls chapter count.
 
 IMPORTANT: When user asks about past camera events, you MUST call this tool — never fabricate memories.
-IMPORTANT: When user sets a notification rule or preference (e.g. "tell me when X happens"), store it as a procedural memory using add_note with memory_type="procedural" and camera_id="global" (or a specific camera). Do NOT use reflectworld_perception configure for this.
+IMPORTANT: When user sets a notification rule or preference (e.g. "tell me when X happens"), store it as a procedural memory using add_note with memory_type="procedural" and camera_id="global" (or a specific camera). Do NOT use cortex_perception configure for this.
 IMPORTANT: When user identifies someone ("that's my neighbor", "that car is mine"), use set_identity to label the entity.`,
-      parameters: ReflectWorldMemoryToolSchema,
+      parameters: CortexMemoryToolSchema,
 
       async execute(_toolCallId: string, params: Record<string, unknown>) {
         const input = params as unknown as SearchAction | GetAction | DeleteAction | AddNoteAction | GetHistoryAction | SetIdentityAction | GetNarrativeAction;
@@ -338,13 +338,13 @@ IMPORTANT: When user identifies someone ("that's my neighbor", "that car is mine
           }
 
           default: {
-            throw new Error(`Unknown reflectworld_memory action: ${JSON.stringify((input as any).action)}`);
+            throw new Error(`Unknown cortex_memory action: ${JSON.stringify((input as any).action)}`);
           }
         }
 
         const eventCameraId = extractCameraId(input, config.defaultCameraId);
         monitorBus.publish("system:tool_invoked", {
-          tool: "reflectworld_memory",
+          tool: "cortex_memory",
           action: input.action,
           success: true,
           camera_id: eventCameraId,

@@ -1,9 +1,9 @@
 # Testing Guide
 
-> How ReflectWorld is tested, which commands to run, and one non-negotiable
+> How Cortex is tested, which commands to run, and one non-negotiable
 > rule: use real data.
 
-ReflectWorld follows a test pyramid. TypeScript uses Vitest, Python
+Cortex follows a test pyramid. TypeScript uses Vitest, Python
 `services/mem` uses pytest, and offline quality regression uses `eval/`.
 
 ---
@@ -78,7 +78,7 @@ individual `@pytest.mark.asyncio`.
 Tests marked `qdrant` require a writable Qdrant instance. They probe the
 configured endpoint once and skip with a clear reason when it is unavailable.
 The default is `localhost:6333`; override it with `QDRANT_TEST_URL`, or with
-`REFLECTWORLD_TEST_QDRANT_HOST` and `REFLECTWORLD_TEST_QDRANT_PORT`. Use a
+`CORTEX_TEST_QDRANT_HOST` and `CORTEX_TEST_QDRANT_PORT`. Use a
 dedicated test instance rather than a shared development database.
 
 ---

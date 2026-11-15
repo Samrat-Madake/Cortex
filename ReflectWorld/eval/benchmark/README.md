@@ -1,4 +1,4 @@
-# ReflectWorld Benchmark
+# Cortex Benchmark
 
 `eval/benchmark/` contains dataset evaluation entry points and the shared
 pipeline used by offline benchmark runs. Product-style E2E video checks live
@@ -49,11 +49,11 @@ questions for the same video reuse the same constructed memory state.
 
 ## Setup
 
-Run from the root of your own `reflectworld` checkout. Do not copy machine-specific
+Run from the root of your own `cortex` checkout. Do not copy machine-specific
 absolute paths from another developer's workspace.
 
 ```bash
-# cd /path/to/your/reflectworld
+# cd /path/to/your/cortex
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda create -n lmms-bench python=3.11 -y
 conda activate lmms-bench
@@ -66,7 +66,7 @@ python -m pip install -e eval/benchmark/lmms/memory_api
 The default conda env name is `lmms-bench`, matching
 `run-benchmark-worker.sh`. If you use an existing env, skip `conda create` and
 activate it directly. `lmms-eval` is the main evaluation framework;
-`eval/benchmark/lmms/memory_api` only installs the ReflectWorld custom model
+`eval/benchmark/lmms/memory_api` only installs the Cortex custom model
 backend plugin. The plugin expects the newer lmms-eval registry v2/model
 manifest API. If the PyPI version does not match the team environment, use a
 pinned lmms-eval checkout:
@@ -80,8 +80,8 @@ This replaces `python -m pip install lmms-eval`.
 If your env has a different name, set `CONDA_ENV=<your-conda-env>` when
 launching workers. If conda is not installed under `~/miniconda3`, also set
 `CONDA_SH="$(conda info --base)/etc/profile.d/conda.sh"`. The CLI
-(`npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses`) prepares local runtime binaries under
-`~/.reflectworld/bin/` and models under `~/.reflectworld/models/`; benchmark
+(`npx @cortex/cortex setup --level 1 --yes --accept-model-licenses`) prepares local runtime binaries under
+`~/.cortex/bin/` and models under `~/.cortex/models/`; benchmark
 workers do not require Docker.
 
 Next, configure `.env` and copy local models before running bootstrap. Bootstrap
@@ -90,13 +90,13 @@ prepare them first so its validation is useful:
 
 ```bash
 cp .env.example .env
-mkdir -p ~/.reflectworld/models
+mkdir -p ~/.cortex/models
 ```
 
-Copy at least the L1 model files to `REFLECTWORLD_MODELS_DIR`:
+Copy at least the L1 model files to `CORTEX_MODELS_DIR`:
 
 ```text
-~/.reflectworld/models/
+~/.cortex/models/
   yolo26m.onnx
   retinaface-resnet50.onnx
   w600k_mbf.onnx
@@ -122,8 +122,8 @@ EMBEDDER_MODEL=text-embedding-3-small
 EMBEDDER_API_KEY=...
 EMBEDDER_BASE_URL=...
 STUBS_ONLY=false
-REFLECTWORLD_MODELS_DIR=~/.reflectworld/models
-STT_MODEL_DIR=~/.reflectworld/models/sherpa-onnx-moonshine-tiny-en-int8
+CORTEX_MODELS_DIR=~/.cortex/models
+STT_MODEL_DIR=~/.cortex/models/sherpa-onnx-moonshine-tiny-en-int8
 ```
 
 Then run setup and bootstrap:
@@ -131,7 +131,7 @@ Then run setup and bootstrap:
 ```bash
 npm install
 npm run build
-npx @reflectworld/reflectworld setup --level 1 --yes --accept-model-licenses
+npx @cortex/cortex setup --level 1 --yes --accept-model-licenses
 bash eval/benchmark/bootstrap.sh
 ```
 
@@ -181,7 +181,7 @@ Common `run-benchmark-worker.sh` arguments:
 - `WORKER_LABEL`: stable worker name used in logs and worker output paths.
 - `--snapshot-version`: experiment output namespace, not a dataset selector.
   Results are written under
-  `~/.reflectworld/benchmark_results/<snapshot_version>/`. All workers in one
+  `~/.cortex/benchmark_results/<snapshot_version>/`. All workers in one
   experiment must use the same value. Prefer names that include dataset, date,
   commit, and important config, such as `videomme_long_20260508_9a75d80`.
 
@@ -249,7 +249,7 @@ bash eval/benchmark/run-benchmark-worker.sh \
 ```
 
 With `--video-ids`, the runner switches from `videomme_long` to
-`reflectworld_videomme_long_subset` and runs the full selected videos unless
+`cortex_videomme_long_subset` and runs the full selected videos unless
 `--offset` or `--limit` is explicitly provided.
 
 ## Multi-worker Allocation
@@ -277,7 +277,7 @@ Each worker starts its own eval-server, Mem service, Qdrant state directory, and
 collection prefix. Workers share only the snapshot output root:
 
 ```text
-~/.reflectworld/benchmark_results/<snapshot_version>/
+~/.cortex/benchmark_results/<snapshot_version>/
 ```
 
 This is the quickest path for a complete VideoMME Long run. The layout is fixed
@@ -394,7 +394,7 @@ Rerun all QA for one completed VideoMME video:
 ```bash
 bash eval/benchmark/run-benchmark-worker.sh \
   --mode qa-only \
-  --reuse-output-root ~/.reflectworld/benchmark_results/videomme_long_YYYYMMDD_commit \
+  --reuse-output-root ~/.cortex/benchmark_results/videomme_long_YYYYMMDD_commit \
   --snapshot-version videomme_long_YYYYMMDD_commit \
   --video-ids 601 \
   --port 8501 \
@@ -407,7 +407,7 @@ Rerun one question:
 ```bash
 bash eval/benchmark/run-benchmark-worker.sh \
   --mode qa-only \
-  --reuse-output-root ~/.reflectworld/benchmark_results/videomme_long_YYYYMMDD_commit \
+  --reuse-output-root ~/.cortex/benchmark_results/videomme_long_YYYYMMDD_commit \
   --snapshot-version videomme_long_YYYYMMDD_commit \
   --video-ids 601 \
   --question-id 601-2 \
@@ -445,7 +445,7 @@ but standard dataset comparison should use the lmms-eval worker path above.
 Default result root:
 
 ```text
-~/.reflectworld/benchmark_results/<snapshot_version>/
+~/.cortex/benchmark_results/<snapshot_version>/
 ```
 
 Important subtrees:

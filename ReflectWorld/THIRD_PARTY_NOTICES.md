@@ -1,13 +1,13 @@
 # Third-Party Notices
 
-ReflectWorld is licensed under the Apache License 2.0 (see [LICENSE](LICENSE)). It builds on
+Cortex is licensed under the Apache License 2.0 (see [LICENSE](LICENSE)). It builds on
 third-party software and optional machine-learning models that carry their own
 licenses. This document summarizes those components.
 
-> ReflectWorld does **not** redistribute the model weights or prepared binaries listed
+> Cortex does **not** redistribute the model weights or prepared binaries listed
 > below. They are downloaded or provided by the user at setup time. You are responsible
 > for complying with each component's license for your use case — **especially for
-> commercial use**. ReflectWorld grants no rights to these third-party components.
+> commercial use**. Cortex grants no rights to these third-party components.
 
 ## Research and demo media assets
 
@@ -19,7 +19,7 @@ open-source academic research project.
 
 The original videos, frames, thumbnails, audio, subtitles, identities, and other
 media content remain the property of their respective rights holders. They are
-**not** covered by ReflectWorld's Apache-2.0 license, and ReflectWorld does not
+**not** covered by Cortex's Apache-2.0 license, and Cortex does not
 grant permission to reuse them outside the academic context in which they are
 shown.
 
@@ -80,18 +80,18 @@ bundled application.
 ## Prepared binaries (downloaded at setup)
 
 Fetched as standalone executables and invoked as separate subprocesses; not linked
-into ReflectWorld.
+into Cortex.
 
 | Binary | Upstream | License | Notes |
 |--------|----------|---------|-------|
 | Qdrant | qdrant/qdrant | Apache-2.0 | Vector store |
 | go2rtc | AlexxIT/go2rtc | MIT | Stream gateway |
 | uv | astral-sh/uv | Apache-2.0 / MIT | Python env manager |
-| ffmpeg | static build (e.g. evermeet.cx, johnvansickle.com) | **GPL / LGPL** | External tool invoked as a subprocess. Static builds are typically GPL; ReflectWorld neither links nor modifies ffmpeg. Choose a build whose license fits your distribution. |
+| ffmpeg | static build (e.g. evermeet.cx, johnvansickle.com) | **GPL / LGPL** | External tool invoked as a subprocess. Static builds are typically GPL; Cortex neither links nor modifies ffmpeg. Choose a build whose license fits your distribution. |
 
 ## Models (downloaded or user-provided at setup)
 
-ReflectWorld is model-agnostic; the perception stack is configurable. The default
+Cortex is model-agnostic; the perception stack is configurable. The default
 models below are **not bundled** with the repository. Review each model's license
 before commercial deployment.
 
@@ -121,7 +121,7 @@ implementations:
 
 | Component | Reference | License / Note |
 |-----------|-----------|----------------|
-| Procedural memory system prompt | `mem0ai/mem0` | Apache-2.0; the prompt text was adapted from the reference project. ReflectWorld's memory implementation is independently developed and does not depend on Mem0. |
+| Procedural memory system prompt | `mem0ai/mem0` | Apache-2.0; the prompt text was adapted from the reference project. Cortex's memory implementation is independently developed and does not depend on Mem0. |
 | RetinaFace anchor/decode configuration | `biubug6/Pytorch_Retinaface` | MIT |
 | CLIP vision architecture and CLIP-ReID export conventions | `openai/CLIP`, `Syliz517/CLIP-ReID` | MIT |
 | ArcFace alignment conventions | InsightFace / ArcFace reference implementations | Code is open source; pretrained model/data terms may be non-commercial or research-only. |

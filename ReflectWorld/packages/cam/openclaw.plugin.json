@@ -1,6 +1,6 @@
 {
-  "id": "reflectworld-cam",
-  "name": "ReflectWorld Cam",
+  "id": "cortex-cam",
+  "name": "Cortex Cam",
   "description": "Video source management — capture, record, extract frames, detect motion via go2rtc gateway",
   "version": "0.1.0",
   "skills": ["./skills"],

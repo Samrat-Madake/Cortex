@@ -1,6 +1,6 @@
 // packages/percept/src/tool.ts
-import { monitorBus } from "@reflectworld/shared";
-import type { Segment } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { Segment } from "@cortex/shared";
 import type { PipelineDeps } from "./pipeline.js";
 import { analyze } from "./pipeline.js";
 
@@ -180,7 +180,7 @@ export async function executeToolAction(
     ? String((config as Record<string, unknown>).security_rules).slice(0, 160)
     : undefined;
   monitorBus.publish("system:tool_invoked", {
-    tool: "reflectworld_perception",
+    tool: "cortex_perception",
     action,
     success,
     camera_id: eventCameraId,

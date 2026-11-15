@@ -1,5 +1,5 @@
 // packages/percept/src/pipeline.ts
-import { createRuntimeHealthReporter, monitorBus, resolveReflectWorldStateDir, writeStderr } from "@reflectworld/shared";
+import { createRuntimeHealthReporter, monitorBus, resolveCortexStateDir, writeStderr } from "@cortex/shared";
 import type {
   LlmCallContext,
   Segment,
@@ -8,7 +8,7 @@ import type {
   BoundingBox,
   EntityRecord,
   SpeakerIdentityLevel,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 import type { AnalyzerResult, VlmOutput, DetectionOutput, ReIdOutput, WorkingMemoryTarget, DIdEntry, PendingEmbedding, SttOutput, VlmTargetIdentity } from "./types.js";
 import { VlmAnalyzer, VlmAnalysisError, type SubjectProposalContext, type VlmPartialField, type VlmSegmentAnalyzeOptions } from "./analyzers/vlm-analyzer.js";
 import { applyVlmCallProfile, resolveVlmCallProfile, type VlmCallMode } from "./vlm-call-profiles.js";
@@ -232,7 +232,7 @@ function isPersonTooSmallForFrame(bbox: BoundingBox, frameArea: number | undefin
  *
  * @param segment - Unified Segment from Eye
  * @param deps - Injected pipeline dependencies
- * @returns PerceptionResult ready to send to ReflectWorld and Act
+ * @returns PerceptionResult ready to send to Cortex and Act
  */
 export async function analyze(
   segment: Segment,
@@ -574,18 +574,18 @@ export async function analyze(
       await commitCriticalState();
     };
   };
-  let vlmGateDecision: NonNullable<import("@reflectworld/shared").PipelineTrace["context"]["decision_context"]>["vlm_gate"] | undefined;
-  const detectionFilterDecision: NonNullable<import("@reflectworld/shared").PipelineTrace["context"]["decision_context"]>["detection_filter"] = {
+  let vlmGateDecision: NonNullable<import("@cortex/shared").PipelineTrace["context"]["decision_context"]>["vlm_gate"] | undefined;
+  const detectionFilterDecision: NonNullable<import("@cortex/shared").PipelineTrace["context"]["decision_context"]>["detection_filter"] = {
     external_detection_count: 0,
     person_area_ratio_threshold: PERSON_MIN_BBOX_AREA_RATIO,
     person_area_filtered_count: 0,
   };
-  const reidDecision: NonNullable<import("@reflectworld/shared").PipelineTrace["context"]["decision_context"]>["reid"] = {};
-  const workingMemoryDecision: NonNullable<import("@reflectworld/shared").PipelineTrace["context"]["decision_context"]>["working_memory"] = {
+  const reidDecision: NonNullable<import("@cortex/shared").PipelineTrace["context"]["decision_context"]>["reid"] = {};
+  const workingMemoryDecision: NonNullable<import("@cortex/shared").PipelineTrace["context"]["decision_context"]>["working_memory"] = {
     cache_hit_tracks: 0,
     scene_context_length: 0,
   };
-  let eventBoundaryDecision: NonNullable<import("@reflectworld/shared").PipelineTrace["context"]["decision_context"]>["event_boundary"] | undefined;
+  let eventBoundaryDecision: NonNullable<import("@cortex/shared").PipelineTrace["context"]["decision_context"]>["event_boundary"] | undefined;
   let vlmArchive: Record<string, unknown> | undefined;
   let postprocessArchive: Record<string, unknown> | undefined;
   let vlmDidSelectionArchive: Record<string, unknown> | undefined;
@@ -602,7 +602,7 @@ export async function analyze(
   const streamingTargetKey = (target: Pick<ParsedSubjectProposalTarget, "tid">, fallbackIndex: number): string =>
     target.tid && target.tid.trim() ? `tid:${target.tid.trim()}` : `idx:${fallbackIndex}`;
 
-  // Inject user-defined rules from ReflectWorld procedural collection
+  // Inject user-defined rules from Cortex procedural collection
   if (deps.memory?.fetchUserRules) {
     try {
       const rules = await deps.memory.fetchUserRules(segment.camera_id);
@@ -671,7 +671,7 @@ export async function analyze(
       suppressSceneDescription = true;
     }
     // Load reference frame if exists (for teach-by-example comparison)
-    const refPath = join(resolveReflectWorldStateDir(), "cameras", `${segment.camera_id}_ref.jpg`);
+    const refPath = join(resolveCortexStateDir(), "cameras", `${segment.camera_id}_ref.jpg`);
     if (existsSync(refPath)) {
       try { referenceFrameBase64 = (await readFile(refPath)).toString("base64"); } catch { /* best-effort */ }
     }

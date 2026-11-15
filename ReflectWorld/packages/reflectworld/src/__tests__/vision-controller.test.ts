@@ -6,7 +6,7 @@ import {
 } from "../vision-controller/default-config.js";
 import type { VisionControllerConfig } from "../vision-controller/types.js";
 import type { FrameDetectionInput, MotionHint } from "../vision-controller/frame-signal-extractor.js";
-import type { PerceptionResult, Segment, PerceptionMemory } from "@reflectworld/shared";
+import type { PerceptionResult, Segment, PerceptionMemory } from "@cortex/shared";
 import type { Rule } from "../vc-types/types.js";
 
 // ── Helpers ──

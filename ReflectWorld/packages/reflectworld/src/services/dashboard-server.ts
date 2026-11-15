@@ -5,17 +5,17 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { join, resolve } from "node:path";
 import type { Duplex } from "node:stream";
 import { WebSocketServer, WebSocket } from "ws";
-import { monitorBus, resolveReflectWorldStateDir, subscribeRuntimeHealth } from "@reflectworld/shared";
-import type { RuntimeHealthObservation, RuntimeHealthScope } from "@reflectworld/shared";
-import type { FrameDetection, Segment } from "@reflectworld/shared";
+import { monitorBus, resolveCortexStateDir, subscribeRuntimeHealth } from "@cortex/shared";
+import type { RuntimeHealthObservation, RuntimeHealthScope } from "@cortex/shared";
+import type { FrameDetection, Segment } from "@cortex/shared";
 import type {
   ActiveSourceStatus,
   DashboardSegmentState,
   DashboardStateEnvelope,
   MonitorEvent,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 import type { PipelineStore } from "../store.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 import {
   DEFAULT_CHAT_RATE_LIMIT_PER_MIN,
   DEFAULT_MAX_FFMPEG_JOBS,
@@ -80,7 +80,7 @@ import { DashboardVideoLibrary } from "./dashboard-videos.js";
 import { DashboardVideoRoutes } from "./dashboard-video-routes.js";
 import { DashboardStaticFiles } from "./dashboard-static-files.js";
 
-export type { ActiveSourceStatus } from "@reflectworld/shared";
+export type { ActiveSourceStatus } from "@cortex/shared";
 export type {
   AnalysisStatusItem,
   AnalysisStatusSnapshot,
@@ -115,11 +115,11 @@ export interface DashboardServerOptions {
   port?: number;
   /** Per-instance mutable state dir. Media files are served from stateDir/media/. */
   stateDir?: string;
-  reflectworldEndpoint?: string;
+  cortexEndpoint?: string;
   /** Shared secret for local service-to-Dashboard webhooks. */
   internalWebhookToken?: string;
   store?: PipelineStore;
-  /** Recordings directory (e.g. ~/.reflectworld/recordings). Required for segment clip serving. */
+  /** Recordings directory (e.g. ~/.cortex/recordings). Required for segment clip serving. */
   recordingsDir?: string;
   /** Directories containing generated media thumbnails/gifs. */
   mediaDirs?: string[];
@@ -137,7 +137,7 @@ export interface DashboardServerOptions {
   purgeSource?: (req: SourcePurgeRequest) => Promise<SourcePurgeResponse>;
   /** Optional Dashboard-only callback to hydrate currently active live watches. */
   getActiveSources?: () => ActiveSourceStatus[];
-  /** Directory for uploaded videos. Defaults to ~/.reflectworld/uploads. */
+  /** Directory for uploaded videos. Defaults to ~/.cortex/uploads. */
   uploadsDir?: string;
   /** Read-only legacy upload directories to include when listing/resolving uploads. */
   legacyUploadsDirs?: string[];
@@ -188,7 +188,7 @@ export class DashboardServer {
   private readonly opts: DashboardServerOptions;
   private readonly stateDir: string;
   private readonly distDir: string;
-  private readonly reflectworldEndpoint: string;
+  private readonly cortexEndpoint: string;
   private readonly internalWebhookToken: string | undefined;
   private readonly store: PipelineStore | null;
   private readonly recordingsDir: string | null;
@@ -236,7 +236,7 @@ export class DashboardServer {
 
   constructor(opts: DashboardServerOptions) {
     this.opts = opts;
-    this.stateDir = opts.stateDir ?? resolveReflectWorldStateDir();
+    this.stateDir = opts.stateDir ?? resolveCortexStateDir();
     this.distDir = opts.distDir;
     this.port = opts.port ?? DEFAULT_PORT;
     this.addSource = opts.addSource ?? null;
@@ -244,7 +244,7 @@ export class DashboardServer {
     this.stopSource = opts.stopSource ?? null;
     this.purgeSource = opts.purgeSource ?? null;
     this.getActiveSources = opts.getActiveSources ?? null;
-    this.reflectworldEndpoint = opts.reflectworldEndpoint ?? "http://127.0.0.1:8219";
+    this.cortexEndpoint = opts.cortexEndpoint ?? "http://127.0.0.1:8219";
     this.internalWebhookToken = opts.internalWebhookToken?.trim() || undefined;
     this.recordingsDir = opts.recordingsDir ?? null;
     this.mediaDirs = opts.mediaDirs ?? [join(this.stateDir, "media")];
@@ -270,7 +270,7 @@ export class DashboardServer {
     });
     this.videoRoutes = new DashboardVideoRoutes({
       uploadsDir: this.uploadsDir,
-      fixturePreviewCacheDir: opts.fixturePreviewCacheDir ?? process.env.REFLECTWORLD_DASHBOARD_FIXTURE_PREVIEW_CACHE_DIR ?? null,
+      fixturePreviewCacheDir: opts.fixturePreviewCacheDir ?? process.env.CORTEX_DASHBOARD_FIXTURE_PREVIEW_CACHE_DIR ?? null,
       videos: this.videos,
       sessionEnabled: () => this.sessionConfig.enabled,
       scopeFromRequest: (req, body, url) => this.scopeFromRequest(req, body, url),
@@ -290,8 +290,8 @@ export class DashboardServer {
       ? opts.go2rtcApiPort
       : typeof opts.go2rtcApiPort === 'string'
         ? parseInt(opts.go2rtcApiPort, 10) || 1984
-        : parseInt(process.env.GO2RTC_API_PORT ?? process.env.REFLECTWORLD_DEMO_GO2RTC_API_PORT ?? "1984", 10);
-    this.publicMode = opts.dashboardSecurity?.publicMode ?? envFlag("REFLECTWORLD_PUBLIC_MODE", false);
+        : parseInt(process.env.GO2RTC_API_PORT ?? process.env.CORTEX_DEMO_GO2RTC_API_PORT ?? "1984", 10);
+    this.publicMode = opts.dashboardSecurity?.publicMode ?? envFlag("CORTEX_PUBLIC_MODE", false);
     this.sessionConfig = {
       enabled: opts.dashboardSessions?.enabled ?? (envFlag("DASHBOARD_MULTI_USER", false) || this.publicMode),
       maxActiveSessions: opts.dashboardSessions?.maxActiveSessions ?? envInt("DASHBOARD_MAX_ACTIVE_SESSIONS", 5),
@@ -388,11 +388,11 @@ export class DashboardServer {
       readRequestBuffer: (req, maxBytes) => this.readRequestBuffer(req, maxBytes),
     });
     this.memoryProxy = new DashboardMemoryProxy({
-      reflectworldEndpoint: this.reflectworldEndpoint,
+      cortexEndpoint: this.cortexEndpoint,
       buildEntityRefMap: (limit, cameraId, scope) => this.segments.buildEntityRefMap(limit, cameraId, scope),
     });
     this.proxyRoutes = new DashboardProxyRoutes({
-      reflectworldEndpoint: this.reflectworldEndpoint,
+      cortexEndpoint: this.cortexEndpoint,
       internalWebhookToken: this.internalWebhookToken,
       requireInternalWebhookToken: this.dashboardSecurityStrict,
       sessionEnabled: () => this.sessionConfig.enabled,
@@ -1000,13 +1000,13 @@ export class DashboardServer {
         return;
       }
 
-      // Proxy: forward /api/reflectworld/* to ReflectWorld service
-      if (url.pathname.startsWith("/api/reflectworld/")) {
-        await this.proxyRoutes.handleReflectWorldProxy(req, res, url);
+      // Proxy: forward /api/cortex/* to Cortex service
+      if (url.pathname.startsWith("/api/cortex/")) {
+        await this.proxyRoutes.handleCortexProxy(req, res, url);
         return;
       }
 
-      // Webhook: ReflectWorld notifies us when memories change
+      // Webhook: Cortex notifies us when memories change
       if (url.pathname === "/api/memory-event" && req.method === "POST") {
         await this.proxyRoutes.handleMemoryEvent(req, res);
         return;

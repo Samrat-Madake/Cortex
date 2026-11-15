@@ -1,4 +1,4 @@
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 import type { FaceReIdResult } from "../analyzers/reid-entry.js";
 import { extractCrop } from "../crop-utils.js";
 import type { DetectionRegistry } from "../did-registry.js";

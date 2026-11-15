@@ -19,7 +19,7 @@ interface SkillTestCase {
 const TEST_CASES: SkillTestCase[] = [
   {
     instruction: "Use night security mode to monitor this camera",
-    expectedTool: "reflectworld_perception",
+    expectedTool: "cortex_perception",
     expectedAction: "configure",
     validate: (call) => {
       const hasNightSecurity =
@@ -35,7 +35,7 @@ const TEST_CASES: SkillTestCase[] = [
   },
   {
     instruction: "Update walking scene guidance",
-    expectedTool: "reflectworld_perception",
+    expectedTool: "cortex_perception",
     expectedAction: "configure",
     validate: (call) => {
       const hasWalking =
@@ -51,7 +51,7 @@ const TEST_CASES: SkillTestCase[] = [
   },
   {
     instruction: "Set the frame rate to 3",
-    expectedTool: "reflectworld_cam",
+    expectedTool: "cortex_cam",
     expectedAction: "set_sampling",
     validate: (call) => {
       const params = call.params ?? {};
@@ -65,7 +65,7 @@ const TEST_CASES: SkillTestCase[] = [
   },
   {
     instruction: "Stop monitoring",
-    expectedTool: "reflectworld_cam",
+    expectedTool: "cortex_cam",
     expectedAction: "stop_watch",
     validate: (call) => {
       const params = call.params ?? {};
@@ -78,7 +78,7 @@ const TEST_CASES: SkillTestCase[] = [
   },
   {
     instruction: "Who came by today?",
-    expectedTool: "reflectworld_memory",
+    expectedTool: "cortex_memory",
     expectedAction: "search",
     validate: (call) => {
       const params = call.params ?? {};
@@ -199,8 +199,8 @@ function toolMatches(actual: string, expected: string): boolean {
   if (actual === expected) return true;
 
   const aliases: Record<string, string[]> = {
-    reflectworld_cam: ["reflectworld_cam"],
-    reflectworld_memory: ["reflectworld_mem"],
+    cortex_cam: ["cortex_cam"],
+    cortex_memory: ["cortex_mem"],
   };
 
   return aliases[expected]?.includes(actual) ?? false;

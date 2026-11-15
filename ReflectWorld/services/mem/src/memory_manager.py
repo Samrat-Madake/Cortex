@@ -3,7 +3,7 @@
 Orchestrates episodic, semantic, and procedural memory creation, retrieval,
 search, update, and deletion across multiple Qdrant collections.
 
-Ported from the legacy ReflectWorld reference implementation.
+Ported from the legacy Cortex reference implementation.
 """
 
 import asyncio
@@ -945,7 +945,7 @@ class MemoryManager:
 
     def reset(self) -> None:
         """Delete and recreate all collections, reset history."""
-        logger.warning("Resetting all ReflectWorld memory stores")
+        logger.warning("Resetting all Cortex memory stores")
         for suffix in COLLECTION_SPECS:
             try:
                 self.store.delete_collection(suffix)
@@ -2603,7 +2603,7 @@ class AsyncMemoryManager:
 
     async def reset(self) -> None:
         """Delete and recreate all collections, reset history."""
-        logger.warning("Resetting all ReflectWorld memory stores (async)")
+        logger.warning("Resetting all Cortex memory stores (async)")
         for suffix in COLLECTION_SPECS:
             try:
                 await asyncio.to_thread(self.store.delete_collection, suffix)

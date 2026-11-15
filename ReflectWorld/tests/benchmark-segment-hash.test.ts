@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import type { Segment } from "@reflectworld/shared";
-import { CamPipeline, CompositeSegmenter } from "@reflectworld/cam";
-import { splitJpegFramesWithRemainder } from "@reflectworld/cam";
-import type { FrameResult } from "@reflectworld/cam";
+import type { Segment } from "@cortex/shared";
+import { CamPipeline, CompositeSegmenter } from "@cortex/cam";
+import { splitJpegFramesWithRemainder } from "@cortex/cam";
+import type { FrameResult } from "@cortex/cam";
 
 function hashValue(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");

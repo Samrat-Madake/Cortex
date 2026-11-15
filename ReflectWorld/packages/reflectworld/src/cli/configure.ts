@@ -111,7 +111,7 @@ export async function collectConfigureAnswers(prompter: ConfigurePrompter): Prom
 
   let embedderSameGateway = false;
   if (mustUseIndependentEmbedder(vlmProvider)) {
-    console.log("Gemini does not provide the OpenAI-compatible embeddings endpoint used by ReflectWorld memory; configure an independent embedder.");
+    console.log("Gemini does not provide the OpenAI-compatible embeddings endpoint used by Cortex memory; configure an independent embedder.");
   } else {
     const embedderAnswer = await askChoice(prompter, "Embedder uses same gateway + default text-embedding-3-small?", ["y", "n"] as const, "y");
     embedderSameGateway = embedderAnswer === "y";
@@ -167,14 +167,14 @@ export function restartOpenClawGateway(run: OpenClawRunner = runOpenClaw): boole
     const message = err instanceof Error ? err.message : String(err);
     console.warn("\nOpenClaw gateway restart did not complete.");
     console.warn("This is expected when the gateway was started manually instead of through a managed service.");
-    console.warn("Restart the OpenClaw gateway process manually for the new ReflectWorld config to take effect.");
+    console.warn("Restart the OpenClaw gateway process manually for the new Cortex config to take effect.");
     console.warn(`Restart error: ${message}\n`);
     return false;
   }
 }
 
 export async function runConfigure(_args: string[]): Promise<void> {
-  console.log("\nReflectWorld OpenClaw Configuration\n");
+  console.log("\nCortex OpenClaw Configuration\n");
   checkOpenClawAvailable();
 
   const prompter = createConfigurePrompter();
@@ -192,7 +192,7 @@ export async function runConfigure(_args: string[]): Promise<void> {
     console.log("\nRestarting OpenClaw gateway...");
     restartOpenClawGateway();
 
-    console.log("\nReflectWorld OpenClaw configuration complete.\n");
+    console.log("\nCortex OpenClaw configuration complete.\n");
   } finally {
     prompter.close();
   }

@@ -1,4 +1,4 @@
-# @reflectworld/percept
+# @cortex/percept
 
 > Perception pipeline: local model inference + VLM analysis with explicit L0/L1 capability tiers.
 
@@ -9,13 +9,13 @@ The Perception package analyzes video segments through a two-tier pipeline. Leve
 ## Installation
 
 ```bash
-npm install @reflectworld/percept
+npm install @cortex/percept
 
 # Level 0 (VLM only) — no extra dependencies needed
 
 # Level 1 (local models) — install inference engine + download models
 npm install onnxruntime-node
-npx -p @reflectworld/percept install-models
+npx -p @cortex/percept install-models
 ```
 
 On Linux GPU hosts, `onnxruntime-node` is still the package to install. CUDA is selected automatically when the NVIDIA driver, CUDA 12 runtime, and cuDNN 9 libraries are visible to Node.
@@ -23,7 +23,7 @@ On Linux GPU hosts, `onnxruntime-node` is still the package to install. CUDA is 
 ## Quick Start
 
 ```typescript
-import { analyze, createPipelineDeps, resolvePerceptionConfig } from "@reflectworld/percept";
+import { analyze, createPipelineDeps, resolvePerceptionConfig } from "@cortex/percept";
 
 const config = resolvePerceptionConfig({ vlm_provider: "openai", vlm_api_key: "...", vlm_base_url: "..." });
 const deps = await createPipelineDeps(config, mediaSaver);
@@ -42,7 +42,7 @@ StrategyManager → picks Level 0/1 by mode + capabilities
   ↓
 Pipeline (serial execution):
   Stage 1: External frame detections + RetinaFace face association
-  Stage 2: ReID evidence query (ArcFace face ReID → ReflectWorld)
+  Stage 2: ReID evidence query (ArcFace face ReID → Cortex)
   Stage 3: Subject proposal + VLM analysis
   ↓
 MediaUploader → keyframes to filesystem

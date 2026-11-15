@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { parseSrt, sliceSrtToSttOutput, type SrtEntry } from "../eval/benchmark/pipeline/srt-provider.js";
-import type { SttOutput } from "@reflectworld/percept";
+import type { SttOutput } from "@cortex/percept";
 
 describe("parseSrt", () => {
   it("parses standard SRT with HTML font tags", () => {

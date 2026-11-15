@@ -20,10 +20,10 @@ loadEnv({ path: join(scriptDir, "../.env") });
 
 import { resolvePerceptionConfig } from "../packages/percept/src/config.js";
 import { createPipelineDeps, analyze, type PipelineDeps } from "../packages/percept/src/pipeline.js";
-import { VisionController } from "../packages/reflectworld/src/vision-controller/index.js";
-import type { RuleAction } from "../packages/reflectworld/src/vc-types/types.js";
-import type { VisionControllerConfig } from "../packages/reflectworld/src/vision-controller/index.js";
-import type { Segment, Frame, PerceptionResult, MotionHint } from "@reflectworld/shared";
+import { VisionController } from "../packages/cortex/src/vision-controller/index.js";
+import type { RuleAction } from "../packages/cortex/src/vc-types/types.js";
+import type { VisionControllerConfig } from "../packages/cortex/src/vision-controller/index.js";
+import type { Segment, Frame, PerceptionResult, MotionHint } from "@cortex/shared";
 import { MotionFilter } from "../packages/cam/src/motion-filter.js";
 import type { MediaSaver } from "../packages/percept/src/media-uploader.js";
 

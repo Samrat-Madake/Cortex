@@ -1,6 +1,6 @@
 // packages/percept/src/analyzers/yolo26.ts
 import type { ModelManager } from "../models/model-manager.js";
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 import { resizeAndPad } from "../models/preprocessing.js";
 import { YOLO_CONFIDENCE, YOLO_CLASS_CONFIDENCE } from "../thresholds.js";
 

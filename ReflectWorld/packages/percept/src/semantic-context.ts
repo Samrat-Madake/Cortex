@@ -38,8 +38,8 @@ export interface SemanticContextIdentityCue {
 
 /**
  * Minimal interface for the Qdrant-backed semantic_context write/read path.
- * Matches ReflectWorldClient.upsertSemanticContext() + getMemories() without
- * importing @reflectworld/mem.
+ * Matches CortexClient.upsertSemanticContext() + getMemories() without
+ * importing @cortex/mem.
  */
 export interface SemanticContextWriter {
   upsertSemanticContext(request: {

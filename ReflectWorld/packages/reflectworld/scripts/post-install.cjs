@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Post-install script for @reflectworld/reflectworld
+// Post-install script for @cortex/cortex
 // Prints perception level info — NO downloads, NO installs (safe)
 "use strict";
 
@@ -12,9 +12,9 @@ function expandHome(p) {
   return p;
 }
 
-const vmHome = expandHome(process.env.REFLECTWORLD_HOME || join(homedir(), ".reflectworld"));
-const modelsDir = process.env.REFLECTWORLD_MODELS_DIR
-  ? expandHome(process.env.REFLECTWORLD_MODELS_DIR)
+const vmHome = expandHome(process.env.CORTEX_HOME || join(homedir(), ".cortex"));
+const modelsDir = process.env.CORTEX_MODELS_DIR
+  ? expandHome(process.env.CORTEX_MODELS_DIR)
   : join(vmHome, "models");
 const packageRoot = join(__dirname, "..");
 const localCliCandidates = [
@@ -22,7 +22,7 @@ const localCliCandidates = [
   join(packageRoot, "dist", "src", "cli", "index.js"),
 ];
 const localCliPath = localCliCandidates.find(existsSync);
-const cli = localCliPath ? `node ${JSON.stringify(localCliPath)}` : "npx @reflectworld/reflectworld";
+const cli = localCliPath ? `node ${JSON.stringify(localCliPath)}` : "npx @cortex/cortex";
 const pluginLevel1Command = localCliPath
   ? `${cli} enable-level1 --package-dir ${JSON.stringify(packageRoot)}`
   : `${cli} enable-level1`;
@@ -47,11 +47,11 @@ const YELLOW = "\x1b[33m";
 if (currentLevel >= 1) {
   const extras = hasBodyReid ? ` + body ReID ${YELLOW}[experimental]${RESET}` : "";
   console.log(`
-${BOLD}${GREEN}ReflectWorld installed!${RESET} ${DIM}Perception Level ${currentLevel}${extras}${RESET}
+${BOLD}${GREEN}Cortex installed!${RESET} ${DIM}Perception Level ${currentLevel}${extras}${RESET}
 `);
 } else {
   console.log(`
-${BOLD}${CYAN}ReflectWorld installed!${RESET}
+${BOLD}${CYAN}Cortex installed!${RESET}
 
   Current: ${BOLD}Level 0${RESET} — Cloud VLM Only
   Scene description + safety analysis via Gemini

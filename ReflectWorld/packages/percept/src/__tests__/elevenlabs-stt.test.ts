@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ElevenLabsStt } from "../analyzers/elevenlabs-stt.js";
-import type { AudioData } from "@reflectworld/shared";
+import type { AudioData } from "@cortex/shared";
 
 const SAMPLE_RATE = 16000;
 const BYTES_PER_SAMPLE = 2;

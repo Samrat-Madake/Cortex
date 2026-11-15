@@ -1,4 +1,4 @@
-import type { OpenClawPluginApi, Segment, PerceptionResult } from "@reflectworld/shared";
+import type { OpenClawPluginApi, Segment, PerceptionResult } from "@cortex/shared";
 import { CamToolSchema } from "./src/schema.js";
 import { executeCamAction, setWatchPersistDir, loadPersistedWatchStates, _resetActiveWatches } from "./src/tool.js";
 import { SourceManager } from "./src/source-manager.js";
@@ -15,8 +15,8 @@ import type { FrameResult } from "./src/types.js";
 import { join } from "node:path";
 
 export default {
-  id: "reflectworld-cam",
-  name: "ReflectWorld Cam v3",
+  id: "cortex-cam",
+  name: "Cortex Cam v3",
   description: "Video source management via go2rtc — snapshot, watch (event/stream), record",
 
   register(api: OpenClawPluginApi) {
@@ -190,7 +190,7 @@ export default {
 
     // ToolFactory: captures ctx.sessionKey so watch can store the originating channel
     api.registerTool((ctx) => ({
-      name: "reflectworld_cam",
+      name: "cortex_cam",
       description: `Camera control tool. You MUST call this tool to interact with cameras — never pretend you did.
 
 Actions:

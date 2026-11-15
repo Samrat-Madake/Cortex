@@ -1,4 +1,4 @@
-import type { ActiveSourceStatus, PipelineTrace } from "@reflectworld/shared";
+import type { ActiveSourceStatus, PipelineTrace } from "@cortex/shared";
 import type { PipelineStore } from "../store.js";
 import {
   dashboardRawReadLimit,

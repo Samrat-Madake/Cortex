@@ -1,5 +1,5 @@
 // packages/percept/src/strategy-manager.ts
-import type { Segment, PerceptionLevel } from "@reflectworld/shared";
+import type { Segment, PerceptionLevel } from "@cortex/shared";
 import type { StrategyConfig } from "./types.js";
 import type { ModelRouter } from "./providers/model-router.js";
 

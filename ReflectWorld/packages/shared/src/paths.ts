@@ -8,14 +8,14 @@ export function canonicalize(p: string): string {
 }
 
 /** Shared read-only assets: bin/, models/, services/ */
-export function resolveReflectWorldHome(): string {
-  const raw = process.env.REFLECTWORLD_HOME || join(homedir(), ".reflectworld");
+export function resolveCortexHome(): string {
+  const raw = process.env.CORTEX_HOME || join(homedir(), ".cortex");
   return canonicalize(raw);
 }
 
 /** Per-instance mutable state: qdrant-storage/, recordings/, sources/, media/, db/, cameras/, segments/ */
-export function resolveReflectWorldStateDir(): string {
+export function resolveCortexStateDir(): string {
   const raw =
-    process.env.REFLECTWORLD_STATE_DIR || join(process.cwd(), ".reflectworld-state");
+    process.env.CORTEX_STATE_DIR || join(process.cwd(), ".cortex-state");
   return canonicalize(raw);
 }

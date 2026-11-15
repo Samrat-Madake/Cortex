@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { analyze, type PipelineDeps } from "../pipeline.js";
 import { WorkingMemoryManager } from "../working-memory.js";
 import { StrategyManager } from "../strategy-manager.js";
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 import type { SttOutput, VlmOutput } from "../types.js";
 
 // Follows existing pipeline.test.ts pattern: hand-built minimal PipelineDeps,

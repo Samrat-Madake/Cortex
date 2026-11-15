@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { monitorBus, type MonitorEvent, type Segment } from "@reflectworld/shared";
+import { monitorBus, type MonitorEvent, type Segment } from "@cortex/shared";
 import { DashboardServer } from "../services/dashboard-server.js";
 
 describe("DashboardServer partial segment projection", () => {
@@ -727,7 +727,7 @@ describe("DashboardServer memory webhook", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-ReflectWorld-Internal-Token": "wrong-secret",
+          "X-Cortex-Internal-Token": "wrong-secret",
         },
         body: JSON.stringify({}),
       });
@@ -737,7 +737,7 @@ describe("DashboardServer memory webhook", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-ReflectWorld-Internal-Token": "test-secret",
+          "X-Cortex-Internal-Token": "test-secret",
         },
         body: JSON.stringify({ type: "memory:memory_added", data: {} }),
       });
@@ -747,7 +747,7 @@ describe("DashboardServer memory webhook", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-ReflectWorld-Internal-Token": "test-secret",
+          "X-Cortex-Internal-Token": "test-secret",
         },
         body: JSON.stringify({
           producer: "memory-service",

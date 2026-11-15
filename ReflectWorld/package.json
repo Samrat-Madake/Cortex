@@ -1,5 +1,5 @@
 {
-  "name": "reflectworld",
+  "name": "cortex",
   "private": true,
   "license": "Apache-2.0",
   "engines": {
@@ -11,8 +11,8 @@
   "scripts": {
     "build": "tsc --build && (find packages/*/dist -name 'tsconfig.tsbuildinfo' -delete 2>/dev/null || true) && node scripts/bundle-assets.js",
     "clean": "tsc --build --clean && (find packages/*/dist -name __tests__ -type d -exec rm -rf {} + 2>/dev/null || true)",
-    "setup": "node packages/reflectworld/dist/src/cli/index.js setup",
-    "start": "node packages/reflectworld/dist/src/cli/index.js start --dev",
+    "setup": "node packages/cortex/dist/src/cli/index.js setup",
+    "start": "node packages/cortex/dist/src/cli/index.js start --dev",
     "release": "npm run build && node scripts/release.js",
     "benchmark:setup": "bash eval/benchmark/bootstrap.sh",
     "benchmark:setup:linux": "bash eval/benchmark/bootstrap.sh",

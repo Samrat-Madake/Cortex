@@ -2,7 +2,7 @@ import type { FrameLevelSignals } from "./types.js";
 
 /**
  * Minimal detection result needed for frame-signal extraction.
- * Intentionally inline (not imported from @reflectworld/percept) to avoid
+ * Intentionally inline (not imported from @cortex/percept) to avoid
  * a cross-package dependency in the vision-controller layer.
  */
 export interface FrameDetectionInput {

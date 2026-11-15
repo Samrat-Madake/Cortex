@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DashboardSourceStatusService } from "../services/dashboard-source-status.js";
-import type { ActiveSourceStatus } from "@reflectworld/shared";
+import type { ActiveSourceStatus } from "@cortex/shared";
 
 function makeService(sources: ActiveSourceStatus[], streams: Record<string, unknown> | null) {
   return new DashboardSourceStatusService({

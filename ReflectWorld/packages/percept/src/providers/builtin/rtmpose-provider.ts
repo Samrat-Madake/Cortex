@@ -3,7 +3,7 @@ import { OnnxBuiltinBase } from "./onnx-builtin-base.js";
 import type { PoseProvider, InferInput, PoseOutput } from "../types.js";
 import type { ModelManager } from "../../models/model-manager.js";
 import { RtmPoseEstimator } from "../../analyzers/rtmpose.js";
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 
 /**
  * Builtin ONNX provider wrapping RTMPose-s.

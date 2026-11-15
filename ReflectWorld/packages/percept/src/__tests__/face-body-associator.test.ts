@@ -1,7 +1,7 @@
 // packages/percept/src/__tests__/face-body-associator.test.ts
 import { describe, it, expect } from "vitest";
 import { FaceBodyAssociator } from "../analyzers/face-body-associator.js";
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 import type { FaceDetection } from "../types.js";
 
 describe("FaceBodyAssociator", () => {

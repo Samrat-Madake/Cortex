@@ -1,6 +1,6 @@
 # Security Policy
 
-This document covers two topics: how to report security vulnerabilities, and ReflectWorld's trust boundary between local trusted use and public deployment.
+This document covers two topics: how to report security vulnerabilities, and Cortex's trust boundary between local trusted use and public deployment.
 
 ## Reporting A Vulnerability
 
@@ -19,17 +19,17 @@ Response expectations:
 
 ### Supported Versions
 
-Security fixes target the latest code on the default `main` branch. ReflectWorld is under active development and does not currently provide long-term support branches.
+Security fixes target the latest code on the default `main` branch. Cortex is under active development and does not currently provide long-term support branches.
 
 ## Trust Boundary: Local Trusted Use vs Public Deployment
 
-ReflectWorld defaults to local, single-user, trusted use. Under that assumption, some permissive defaults are intentional usability tradeoffs rather than vulnerabilities: permissive CORS, local tool APIs, permissive video source parsing, and broad local event visibility.
+Cortex defaults to local, single-user, trusted use. Under that assumption, some permissive defaults are intentional usability tradeoffs rather than vulnerabilities: permissive CORS, local tool APIs, permissive video source parsing, and broad local event visibility.
 
 These assumptions only hold for loopback, single-machine, self-use. If you expose the service to a LAN, the public internet, a public demo, or multi-user hosting, those same defaults become attack surfaces that must be closed first.
 
 ### Local Trusted Mode Assumptions
 
-The runtime host, HTTP server, WebSockets, tool API, and Dashboard proxy assume the visitor is the person running ReflectWorld on the local machine. In this mode, the following are intentional conveniences:
+The runtime host, HTTP server, WebSockets, tool API, and Dashboard proxy assume the visitor is the person running Cortex on the local machine. In this mode, the following are intentional conveniences:
 
 - permissive CORS for local frontend development;
 - local Agent tool APIs such as `/api/tool/:toolName` and Dashboard tool proxy surfaces;
@@ -38,7 +38,7 @@ The runtime host, HTTP server, WebSockets, tool API, and Dashboard proxy assume 
 
 ### Risks When Exposed Beyond Loopback
 
-If ReflectWorld binds to a non-loopback address or runs in a public environment without the boundaries below, known attack surfaces include:
+If Cortex binds to a non-loopback address or runs in a public environment without the boundaries below, known attack surfaces include:
 
 - **SSRF and arbitrary file reads:** user-controlled `source` can reach ffmpeg/go2rtc and may access cloud metadata, private networks, or local files.
 - **Unauthenticated cross-tenant data operations:** an exposed mem service without auth could allow reset, read, or delete operations against other users' memories.
@@ -51,13 +51,13 @@ If ReflectWorld binds to a non-loopback address or runs in a public environment 
 
 ### Required Boundaries Before Public Deployment
 
-Before exposing ReflectWorld to a LAN, public internet, public demo, or multi-user hosting, enable the following:
+Before exposing Cortex to a LAN, public internet, public demo, or multi-user hosting, enable the following:
 
 - **Loopback binding:** HTTP/WS host and managed child services should bind to `127.0.0.1` by default. Bind other interfaces only behind an explicit public/LAN mode.
 - **Auth:** session or token checks must cover all mutation, proxy, chat, and webhook routes. Child services such as mem should use shared-token auth when exposed beyond loopback.
 - **Server-derived identity:** isolation keys such as `user_id` must be derived from the server-side session, not accepted from request bodies. Dangerous operations such as `/reset` and bulk `DELETE` should be denied or admin-gated.
-- **Source allowlist and SSRF protection:** validate schemes, resolve DNS, reject loopback/link-local/private ranges by default, and disable local file paths unless explicitly allowed. `REFLECTWORLD_ALLOW_PRIVATE_SOURCE` and `REFLECTWORLD_ALLOW_LOCAL_SOURCE` are escape hatches for trusted local/private deployments, not public demos.
-- **Dashboard/tool public-mode gating:** when `DASHBOARD_MULTI_USER=true` or `REFLECTWORLD_PUBLIC_MODE=true`, validate WebSocket Origin, limit connections, rate-limit chat, and admin-gate CLI tool APIs.
+- **Source allowlist and SSRF protection:** validate schemes, resolve DNS, reject loopback/link-local/private ranges by default, and disable local file paths unless explicitly allowed. `CORTEX_ALLOW_PRIVATE_SOURCE` and `CORTEX_ALLOW_LOCAL_SOURCE` are escape hatches for trusted local/private deployments, not public demos.
+- **Dashboard/tool public-mode gating:** when `DASHBOARD_MULTI_USER=true` or `CORTEX_PUBLIC_MODE=true`, validate WebSocket Origin, limit connections, rate-limit chat, and admin-gate CLI tool APIs.
 - **Rate limiting:** apply per-session limits to chat, inference, and write-heavy routes.
 - **WebSocket limits:** use Origin allowlists, connection caps, and `maxPayload`.
 - **Default-deny event visibility:** non-loopback deployments must scope events by session.
@@ -70,7 +70,7 @@ Before exposing ReflectWorld to a LAN, public internet, public demo, or multi-us
 - [ ] All mutation, proxy, chat, and webhook routes require session/token auth.
 - [ ] `user_id` and related isolation keys are server-derived.
 - [ ] Video `source` rejects `file:///...`, cloud metadata addresses, loopback, and private ranges unless explicitly allowed.
-- [ ] Public/hosted environments do not enable `REFLECTWORLD_ALLOW_PRIVATE_SOURCE` or `REFLECTWORLD_ALLOW_LOCAL_SOURCE`; network egress rules also block private, loopback, link-local, and cloud metadata ranges.
+- [ ] Public/hosted environments do not enable `CORTEX_ALLOW_PRIVATE_SOURCE` or `CORTEX_ALLOW_LOCAL_SOURCE`; network egress rules also block private, loopback, link-local, and cloud metadata ranges.
 - [ ] Chat, inference, and write routes have per-session rate limits.
 - [ ] WebSockets enforce Origin allowlist and connection/payload limits.
 - [ ] OpenAI-compatible chat rate limits match expected public capacity.

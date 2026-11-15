@@ -2,12 +2,12 @@
 import { z } from "zod";
 
 /**
- * Zod schema for @reflectworld/mem plugin configuration.
+ * Zod schema for @cortex/mem plugin configuration.
  * Values can be overridden via the plugin options object at registration time.
  */
 export const MemoryConfigSchema = z.object({
   /**
-   * Base URL of the ReflectWorld FastAPI service.
+   * Base URL of the Cortex FastAPI service.
    * @default "http://localhost:8219"
    */
   baseUrl: z

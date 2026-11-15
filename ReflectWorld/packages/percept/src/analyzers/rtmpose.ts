@@ -1,7 +1,7 @@
 // packages/percept/src/analyzers/rtmpose.ts
 
 import type { ModelManager } from "../models/model-manager.js";
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 
 /**
  * RTMPose SimCC decoder.

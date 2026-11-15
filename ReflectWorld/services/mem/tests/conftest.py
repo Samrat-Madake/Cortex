@@ -1,4 +1,4 @@
-"""Shared fixtures for ReflectWorld memory service tests."""
+"""Shared fixtures for Cortex memory service tests."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ class QdrantTestEndpoint:
 
 
 def _qdrant_endpoint_from_env() -> QdrantTestEndpoint:
-    raw_url = os.getenv("QDRANT_TEST_URL") or os.getenv("REFLECTWORLD_TEST_QDRANT_URL")
+    raw_url = os.getenv("QDRANT_TEST_URL") or os.getenv("CORTEX_TEST_QDRANT_URL")
     if raw_url:
         parsed = urlparse(raw_url)
         return QdrantTestEndpoint(
@@ -27,8 +27,8 @@ def _qdrant_endpoint_from_env() -> QdrantTestEndpoint:
             port=parsed.port or 6333,
         )
     return QdrantTestEndpoint(
-        host=os.getenv("REFLECTWORLD_TEST_QDRANT_HOST", os.getenv("QDRANT_TEST_HOST", "localhost")),
-        port=int(os.getenv("REFLECTWORLD_TEST_QDRANT_PORT", os.getenv("QDRANT_TEST_PORT", "6333"))),
+        host=os.getenv("CORTEX_TEST_QDRANT_HOST", os.getenv("QDRANT_TEST_HOST", "localhost")),
+        port=int(os.getenv("CORTEX_TEST_QDRANT_PORT", os.getenv("QDRANT_TEST_PORT", "6333"))),
     )
 
 
@@ -40,13 +40,13 @@ def qdrant_test_endpoint() -> QdrantTestEndpoint:
 @pytest.fixture(scope="session")
 def requires_qdrant(qdrant_test_endpoint: QdrantTestEndpoint) -> QdrantTestEndpoint:
     """Skip Qdrant integration tests unless the configured Qdrant is writable."""
-    timeout = float(os.getenv("REFLECTWORLD_TEST_QDRANT_TIMEOUT", "3"))
+    timeout = float(os.getenv("CORTEX_TEST_QDRANT_TIMEOUT", "3"))
     client = QdrantClient(
         host=qdrant_test_endpoint.host,
         port=qdrant_test_endpoint.port,
         timeout=timeout,
     )
-    probe_collection = f"reflectworld_pytest_probe_{uuid.uuid4().hex}"
+    probe_collection = f"cortex_pytest_probe_{uuid.uuid4().hex}"
     try:
         client.get_collections()
         client.create_collection(
@@ -57,7 +57,7 @@ def requires_qdrant(qdrant_test_endpoint: QdrantTestEndpoint) -> QdrantTestEndpo
     except Exception as exc:
         pytest.skip(
             "Qdrant integration tests require a writable Qdrant instance. "
-            "Set QDRANT_TEST_URL or REFLECTWORLD_TEST_QDRANT_HOST/PORT. "
+            "Set QDRANT_TEST_URL or CORTEX_TEST_QDRANT_HOST/PORT. "
             f"Current target: {qdrant_test_endpoint.host}:{qdrant_test_endpoint.port}. "
             f"Probe failed: {exc}"
         )

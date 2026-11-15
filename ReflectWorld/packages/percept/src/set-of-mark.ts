@@ -1,7 +1,7 @@
 // packages/percept/src/set-of-mark.ts
 // Draw labelled detection bboxes on keyframe images (Set-of-Mark annotation).
 
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 import type { DIdEntry } from "./types.js";
 
 /** A single annotation to overlay on a keyframe. */

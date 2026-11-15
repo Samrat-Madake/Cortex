@@ -1,7 +1,7 @@
 {
-  "id": "reflectworld-mem",
-  "name": "ReflectWorld Memory",
-  "description": "Search and manage ReflectWorld video memories — episodic, semantic, and procedural",
+  "id": "cortex-mem",
+  "name": "Cortex Memory",
+  "description": "Search and manage Cortex video memories — episodic, semantic, and procedural",
   "version": "0.1.0",
   "skills": ["./skills"],
   "configSchema": {
@@ -10,7 +10,7 @@
     "properties": {
       "baseUrl": {
         "type": "string",
-        "description": "ReflectWorld API base URL (default: http://localhost:8219)"
+        "description": "Cortex API base URL (default: http://localhost:8219)"
       },
       "timeoutMs": {
         "type": "number",

@@ -1,6 +1,6 @@
-# ReflectWorld Architecture
+# Cortex Architecture
 
-ReflectWorld is a local-first visual memory runtime. It turns camera streams and
+Cortex is a local-first visual memory runtime. It turns camera streams and
 video files into structured observations, stores those observations in
 persistent memory, and exposes the resulting state to the Dashboard and agent
 tools.
@@ -12,10 +12,10 @@ without documenting every internal mechanism.
 
 ```mermaid
 graph LR
-    Source["Camera / video file / stream"] --> Cam["@reflectworld/cam<br/>capture, audio, segmentation"]
-    Cam --> Percept["@reflectworld/percept<br/>visual analysis and identity evidence"]
+    Source["Camera / video file / stream"] --> Cam["@cortex/cam<br/>capture, audio, segmentation"]
+    Cam --> Percept["@cortex/percept<br/>visual analysis and identity evidence"]
     Percept --> MemoryAdapter["memory adapter"]
-    MemoryAdapter --> MemClient["@reflectworld/mem<br/>TypeScript client"]
+    MemoryAdapter --> MemClient["@cortex/mem<br/>TypeScript client"]
     MemClient --> MemService["Python memory service"]
     MemService --> Qdrant["Qdrant vector store"]
     Percept --> Events["monitor events"]
@@ -33,7 +33,7 @@ processes are used only where the runtime boundary requires them:
 
 The default deployment is local-first. Source media, generated media artifacts,
 local recognition model outputs, memory state, and vector data stay on the
-machine running ReflectWorld. Configured model providers receive only the VLM,
+machine running Cortex. Configured model providers receive only the VLM,
 LLM, STT, or embedding requests needed for the features you enable.
 
 ## Main Packages
@@ -44,7 +44,7 @@ LLM, STT, or embedding requests needed for the features you enable.
 | `packages/percept` | Analyzes each segment with local evidence and VLM calls; extracts summaries, subjects, speech context, risk signals, and identity evidence. |
 | `packages/mem` | TypeScript client for the memory service. |
 | `services/mem` | Python/FastAPI service for memory storage, retrieval, semantic context, and vector search. |
-| `packages/reflectworld` | Orchestrator, CLI, runtime services, state directories, configuration, and Dashboard API. |
+| `packages/cortex` | Orchestrator, CLI, runtime services, state directories, configuration, and Dashboard API. |
 | `packages/dashboard` | React UI for sources, segment timeline, entities, memory, and chat. |
 | `packages/shared` | Shared event and data contracts used across packages. |
 | `packages/host` | Development/demo host for running the Dashboard and tool APIs locally. |
@@ -64,7 +64,7 @@ LLM, STT, or embedding requests needed for the features you enable.
 
 ## Memory Model
 
-ReflectWorld stores memory at multiple levels of abstraction:
+Cortex stores memory at multiple levels of abstraction:
 
 - **Segment memories**: what happened in a specific time range.
 - **Entity memories**: what was observed about a recurring person, object, or
@@ -107,7 +107,7 @@ HTTP and event contracts are documented in the reference section:
 
 ## Configuration And Runtime Modes
 
-ReflectWorld supports two common runtime shapes:
+Cortex supports two common runtime shapes:
 
 - **Standalone**: run from this repository or an npm package using `.env`.
 - **OpenClaw plugin mode**: configure through the host plugin configuration
@@ -121,7 +121,7 @@ Both shapes use the same core packages. See:
 
 ## Design Boundaries
 
-ReflectWorld's public architecture follows a few practical boundaries:
+Cortex's public architecture follows a few practical boundaries:
 
 - Keep media and memory local unless the user chooses external providers.
 - Keep raw source data, generated media, and model artifacts out of the source

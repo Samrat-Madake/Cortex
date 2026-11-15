@@ -4,13 +4,13 @@
  * Per-session pipeline for a single camera watch.
  */
 
-import { monitorBus } from "@reflectworld/shared";
-import type { Segment, PerceptionResult, SpeechSegment, AudioData, VoiceRange } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { Segment, PerceptionResult, SpeechSegment, AudioData, VoiceRange } from "@cortex/shared";
 import type { FrameResult } from "./types.js";
 import { buildSegment, generateSegmentId, type BuildSegmentOptions } from "./segment-builder.js";
 import type { Segmenter, SegmenterHints } from "./segmenter/types.js";
 import { AsyncQueue } from "./async-queue.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 export interface PipelineConfig {
   cameraId: string;

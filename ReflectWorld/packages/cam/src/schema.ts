@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 
-/** Flat object schema for the reflectworld_cam tool. */
+/** Flat object schema for the cortex_cam tool. */
 export const CamToolSchema = Type.Object({
   action: Type.Unsafe<string>(
     Type.String({

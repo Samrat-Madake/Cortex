@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { normalizeSecretInput } from "@reflectworld/shared";
+import { normalizeSecretInput } from "@cortex/shared";
 import { bridgePluginConfigToEnv } from "../config-env-bridge.js";
 
 describe("normalizeSecretInput", () => {
@@ -15,8 +15,8 @@ describe("normalizeSecretInput", () => {
 
   it("returns undefined for file/exec source", () => {
     const warn = vi.fn();
-    expect(normalizeSecretInput({ source: "file", provider: "default", id: "/secret" }, "reflectworld", warn)).toBeUndefined();
-    expect(normalizeSecretInput({ source: "exec", provider: "default", id: "cmd" }, "reflectworld", warn)).toBeUndefined();
+    expect(normalizeSecretInput({ source: "file", provider: "default", id: "/secret" }, "cortex", warn)).toBeUndefined();
+    expect(normalizeSecretInput({ source: "exec", provider: "default", id: "cmd" }, "cortex", warn)).toBeUndefined();
     expect(warn).toHaveBeenCalledTimes(2);
   });
 
@@ -38,16 +38,16 @@ describe("bridgePluginConfigToEnv", () => {
       "VLM_MAX_RETRIES",
       "VLM_RETRY_BASE_DELAY_MS",
       "VLM_RETRY_MAX_DELAY_MS",
-      "REFLECTWORLD_PERCEPTION_SOURCE_CONCURRENCY",
-      "REFLECTWORLD_PERCEPTION_MAX_QUEUED_PER_SOURCE",
-      "REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS",
-      "REFLECTWORLD_LOCAL_FILE_PACING",
-      "REFLECTWORLD_PERCEPTION_RUNTIME_MODE",
-      "REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL",
+      "CORTEX_PERCEPTION_SOURCE_CONCURRENCY",
+      "CORTEX_PERCEPTION_MAX_QUEUED_PER_SOURCE",
+      "CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS",
+      "CORTEX_LOCAL_FILE_PACING",
+      "CORTEX_PERCEPTION_RUNTIME_MODE",
+      "CORTEX_PERCEPTION_REQUIRED_LEVEL",
       "WORKING_MEMORY_EVENT_TIMEOUT_SEC",
       "WORKING_MEMORY_MAX_EVENT_SEGMENTS",
       "STUBS_ONLY",
-      "REFLECTWORLD_MODELS_DIR",
+      "CORTEX_MODELS_DIR",
       "SCENE_DESCRIPTION",
       "EMBEDDER_MODEL",
       "EMBEDDER_API_KEY",
@@ -59,10 +59,10 @@ describe("bridgePluginConfigToEnv", () => {
       "ELEVENLABS_MODEL_ID",
       "ELEVENLABS_LANGUAGE_CODE",
       "COLLECTION_PREFIX",
-      "REFLECTWORLD_ENDPOINT",
+      "CORTEX_ENDPOINT",
       "FOCUS_TARGETS",
       "SECURITY_RULES",
-      "REFLECTWORLD_PROFILING_ENABLED",
+      "CORTEX_PROFILING_ENABLED",
     ]) {
       delete process.env[key];
     }
@@ -109,16 +109,16 @@ describe("bridgePluginConfigToEnv", () => {
     expect(process.env.VLM_MAX_RETRIES).toBe("4");
     expect(process.env.VLM_RETRY_BASE_DELAY_MS).toBe("700");
     expect(process.env.VLM_RETRY_MAX_DELAY_MS).toBe("5000");
-    expect(process.env.REFLECTWORLD_PERCEPTION_SOURCE_CONCURRENCY).toBe("2");
-    expect(process.env.REFLECTWORLD_PERCEPTION_MAX_QUEUED_PER_SOURCE).toBe("9");
-    expect(process.env.REFLECTWORLD_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS).toBe("180000");
-    expect(process.env.REFLECTWORLD_LOCAL_FILE_PACING).toBe("realtime");
-    expect(process.env.REFLECTWORLD_PERCEPTION_RUNTIME_MODE).toBe("live_latency");
+    expect(process.env.CORTEX_PERCEPTION_SOURCE_CONCURRENCY).toBe("2");
+    expect(process.env.CORTEX_PERCEPTION_MAX_QUEUED_PER_SOURCE).toBe("9");
+    expect(process.env.CORTEX_PERCEPTION_LIVE_BACKLOG_SKIP_AFTER_MS).toBe("180000");
+    expect(process.env.CORTEX_LOCAL_FILE_PACING).toBe("realtime");
+    expect(process.env.CORTEX_PERCEPTION_RUNTIME_MODE).toBe("live_latency");
     expect(process.env.WORKING_MEMORY_EVENT_TIMEOUT_SEC).toBe("30");
     expect(process.env.WORKING_MEMORY_MAX_EVENT_SEGMENTS).toBe("12");
     expect(process.env.STUBS_ONLY).toBe("false");
-    expect(process.env.REFLECTWORLD_PERCEPTION_REQUIRED_LEVEL).toBe("1");
-    expect(process.env.REFLECTWORLD_MODELS_DIR).toBe("/tmp/models");
+    expect(process.env.CORTEX_PERCEPTION_REQUIRED_LEVEL).toBe("1");
+    expect(process.env.CORTEX_MODELS_DIR).toBe("/tmp/models");
     expect(process.env.SCENE_DESCRIPTION).toBe("front lobby");
     expect(process.env.STT_PROVIDER).toBe("elevenlabs");
     expect(process.env.STT_MODEL_DIR).toBe("/tmp/stt");
@@ -134,14 +134,14 @@ describe("bridgePluginConfigToEnv", () => {
         focus_targets: "front desk",
         security_rules: "notify on tailgating",
         profiling_enabled: false,
-        reflectworld_endpoint: "http://localhost:9999",
+        cortex_endpoint: "http://localhost:9999",
       },
     });
 
     expect(process.env.FOCUS_TARGETS).toBeUndefined();
     expect(process.env.SECURITY_RULES).toBeUndefined();
-    expect(process.env.REFLECTWORLD_PROFILING_ENABLED).toBeUndefined();
-    expect(process.env.REFLECTWORLD_ENDPOINT).toBeUndefined();
+    expect(process.env.CORTEX_PROFILING_ENABLED).toBeUndefined();
+    expect(process.env.CORTEX_ENDPOINT).toBeUndefined();
   });
 
   it("bridges env-source SecretRef credentials to env", () => {

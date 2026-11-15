@@ -3,7 +3,7 @@ import type {
   ActiveSourceStatus,
   DashboardStateEnvelope,
   MonitorEvent,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 import {
   readCookie,
   sanitizeSessionToken,

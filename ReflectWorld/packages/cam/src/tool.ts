@@ -1,5 +1,5 @@
-import { monitorBus } from "@reflectworld/shared";
-import type { Segment, PerceptionResult, MotionHint } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { Segment, PerceptionResult, MotionHint } from "@cortex/shared";
 import type { CamAction, FrameResult } from "./types.js";
 import type { SourceManager } from "./source-manager.js";
 import type { CamConfig } from "./config.js";
@@ -9,7 +9,7 @@ import type { RecordManager, RecordingFile } from "./record-manager.js";
 import type { FrameExtractor } from "./frame-extractor.js";
 import { existsSync, mkdirSync, writeFileSync, readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { resolveReflectWorldStateDir, canonicalize } from "@reflectworld/shared";
+import { resolveCortexStateDir, canonicalize } from "@cortex/shared";
 import { MotionFilter } from "./motion-filter.js";
 import { AudioExtractor } from "./audio-extractor.js";
 import { LocalFileMediaSource, type AudioChunk, type VideoFrame } from "./local-file-media-source.js";
@@ -22,7 +22,7 @@ import { defaultSourceSecurityOptions, shouldUseStrictSourceValidation, sourceSe
 import { CamPipeline } from "./pipeline.js";
 import { buildSegment } from "./segment-builder.js";
 import { createSegmenterChain } from "./segmenter/index.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 import { networkInterfaces } from "node:os";
 import QRCode from "qrcode";
 
@@ -52,11 +52,11 @@ export interface CamToolDeps {
   sileroVad?: SileroVad;
   config?: CamConfig;
   logger?: CamLogger;
-  /** Injected by @reflectworld/reflectworld to wire Cam → Perception → Memory → Act. */
+  /** Injected by @cortex/cortex to wire Cam → Perception → Memory → Act. */
   onSegment?: (segment: Segment) => Promise<PerceptionResult | null> | void;
   /** Optional runtime drain hook used by local-file EOF and mode switches. */
   waitForCameraIdle?: (cameraId: string) => Promise<void>;
-  /** Injected by @reflectworld/reflectworld for per-frame detection + VisionController frame policy. */
+  /** Injected by @cortex/cortex for per-frame detection + VisionController frame policy. */
   onFrameProcessed?: (
     frame: FrameResult,
     cameraId: string,
@@ -269,7 +269,7 @@ export async function executeCamAction(
   const resolvedCameraId = resolveCameraIdForToolEvent(action, params, deps, parsed);
   const success = !(parsed && typeof parsed === "object" && "error" in parsed);
   monitorBus.publish("system:tool_invoked", {
-    tool: "reflectworld_cam",
+    tool: "cortex_cam",
     action,
     success,
     camera_id: resolvedCameraId,
@@ -385,7 +385,7 @@ async function handleAddSource(params: Record<string, unknown>, deps: CamToolDep
       // Save QR code as PNG file so agent can attach it in chat
       let qrFilePath: string | undefined;
       try {
-        const qrDir = join(deps.config?.recordings_dir ?? resolveReflectWorldStateDir(), "qrcodes");
+        const qrDir = join(deps.config?.recordings_dir ?? resolveCortexStateDir(), "qrcodes");
         if (!existsSync(qrDir)) mkdirSync(qrDir, { recursive: true });
         qrFilePath = join(qrDir, `${config.id}_setup.png`);
         await QRCode.toFile(qrFilePath, deviceInfo.nodeUrl, { width: 256, margin: 2 });
@@ -465,7 +465,7 @@ async function handleRemoveSource(params: Record<string, unknown>, deps: CamTool
   }
   // Remove QR code image
   if (source?.protocol === "phone") {
-    const qrPath = join(deps.config?.recordings_dir ?? resolveReflectWorldStateDir(), "qrcodes", `${id}_setup.png`);
+    const qrPath = join(deps.config?.recordings_dir ?? resolveCortexStateDir(), "qrcodes", `${id}_setup.png`);
     try { if (existsSync(qrPath)) unlinkSync(qrPath); } catch { /* best-effort */ }
   }
   const localDev = activeLocalDevices.get(id);
@@ -1591,7 +1591,7 @@ async function handleSaveReference(params: Record<string, unknown>, deps: CamToo
     }
 
     // Save JPEG to reference path
-    const refDir = join(resolveReflectWorldStateDir(), "cameras");
+    const refDir = join(resolveCortexStateDir(), "cameras");
     if (!existsSync(refDir)) mkdirSync(refDir, { recursive: true });
     const refPath = join(refDir, `${id}_ref.jpg`);
     writeFileSync(refPath, Buffer.from(frame.data, "base64"));

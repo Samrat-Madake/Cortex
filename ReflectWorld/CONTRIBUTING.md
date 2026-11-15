@@ -1,8 +1,8 @@
 # Contributing Guide
 
-Thank you for your interest in ReflectWorld. This guide explains how to contribute changes, from fork to PR merge.
+Thank you for your interest in Cortex. This guide explains how to contribute changes, from fork to PR merge.
 
-ReflectWorld is a TypeScript monorepo using npm workspaces plus one Python child service under `services/mem`. Most commands below run from the repository root. Python-specific steps are called out explicitly.
+Cortex is a TypeScript monorepo using npm workspaces plus one Python child service under `services/mem`. Most commands below run from the repository root. Python-specific steps are called out explicitly.
 
 This page covers contribution workflow only. For environment setup and local development, read [docs/contributing/development.md](docs/contributing/development.md). For testing policy and commands, read [docs/contributing/testing.md](docs/contributing/testing.md).
 
@@ -21,9 +21,9 @@ By participating, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 ### 1. Fork And Clone
 
 ```bash
-git clone git@github.com:<your-username>/ReflectWorld.git
-cd ReflectWorld
-git remote add upstream git@github.com:addxai/ReflectWorld.git
+git clone git@github.com:<your-username>/Cortex.git
+cd Cortex
+git remote add upstream git@github.com:addxai/Cortex.git
 ```
 
 ### 2. Create A Branch
@@ -57,7 +57,7 @@ Prerequisites are Node `>=22`, Python `>=3.11`, and a recent `uv`. Full setup de
 
 ### 4. Write Code
 
-- Put shared contracts in `shared`, business logic in the owning package, and orchestration in `reflectworld`.
+- Put shared contracts in `shared`, business logic in the owning package, and orchestration in `cortex`.
 - `shared` must not depend on business packages. `cam` and `percept` should not directly import each other; they are wired by the orchestrator and share contracts through `shared`.
 - Code comments, docstrings, and public documentation should be English. If a
   maintainer keeps a non-English draft for review, it should stay in a private

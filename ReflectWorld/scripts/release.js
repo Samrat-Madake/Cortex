@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Build a single self-contained npm package for @reflectworld/reflectworld.
+ * Build a single self-contained npm package for @cortex/cortex.
  *
- * Inlines all @reflectworld/* workspace packages via esbuild so the published
+ * Inlines all @cortex/* workspace packages via esbuild so the published
  * package has no unresolvable workspace deps; keeps third-party deps external
  * (declared in the generated publish package.json). Produces a publish/ staging
  * dir + a .tgz via `npm pack`. Does NOT publish to the registry.
@@ -18,18 +18,18 @@ import * as esbuild from "esbuild";
 import { generateDtsBundle } from "dts-bundle-generator";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const VM_PKG = resolve(ROOT, "packages/reflectworld");
+const VM_PKG = resolve(ROOT, "packages/cortex");
 const PUBLISH = resolve(VM_PKG, "publish");
 const BUNDLE = resolve(PUBLISH, "bundle");
 
-const WORKSPACE_SCOPE = "@reflectworld/";
-const INLINED = ["@reflectworld/cam", "@reflectworld/mem", "@reflectworld/percept", "@reflectworld/shared"];
+const WORKSPACE_SCOPE = "@cortex/";
+const INLINED = ["@cortex/cam", "@cortex/mem", "@cortex/percept", "@cortex/shared"];
 
 const log = (m) => console.log(`[release] ${m}`);
 
 // ── 0. Pre-flight ──
 if (!existsSync(resolve(VM_PKG, "dist/index.js"))) {
-  console.error("[release] packages/reflectworld/dist not found. Run `npm run build` first.");
+  console.error("[release] packages/cortex/dist not found. Run `npm run build` first.");
   process.exit(1);
 }
 
@@ -37,7 +37,7 @@ if (!existsSync(resolve(VM_PKG, "dist/index.js"))) {
 rmSync(PUBLISH, { recursive: true, force: true });
 mkdirSync(BUNDLE, { recursive: true });
 
-// ── 2. esbuild bundle: inline @reflectworld/*, externalize third-party + node builtins ──
+// ── 2. esbuild bundle: inline @cortex/*, externalize third-party + node builtins ──
 const externalizeNonWorkspace = {
   name: "externalize-non-workspace",
   setup(build) {
@@ -50,7 +50,7 @@ const externalizeNonWorkspace = {
   },
 };
 
-log("esbuild bundling (inline @reflectworld/*, external third-party)...");
+log("esbuild bundling (inline @cortex/*, external third-party)...");
 await esbuild.build({
   entryPoints: [
     resolve(VM_PKG, "dist/index.js"),
@@ -75,7 +75,7 @@ if (existsSync(cliEntry)) {
   chmodSync(cliEntry, 0o755);
 }
 
-// ── 3. dts-bundle-generator: single .d.ts with @reflectworld/* types inlined ──
+// ── 3. dts-bundle-generator: single .d.ts with @cortex/* types inlined ──
 log("generating bundled .d.ts...");
 let dtsInlined = false;
 // dts-bundle-generator chokes on ambient global augmentations pulled in by
@@ -99,7 +99,7 @@ try {
   dtsInlined = true;
 } catch (e) {
   // Fall back to the tsc-emitted declarations so the package still ships types.
-  // Runtime is unaffected; consumer-side @reflectworld/* type resolution may degrade.
+  // Runtime is unaffected; consumer-side @cortex/* type resolution may degrade.
   console.warn(`[release] dts bundling failed (${String(e.message).split("\n")[0]}); using raw dist/index.d.ts`);
   cpSync(resolve(VM_PKG, "dist/index.d.ts"), resolve(BUNDLE, "index.d.ts"));
 } finally {
@@ -120,7 +120,7 @@ copyAsset("bundled-dashboard");
 copyAsset("openclaw.plugin.json");
 // Aggregate skills from ALL workspace packages (cam/percept/mem each ship their
 // own SKILL.md) into a single publish/skills/ so the manifest's "./skills" picks
-// up the full set, not just reflectworld's own two.
+// up the full set, not just cortex's own two.
 const skillsDest = resolve(PUBLISH, "skills");
 mkdirSync(skillsDest, { recursive: true });
 let skillCount = 0;
@@ -144,10 +144,10 @@ const readme = existsSync(resolve(VM_PKG, "README.md")) ? resolve(VM_PKG, "READM
 if (existsSync(readme)) cpSync(readme, resolve(PUBLISH, "README.md"));
 if (existsSync(resolve(ROOT, ".env.example"))) cpSync(resolve(ROOT, ".env.example"), resolve(PUBLISH, ".env.example"));
 
-// ── 5. Generate publish package.json (drop @reflectworld/* deps, merge third-party) ──
+// ── 5. Generate publish package.json (drop @cortex/* deps, merge third-party) ──
 log("generating publish package.json...");
 const deps = {}, optDeps = {}, peerDeps = {}, peerDepsMeta = {};
-for (const p of ["shared", "mem", "cam", "percept", "reflectworld"]) {
+for (const p of ["shared", "mem", "cam", "percept", "cortex"]) {
   const pkg = JSON.parse(readFileSync(resolve(ROOT, "packages", p, "package.json"), "utf8"));
   for (const [k, v] of Object.entries(pkg.dependencies || {})) if (!k.startsWith(WORKSPACE_SCOPE)) deps[k] = v;
   for (const [k, v] of Object.entries(pkg.optionalDependencies || {})) optDeps[k] = v;
@@ -173,7 +173,7 @@ const publishPkg = {
   main: "./bundle/index.js",
   types: "./bundle/index.d.ts",
   exports: { ".": { types: "./bundle/index.d.ts", import: "./bundle/index.js", default: "./bundle/index.js" } },
-  bin: { reflectworld: "bundle/src/cli/index.js" },
+  bin: { cortex: "bundle/src/cli/index.js" },
   files: ["bundle", "bundled-services", "bundled-dashboard", "skills", "openclaw.plugin.json", "scripts/post-install.cjs", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", ".env.example"],
   scripts: { postinstall: "node scripts/post-install.cjs" },
   dependencies: deps,
@@ -186,15 +186,15 @@ const publishPkg = {
 };
 writeFileSync(resolve(PUBLISH, "package.json"), JSON.stringify(publishPkg, null, 2) + "\n");
 
-// ── 6. Verify no @reflectworld/* leaked into the bundle .d.ts ──
-if (/@reflectworld\//.test(readFileSync(resolve(BUNDLE, "index.d.ts"), "utf8"))) {
+// ── 6. Verify no @cortex/* leaked into the bundle .d.ts ──
+if (/@cortex\//.test(readFileSync(resolve(BUNDLE, "index.d.ts"), "utf8"))) {
   if (dtsInlined) {
-    console.error("[release] FAIL: @reflectworld/* remains in inlined bundle/index.d.ts.");
+    console.error("[release] FAIL: @cortex/* remains in inlined bundle/index.d.ts.");
     process.exit(1);
   }
-  console.warn("[release] WARN: fallback .d.ts still references @reflectworld/* types — runtime unaffected; fix dts bundling later.");
+  console.warn("[release] WARN: fallback .d.ts still references @cortex/* types — runtime unaffected; fix dts bundling later.");
 } else {
-  log("verified: no @reflectworld/* in bundled .d.ts");
+  log("verified: no @cortex/* in bundled .d.ts");
 }
 
 // ── 7. npm pack from publish/ ──

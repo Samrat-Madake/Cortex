@@ -1,17 +1,17 @@
 import { join } from "node:path";
 import { z } from "zod";
-import { resolveReflectWorldHome, resolveReflectWorldStateDir } from "@reflectworld/shared";
+import { resolveCortexHome, resolveCortexStateDir } from "@cortex/shared";
 
-function stableReflectWorldBin(name: string): string {
-  return join(resolveReflectWorldHome(), "bin", name);
+function stableCortexBin(name: string): string {
+  return join(resolveCortexHome(), "bin", name);
 }
 
 export const CamConfigSchema = z.object({
   // -- source management --
-  sources_dir: z.string().default(join(resolveReflectWorldStateDir(), "sources")),
+  sources_dir: z.string().default(join(resolveCortexStateDir(), "sources")),
 
   // -- go2rtc --
-  go2rtc_bin: z.string().default(stableReflectWorldBin("go2rtc")),
+  go2rtc_bin: z.string().default(stableCortexBin("go2rtc")),
   go2rtc_api_port: z.number().default(1984),
   go2rtc_rtsp_port: z.number().default(8554),
   go2rtc_webrtc_port: z.number().default(8555),
@@ -25,11 +25,11 @@ export const CamConfigSchema = z.object({
   go2rtc_reuse_external: z.boolean().default(true),
 
   // -- ffmpeg --
-  ffmpeg_bin: z.string().default(stableReflectWorldBin("ffmpeg")),
-  ffprobe_bin: z.string().default(stableReflectWorldBin("ffprobe")),
+  ffmpeg_bin: z.string().default(stableCortexBin("ffmpeg")),
+  ffprobe_bin: z.string().default(stableCortexBin("ffprobe")),
 
   // -- recording --
-  recordings_dir: z.string().default(join(resolveReflectWorldStateDir(), "recordings")),
+  recordings_dir: z.string().default(join(resolveCortexStateDir(), "recordings")),
   default_segment_sec: z.number().min(5).default(30),
   /** Per-camera recording quota in MB. Default 2048 (2GB). Set 0 to disable FIFO. */
   recording_quota_mb: z.number().min(0).default(2048),
@@ -47,13 +47,13 @@ export const CamConfigSchema = z.object({
   default_snapshot_quality: z.number().min(1).max(100).default(85),
 
   // -- downstream services --
-  reflectworld_endpoint: z.string().default("http://localhost:8219"),
+  cortex_endpoint: z.string().default("http://localhost:8219"),
   auto_analyze: z.boolean().default(true),
   /** Restore persisted watch sessions when the cam service starts. */
   restore_watches: z.boolean().default(true),
 
   // -- VAD --
-  silero_vad_model: z.string().default(join(resolveReflectWorldHome(), "models", "silero_vad.onnx")),
+  silero_vad_model: z.string().default(join(resolveCortexHome(), "models", "silero_vad.onnx")),
   vad_enabled: z.boolean().default(true),
   vad_threshold: z.number().min(0).max(1).default(0.5),
   vad_min_silence_duration: z.number().min(0).default(0.05),

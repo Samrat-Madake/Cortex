@@ -1,13 +1,13 @@
-import type { AddMemoryRequest, AddMemoryResponse, ReflectWorldClient } from "@reflectworld/mem";
-import type { PerceptionResult, Segment } from "@reflectworld/shared";
-import type { PipelineMemory } from "@reflectworld/percept";
+import type { AddMemoryRequest, AddMemoryResponse, CortexClient } from "@cortex/mem";
+import type { PerceptionResult, Segment } from "@cortex/shared";
+import type { PipelineMemory } from "@cortex/percept";
 import { randomUUID } from "node:crypto";
 import { projectDialogueEvents } from "./dialogue-events.js";
 
 export const REID_MATCH_THRESHOLD = 0.5;
 
-export type ReflectWorldoryClientPort = Pick<
-  ReflectWorldClient,
+export type CortexoryClientPort = Pick<
+  CortexClient,
   "add" | "reidSearch" | "reidUpsert" | "reidGalleryUpdate" | "reidBatchInit" | "reidUpdateIdentity" | "reidDelete"
 >;
 
@@ -54,13 +54,13 @@ export interface BuildPerceptionAddRequestOptions {
 }
 
 export interface CreateMemoryReidAdapterOptions {
-  memClient: Pick<ReflectWorldClient, "reidSearch" | "reidUpsert" | "reidGalleryUpdate"> & Partial<Pick<ReflectWorldClient, "reidBatchInit" | "reidUpdateIdentity">>;
+  memClient: Pick<CortexClient, "reidSearch" | "reidUpsert" | "reidGalleryUpdate"> & Partial<Pick<CortexClient, "reidBatchInit" | "reidUpdateIdentity">>;
   userId: string;
   cameraId?: () => string | undefined;
 }
 
 export interface CreateMemoryStorePerceptionOptions {
-  memClient: Pick<ReflectWorldClient, "add">;
+  memClient: Pick<CortexClient, "add">;
   userId: string;
   semanticMode?: AddMemoryRequest["semantic_mode"];
   sourceTimeMetadataForSegment?: SourceTimeMetadataFactory;

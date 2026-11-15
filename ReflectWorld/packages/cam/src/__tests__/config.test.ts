@@ -1,12 +1,12 @@
 import { join } from "node:path";
 import { describe, it, expect } from "vitest";
-import { resolveReflectWorldHome, resolveReflectWorldStateDir } from "@reflectworld/shared";
+import { resolveCortexHome, resolveCortexStateDir } from "@cortex/shared";
 import { resolveCamConfig } from "../config.js";
 
 describe("resolveCamConfig", () => {
   it("returns defaults for empty input", () => {
     const cfg = resolveCamConfig();
-    expect(cfg.sources_dir).toBe(join(resolveReflectWorldStateDir(), "sources"));
+    expect(cfg.sources_dir).toBe(join(resolveCortexStateDir(), "sources"));
     expect(cfg.default_snapshot_quality).toBe(85);
   });
 
@@ -21,7 +21,7 @@ describe("resolveCamConfig", () => {
 
   it("applies v3 go2rtc defaults", () => {
     const config = resolveCamConfig({});
-    expect(config.go2rtc_bin).toBe(join(resolveReflectWorldHome(), "bin", "go2rtc"));
+    expect(config.go2rtc_bin).toBe(join(resolveCortexHome(), "bin", "go2rtc"));
     expect(config.go2rtc_api_port).toBe(1984);
     expect(config.go2rtc_rtsp_port).toBe(8554);
     expect(config.go2rtc_webrtc_port).toBe(8555);
@@ -31,14 +31,14 @@ describe("resolveCamConfig", () => {
 
   it("uses prepared local binary defaults", () => {
     const config = resolveCamConfig({});
-    expect(config.ffmpeg_bin).toBe(join(resolveReflectWorldHome(), "bin", "ffmpeg"));
-    expect(config.ffprobe_bin).toBe(join(resolveReflectWorldHome(), "bin", "ffprobe"));
-    expect(config.silero_vad_model).toBe(join(resolveReflectWorldHome(), "models", "silero_vad.onnx"));
+    expect(config.ffmpeg_bin).toBe(join(resolveCortexHome(), "bin", "ffmpeg"));
+    expect(config.ffprobe_bin).toBe(join(resolveCortexHome(), "bin", "ffprobe"));
+    expect(config.silero_vad_model).toBe(join(resolveCortexHome(), "models", "silero_vad.onnx"));
   });
 
   it("applies v3 recording defaults", () => {
     const config = resolveCamConfig({});
-    expect(config.recordings_dir).toBe(join(resolveReflectWorldStateDir(), "recordings"));
+    expect(config.recordings_dir).toBe(join(resolveCortexStateDir(), "recordings"));
     expect(config.default_segment_sec).toBe(30);
   });
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { ActiveSourceStatus, DashboardStateEnvelope } from "@reflectworld/shared";
+import type { ActiveSourceStatus, DashboardStateEnvelope } from "@cortex/shared";
 import type { MonitorEvent } from "../types";
 import type { DashboardSession } from "../session";
 import { dashboardAuthHeaders, withDashboardQuery } from "../session";
@@ -141,19 +141,19 @@ export function upsertMonitorEvents(
   return monitorEventsForRender(eventMap);
 }
 
-/** Load existing procedural memories from ReflectWorld via Monitor /api proxy. */
+/** Load existing procedural memories from Cortex via Monitor /api proxy. */
 async function loadProceduralMemories(session: DashboardSession): Promise<MonitorEvent[]> {
   try {
-    // Query with camera_id=global to satisfy ReflectWorld's identifier requirement.
+    // Query with camera_id=global to satisfy Cortex's identifier requirement.
     // Global rules cover all cameras; camera-specific rules will also be returned
     // via real-time WebSocket events when they're created.
     const resp = await fetch(
-      withDashboardQuery(`/api/reflectworld/memories?memory_type=procedural&camera_id=global&user_id=${encodeURIComponent(session.userId)}&limit=50`, session),
+      withDashboardQuery(`/api/cortex/memories?memory_type=procedural&camera_id=global&user_id=${encodeURIComponent(session.userId)}&limit=50`, session),
       { headers: dashboardAuthHeaders(session) },
     );
     if (!resp.ok) return [];
     const data = await resp.json();
-    // ReflectWorld returns { collection_name: [...items] }
+    // Cortex returns { collection_name: [...items] }
     const items: Array<{ id: string; memory: string; camera_id?: string; created_at?: string }> = [];
     for (const [, v] of Object.entries(data)) {
       if (Array.isArray(v)) items.push(...v);
@@ -400,7 +400,7 @@ async function loadRecentSegments(cameraIds: string[], session: DashboardSession
   }
 }
 
-export interface ReflectWorldMemoryItem {
+export interface CortexMemoryItem {
   id?: string;
   memory?: string;
   created_at?: string;
@@ -415,7 +415,7 @@ export interface ReflectWorldMemoryItem {
 }
 
 export function semanticMemoryItemToMonitorEvent(
-  item: ReflectWorldMemoryItem,
+  item: CortexMemoryItem,
   fallbackCameraId: string,
   fallbackTimestamp = Date.now(),
 ): MonitorEvent | null {
@@ -447,7 +447,7 @@ export function semanticMemoryItemToMonitorEvent(
 
 type DashboardHydratedMemoryType = "semantic_context" | "episodic_schema" | "episodic_trace";
 
-function memoryItemTimestamp(item: ReflectWorldMemoryItem, fallbackTimestamp = Date.now()): number {
+function memoryItemTimestamp(item: CortexMemoryItem, fallbackTimestamp = Date.now()): number {
   const timestamp = item.updated_at
     ? new Date(item.updated_at).getTime()
     : item.created_at
@@ -457,7 +457,7 @@ function memoryItemTimestamp(item: ReflectWorldMemoryItem, fallbackTimestamp = D
 }
 
 export function dashboardMemoryItemToMonitorEvent(
-  item: ReflectWorldMemoryItem,
+  item: CortexMemoryItem,
   memoryType: DashboardHydratedMemoryType,
   fallbackCameraId: string,
   fallbackTimestamp = Date.now(),
@@ -510,27 +510,27 @@ function collectStableEntityIds(events: MonitorEvent[]): string[] {
 
 async function loadSemanticMemories(entityIds: string[], session: DashboardSession): Promise<MonitorEvent[]> {
   if (entityIds.length === 0) return [];
-  const parseItems = (data: Record<string, unknown>): ReflectWorldMemoryItem[] => {
+  const parseItems = (data: Record<string, unknown>): CortexMemoryItem[] => {
     if (Array.isArray(data)) {
-      return data.filter((item): item is ReflectWorldMemoryItem => Boolean(item) && typeof item === "object");
+      return data.filter((item): item is CortexMemoryItem => Boolean(item) && typeof item === "object");
     }
-    const items: ReflectWorldMemoryItem[] = [];
+    const items: CortexMemoryItem[] = [];
     for (const [, value] of Object.entries(data)) {
       if (!Array.isArray(value)) continue;
       for (const item of value) {
-        if (item && typeof item === "object") items.push(item as ReflectWorldMemoryItem);
+        if (item && typeof item === "object") items.push(item as CortexMemoryItem);
       }
     }
     return items;
   };
-  const fetchMemories = async (path: string): Promise<ReflectWorldMemoryItem[]> => {
+  const fetchMemories = async (path: string): Promise<CortexMemoryItem[]> => {
     const resp = await fetch(path, { headers: dashboardAuthHeaders(session) });
     if (!resp.ok) return [];
     return parseItems(await resp.json() as Record<string, unknown>);
   };
   try {
     const batches = await Promise.all(entityIds.map(async (entityId) => {
-      const scopedPath = withDashboardQuery(`/api/reflectworld/memories?memory_type=semantic&entity_id=${encodeURIComponent(entityId)}&limit=100`, session);
+      const scopedPath = withDashboardQuery(`/api/cortex/memories?memory_type=semantic&entity_id=${encodeURIComponent(entityId)}&limit=100`, session);
       const items = await fetchMemories(scopedPath);
       return items
         .map((item) => semanticMemoryItemToMonitorEvent(item, ""))
@@ -544,15 +544,15 @@ async function loadSemanticMemories(entityIds: string[], session: DashboardSessi
 
 async function loadDashboardMemories(cameraIds: string[], session: DashboardSession): Promise<MonitorEvent[]> {
   if (cameraIds.length === 0) return [];
-  const parseItems = (data: Record<string, unknown> | ReflectWorldMemoryItem[]): ReflectWorldMemoryItem[] => {
+  const parseItems = (data: Record<string, unknown> | CortexMemoryItem[]): CortexMemoryItem[] => {
     if (Array.isArray(data)) {
-      return data.filter((item): item is ReflectWorldMemoryItem => Boolean(item) && typeof item === "object");
+      return data.filter((item): item is CortexMemoryItem => Boolean(item) && typeof item === "object");
     }
-    const items: ReflectWorldMemoryItem[] = [];
+    const items: CortexMemoryItem[] = [];
     for (const [, value] of Object.entries(data)) {
       if (!Array.isArray(value)) continue;
       for (const item of value) {
-        if (item && typeof item === "object") items.push(item as ReflectWorldMemoryItem);
+        if (item && typeof item === "object") items.push(item as CortexMemoryItem);
       }
     }
     return items;
@@ -561,7 +561,7 @@ async function loadDashboardMemories(cameraIds: string[], session: DashboardSess
     const sortOrder = memoryType === "episodic_schema" ? "asc" : "desc";
     const resp = await fetch(
       withDashboardQuery(
-        `/api/reflectworld/memories?memory_type=${encodeURIComponent(memoryType)}&camera_id=${encodeURIComponent(cameraId)}&limit=${limit}&sort_order=${sortOrder}`,
+        `/api/cortex/memories?memory_type=${encodeURIComponent(memoryType)}&camera_id=${encodeURIComponent(cameraId)}&limit=${limit}&sort_order=${sortOrder}`,
         session,
       ),
       { headers: dashboardAuthHeaders(session) },

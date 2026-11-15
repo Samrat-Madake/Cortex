@@ -1,10 +1,10 @@
-# reflectworld_memory
+# cortex_memory
 
-Search and manage ReflectWorld video memories from ReflectWorld cameras.
+Search and manage Cortex video memories from Cortex cameras.
 
 ## When to use
 
-Use `reflectworld_memory` when the user asks about:
+Use `cortex_memory` when the user asks about:
 - What happened in front of a camera ("who came to the door today?")
 - Identifying recurring patterns ("does this person visit often?")
 - Retrieving event history for a camera or entity
@@ -84,7 +84,7 @@ Retrieve episodic memory timeline for a camera, optionally filtered by entity.
 
 ## Procedural Rules Examples
 
-Procedural rules are the key mechanism for persistent agent behavior. They are stored in ReflectWorld and automatically injected into the VLM prompt during every perception cycle.
+Procedural rules are the key mechanism for persistent agent behavior. They are stored in Cortex and automatically injected into the VLM prompt during every perception cycle.
 
 | User request | add_note call |
 |-------------|---------------|
@@ -121,7 +121,7 @@ Configure via plugin options at registration time:
 
 ```typescript
 openclaw.register(memoryPlugin, {
-  baseUrl: "http://reflectworld:8219",   // ReflectWorld service URL
+  baseUrl: "http://cortex:8219",   // Cortex service URL
   timeoutMs: 10000,                   // Request timeout (ms)
   defaultCameraId: "cam-front-door",  // Applied when camera_id not specified
   defaultSearchMemoryType: "all",     // Default collection to search
@@ -131,12 +131,12 @@ openclaw.register(memoryPlugin, {
 
 ## Error handling
 
-The tool throws `ReflectWorldClientError` with `.statusCode` on HTTP failures. The agent should handle:
+The tool throws `CortexClientError` with `.statusCode` on HTTP failures. The agent should handle:
 - `404`: Memory or entity not found
 - `400`: Invalid parameters (check camera_id, collection names)
-- `500`: ReflectWorld service error -- check service health with `GET /health`
+- `500`: Cortex service error -- check service health with `GET /health`
 
 ## Related tools
 
-- `reflectworld_cam` -- capture video from cameras
-- `reflectworld_perception` -- analyze video to generate memories
+- `cortex_cam` -- capture video from cameras
+- `cortex_perception` -- analyze video to generate memories

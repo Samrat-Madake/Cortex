@@ -1,4 +1,4 @@
-import type { Frame, LlmCallContext, LlmCallRecord } from "@reflectworld/shared";
+import type { Frame, LlmCallContext, LlmCallRecord } from "@cortex/shared";
 import type { VlmEventContextUpdate, VlmOutput, VlmTargetIdentity } from "../../types.js";
 
 export interface RawVlmResponse {
@@ -329,7 +329,7 @@ export interface PromptContext {
   focusTargets?: string;
   /** Custom security criteria, e.g. "No one should be on the property after 10pm". */
   securityRules?: string;
-  /** User-defined rules from ReflectWorld procedural collection, merged into analysis context. */
+  /** User-defined rules from Cortex procedural collection, merged into analysis context. */
   userRules?: string;
 }
 

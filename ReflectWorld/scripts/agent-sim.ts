@@ -1,15 +1,15 @@
 /**
  * OpenClaw Agent Simulator
  *
- * Simulates how the OpenClaw Agent would use ReflectWorld tools
+ * Simulates how the OpenClaw Agent would use Cortex tools
  * based on the global SKILL.md orchestration guide.
  *
- * Runs against real services (ReflectWorld + Qdrant).
+ * Runs against real services (Cortex + Qdrant).
  */
-import { ReflectWorldClient } from "../packages/mem/src/client.ts";
+import { CortexClient } from "../packages/mem/src/client.ts";
 import { flattenSearchResults } from "../packages/mem/src/types.ts";
 
-const mem = new ReflectWorldClient({ baseUrl: "http://localhost:8219", timeoutMs: 30_000 });
+const mem = new CortexClient({ baseUrl: "http://localhost:8219", timeoutMs: 30_000 });
 
 // ── Simulated tool registry (what OpenClaw would have) ─────────────────
 
@@ -26,7 +26,7 @@ interface ToolResult {
 
 async function executeToolCall(call: ToolCall): Promise<ToolResult> {
   switch (call.tool) {
-    case "reflectworld_memory": {
+    case "cortex_memory": {
       switch (call.action) {
         case "search": {
           const resp = await mem.search({
@@ -62,7 +62,7 @@ async function executeToolCall(call: ToolCall): Promise<ToolResult> {
       }
     }
 
-    case "reflectworld_cam": {
+    case "cortex_cam": {
       // Simulate cam tool (no real camera connected in this test)
       switch (call.action) {
         case "list_sources":
@@ -89,7 +89,7 @@ async function executeToolCall(call: ToolCall): Promise<ToolResult> {
             name: call.params.name,
             mode: call.params.mode,
             status: "watching",
-            message: "Pipeline started: Cam -> Perception -> ReflectWorld + Act",
+            message: "Pipeline started: Cam -> Perception -> Cortex + Act",
           }};
         case "stop_watch":
           return { success: true, data: { name: call.params.name, status: "stopped" }};
@@ -98,7 +98,7 @@ async function executeToolCall(call: ToolCall): Promise<ToolResult> {
       }
     }
 
-    case "reflectworld_perception": {
+    case "cortex_perception": {
       switch (call.action) {
         case "analyze":
           return { success: true, data: {
@@ -122,7 +122,7 @@ async function executeToolCall(call: ToolCall): Promise<ToolResult> {
       }
     }
 
-    case "reflectworld_act": {
+    case "cortex_act": {
       switch (call.action) {
         case "add_rule":
           return { success: true, data: {
@@ -163,14 +163,14 @@ async function agentProcess(userMessage: string): Promise<AgentResponse> {
   if (matchesIntent(msg, ["yesterday", "last", "previous", "someone", "who came", "what happened",
       "happened", "visitors", "records", "history", "recently", "today",
       "did anyone", "when", "how many times", "suspicious"])) {
-    const call: ToolCall = { tool: "reflectworld_memory", action: "search", params: { query: userMessage, limit: 5 } };
+    const call: ToolCall = { tool: "cortex_memory", action: "search", params: { query: userMessage, limit: 5 } };
     const result = await executeToolCall(call);
     const results = result.data as Array<{ memory: string; score: number }>;
     const reply = results.length > 0
       ? formatMemoryResults(results)
       : "I don't recall seeing anything matching that. Is the camera monitoring active?";
     return {
-      thinking: `User is asking about past events → SKILL.md Pattern 1 (Query) → reflectworld_memory.search`,
+      thinking: `User is asking about past events → SKILL.md Pattern 1 (Query) → cortex_memory.search`,
       toolCalls: [call],
       reply,
     };
@@ -179,11 +179,11 @@ async function agentProcess(userMessage: string): Promise<AgentResponse> {
   // Pattern 2: Asking about current state → cam snapshot
   if (matchesIntent(msg, ["what's happening", "look", "show me", "take a photo",
       "snapshot", "current", "outside", "now"])) {
-    const call: ToolCall = { tool: "reflectworld_cam", action: "snapshot", params: { name: "front_door" } };
+    const call: ToolCall = { tool: "cortex_cam", action: "snapshot", params: { name: "front_door" } };
     const result = await executeToolCall(call);
     const data = result.data as { description: string };
     return {
-      thinking: `User wants to see current state → SKILL.md Pattern 2 (Live view) → reflectworld_cam.snapshot`,
+      thinking: `User wants to see current state → SKILL.md Pattern 2 (Live view) → cortex_cam.snapshot`,
       toolCalls: [call],
       reply: data.description.replace("[simulated] ", "I can see: "),
     };
@@ -195,14 +195,14 @@ async function agentProcess(userMessage: string): Promise<AgentResponse> {
     const isPhone = matchesIntent(msg, ["phone"]);
     const source = isPhone ? "phone" : "webcam";
     const name = isPhone ? "my_phone" : "my_webcam";
-    const call: ToolCall = { tool: "reflectworld_cam", action: "add_source", params: { source, name } };
+    const call: ToolCall = { tool: "cortex_cam", action: "add_source", params: { source, name } };
     const result = await executeToolCall(call);
     const data = result.data as { name: string; nodeUrl?: string };
     const reply = isPhone
       ? `Phone camera "${data.name}" is set up. Please open this URL to connect: ${data.nodeUrl}`
       : `Webcam "${data.name}" is connected and ready. Want me to take a test snapshot?`;
     return {
-      thinking: `User wants to add a camera → SKILL.md Pattern 5 (Device onboarding) → reflectworld_cam.add_source`,
+      thinking: `User wants to add a camera → SKILL.md Pattern 5 (Device onboarding) → cortex_cam.add_source`,
       toolCalls: [call],
       reply,
     };
@@ -214,13 +214,13 @@ async function agentProcess(userMessage: string): Promise<AgentResponse> {
     const mode = matchesIntent(msg, ["every", "periodic", "minute"]) ? "periodic"
       : matchesIntent(msg, ["motion", "event"]) ? "event" : "stream";
     const call: ToolCall = {
-      tool: "reflectworld_cam", action: "start_watch",
+      tool: "cortex_cam", action: "start_watch",
       params: { name: "front_door", mode, ...(mode === "periodic" ? { interval: 60 } : {}) },
     };
     const result = await executeToolCall(call);
     const data = result.data as { mode: string };
     return {
-      thinking: `User wants monitoring → SKILL.md Pattern 3 (Monitor setup) → reflectworld_cam.start_watch(mode=${data.mode})`,
+      thinking: `User wants monitoring → SKILL.md Pattern 3 (Monitor setup) → cortex_cam.start_watch(mode=${data.mode})`,
       toolCalls: [call],
       reply: `Monitoring started in ${data.mode} mode. I'll watch the front door and notify you if anything happens. The pipeline runs automatically: capture → analyze → store → notify.`,
     };
@@ -236,10 +236,10 @@ async function agentProcess(userMessage: string): Promise<AgentResponse> {
     const actions = isSecurityRule
       ? { notify: { type: "alert" }, identify: true }
       : { notify: { type: "summary", template: userMessage } };
-    const call: ToolCall = { tool: "reflectworld_act", action: "add_rule", params: { trigger, actions } };
+    const call: ToolCall = { tool: "cortex_act", action: "add_rule", params: { trigger, actions } };
     await executeToolCall(call);
     return {
-      thinking: `User wants automation → SKILL.md Pattern 4 (Rule setup) → reflectworld_act.add_rule`,
+      thinking: `User wants automation → SKILL.md Pattern 4 (Rule setup) → cortex_act.add_rule`,
       toolCalls: [call],
       reply: isSecurityRule
         ? "Rule created. I'll send an alert and request identification when an unfamiliar person appears."
@@ -297,8 +297,8 @@ const scenarios = [
 
 async function main() {
   console.log("╔══════════════════════════════════════════════════════════════╗");
-  console.log("║           OpenClaw Agent Simulator (ReflectWorld)                ║");
-  console.log("║     Following skills/reflectworld/SKILL.md orchestration        ║");
+  console.log("║           OpenClaw Agent Simulator (Cortex)                ║");
+  console.log("║     Following skills/cortex/SKILL.md orchestration        ║");
   console.log("╚══════════════════════════════════════════════════════════════╝\n");
 
   for (const query of scenarios) {

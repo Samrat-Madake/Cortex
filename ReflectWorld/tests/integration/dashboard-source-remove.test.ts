@@ -4,9 +4,9 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { WebSocket } from "ws";
-import { DashboardServer, type SourcePurgeRequest, type SourceRemoveRequest } from "../../packages/reflectworld/src/services/dashboard-server.js";
-import { PipelineStore } from "../../packages/reflectworld/src/store.js";
-import { monitorBus } from "@reflectworld/shared";
+import { DashboardServer, type SourcePurgeRequest, type SourceRemoveRequest } from "../../packages/cortex/src/services/dashboard-server.js";
+import { PipelineStore } from "../../packages/cortex/src/store.js";
+import { monitorBus } from "@cortex/shared";
 
 function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -62,7 +62,7 @@ describe("DashboardServer source remove lifecycle", () => {
 
   beforeEach(async () => {
     port = await getFreePort();
-    tmpRoot = mkdtempSync(join(tmpdir(), "reflectworld-dashboard-remove-"));
+    tmpRoot = mkdtempSync(join(tmpdir(), "cortex-dashboard-remove-"));
     uploadsDir = join(tmpRoot, "uploads");
     mkdirSync(uploadsDir, { recursive: true });
   });
@@ -1096,7 +1096,7 @@ describe("DashboardServer source remove lifecycle", () => {
     expect(hidden.body.events).toEqual([]);
   });
 
-  it("does not forward dashboard session query params to ReflectWorld in single-user mode", async () => {
+  it("does not forward dashboard session query params to Cortex in single-user mode", async () => {
     const upstreamPort = await getFreePort();
     let upstreamUrl = "";
     upstream = createServer((req, res) => {
@@ -1112,11 +1112,11 @@ describe("DashboardServer source remove lifecycle", () => {
       distDir: "/nonexistent",
       port,
       uploadsDir,
-      reflectworldEndpoint: `http://127.0.0.1:${upstreamPort}`,
+      cortexEndpoint: `http://127.0.0.1:${upstreamPort}`,
     });
     await dashboard.start();
 
-    const res = await getJson(port, "/api/reflectworld/memories?memory_type=semantic&camera_id=cam-a&session_id=session-a&user_id=random-user");
+    const res = await getJson(port, "/api/cortex/memories?memory_type=semantic&camera_id=cam-a&session_id=session-a&user_id=random-user");
 
     expect(res.status).toBe(200);
     expect(upstreamUrl).toContain("/memories?");
@@ -1126,7 +1126,7 @@ describe("DashboardServer source remove lifecycle", () => {
     expect(upstreamUrl).not.toContain("user_id=");
   });
 
-  it("requires a dashboard session before proxying ReflectWorld in multi-user mode", async () => {
+  it("requires a dashboard session before proxying Cortex in multi-user mode", async () => {
     const upstreamPort = await getFreePort();
     let upstreamHits = 0;
     upstream = createServer((_req, res) => {
@@ -1143,17 +1143,17 @@ describe("DashboardServer source remove lifecycle", () => {
       port,
       uploadsDir,
       dashboardSessions: { enabled: true },
-      reflectworldEndpoint: `http://127.0.0.1:${upstreamPort}`,
+      cortexEndpoint: `http://127.0.0.1:${upstreamPort}`,
     });
     await dashboard.start();
 
-    const res = await getJson(port, "/api/reflectworld/memories?memory_type=semantic&user_id=victim-user");
+    const res = await getJson(port, "/api/cortex/memories?memory_type=semantic&user_id=victim-user");
 
     expect(res.status).toBe(401);
     expect(upstreamHits).toBe(0);
   });
 
-  it("derives proxied ReflectWorld user_id from the dashboard session", async () => {
+  it("derives proxied Cortex user_id from the dashboard session", async () => {
     const upstreamPort = await getFreePort();
     let upstreamUrl = "";
     let upstreamBody: any = null;
@@ -1177,12 +1177,12 @@ describe("DashboardServer source remove lifecycle", () => {
       port,
       uploadsDir,
       dashboardSessions: { enabled: true },
-      reflectworldEndpoint: `http://127.0.0.1:${upstreamPort}`,
+      cortexEndpoint: `http://127.0.0.1:${upstreamPort}`,
     });
     await dashboard.start();
     await postJson(port, "/api/dashboard/session/start", { session_id: "session-a", user_id: "user-a" });
 
-    const res = await fetch(`http://127.0.0.1:${port}/api/reflectworld/memories?memory_type=semantic&user_id=victim-user`, {
+    const res = await fetch(`http://127.0.0.1:${port}/api/cortex/memories?memory_type=semantic&user_id=victim-user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1201,7 +1201,7 @@ describe("DashboardServer source remove lifecycle", () => {
     expect(upstreamBody).not.toHaveProperty("session_id");
   });
 
-  it("blocks destructive ReflectWorld proxy requests for non-admin sessions", async () => {
+  it("blocks destructive Cortex proxy requests for non-admin sessions", async () => {
     const upstreamPort = await getFreePort();
     let upstreamHits = 0;
     upstream = createServer((_req, res) => {
@@ -1218,12 +1218,12 @@ describe("DashboardServer source remove lifecycle", () => {
       port,
       uploadsDir,
       dashboardSessions: { enabled: true },
-      reflectworldEndpoint: `http://127.0.0.1:${upstreamPort}`,
+      cortexEndpoint: `http://127.0.0.1:${upstreamPort}`,
     });
     await dashboard.start();
     await postJson(port, "/api/dashboard/session/start", { session_id: "session-a", user_id: "user-a" });
 
-    const res = await fetch(`http://127.0.0.1:${port}/api/reflectworld/memories?session_id=session-a&user_id=user-a`, {
+    const res = await fetch(`http://127.0.0.1:${port}/api/cortex/memories?session_id=session-a&user_id=user-a`, {
       method: "DELETE",
     });
 
@@ -1231,7 +1231,7 @@ describe("DashboardServer source remove lifecycle", () => {
     expect(upstreamHits).toBe(0);
   });
 
-  it("allows deleting a single ReflectWorld memory owned by the dashboard session", async () => {
+  it("allows deleting a single Cortex memory owned by the dashboard session", async () => {
     const upstreamPort = await getFreePort();
     const upstreamUrls: string[] = [];
     upstream = createServer((req, res) => {
@@ -1239,7 +1239,7 @@ describe("DashboardServer source remove lifecycle", () => {
       if (req.method === "GET" && req.url?.startsWith("/memories/rule-1")) {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({
-          reflectworld_procedural: {
+          cortex_procedural: {
             id: "rule-1",
             memory: "Keep the front door clear.",
             user_id: "user-a",
@@ -1264,12 +1264,12 @@ describe("DashboardServer source remove lifecycle", () => {
       port,
       uploadsDir,
       dashboardSessions: { enabled: true },
-      reflectworldEndpoint: `http://127.0.0.1:${upstreamPort}`,
+      cortexEndpoint: `http://127.0.0.1:${upstreamPort}`,
     });
     await dashboard.start();
     await postJson(port, "/api/dashboard/session/start", { session_id: "session-a", user_id: "user-a" });
 
-    const res = await fetch(`http://127.0.0.1:${port}/api/reflectworld/memories/rule-1?memory_type=procedural&session_id=session-a&user_id=user-a`, {
+    const res = await fetch(`http://127.0.0.1:${port}/api/cortex/memories/rule-1?memory_type=procedural&session_id=session-a&user_id=user-a`, {
       method: "DELETE",
     });
 
@@ -1287,7 +1287,7 @@ describe("DashboardServer source remove lifecycle", () => {
       upstreamUrls.push(`${req.method} ${req.url ?? ""}`);
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({
-        reflectworld_procedural: {
+        cortex_procedural: {
           id: "rule-1",
           memory: "Victim rule.",
           user_id: "victim-user",
@@ -1303,12 +1303,12 @@ describe("DashboardServer source remove lifecycle", () => {
       port,
       uploadsDir,
       dashboardSessions: { enabled: true },
-      reflectworldEndpoint: `http://127.0.0.1:${upstreamPort}`,
+      cortexEndpoint: `http://127.0.0.1:${upstreamPort}`,
     });
     await dashboard.start();
     await postJson(port, "/api/dashboard/session/start", { session_id: "session-a", user_id: "user-a" });
 
-    const res = await fetch(`http://127.0.0.1:${port}/api/reflectworld/memories/rule-1?memory_type=procedural&session_id=session-a&user_id=user-a`, {
+    const res = await fetch(`http://127.0.0.1:${port}/api/cortex/memories/rule-1?memory_type=procedural&session_id=session-a&user_id=user-a`, {
       method: "DELETE",
     });
 
@@ -1371,11 +1371,11 @@ describe("DashboardServer source remove lifecycle", () => {
       port,
       uploadsDir,
       store,
-      reflectworldEndpoint: `http://127.0.0.1:${upstreamPort}`,
+      cortexEndpoint: `http://127.0.0.1:${upstreamPort}`,
     });
     await dashboard.start();
 
-    const res = await getJson(port, "/api/reflectworld/memories?memory_type=semantic&camera_id=cam-memory");
+    const res = await getJson(port, "/api/cortex/memories?memory_type=semantic&camera_id=cam-memory");
 
     expect(res.status).toBe(200);
     expect(res.body.memories[0].entity_id).toBe("entity-1");

@@ -1,15 +1,15 @@
 ================================================================================
-REFLECTWORLD - LEVEL 0 RUN GUIDE (MANUAL TERMINAL SETUP)
+CORTEX - LEVEL 0 RUN GUIDE (MANUAL TERMINAL SETUP)
 ================================================================================
 This guide allows you to run each component in its own terminal window
 so you can see live logs, API calls, Qdrant vectors, and video perception.
 ================================================================================
 
 PREREQUISITES (ALREADY CONFIGURED):
- - Gemini API key is configured in: ReflectWorld\.env
+ - Gemini API key is configured in: Cortex\.env
  - Qdrant binary is located at: C:\qdrant\qdrant.exe
  - Python virtual environment is set up at: services\mem\.venv
- - Binaries (ffmpeg, go2rtc, silero_vad) are placed in: C:\Users\DELL\.reflectworld\bin
+ - Binaries (ffmpeg, go2rtc, silero_vad) are placed in: C:\Users\DELL\.cortex\bin
 
 --------------------------------------------------------------------------------
 STEP 1: START QDRANT VECTOR DATABASE (Terminal 1)
@@ -32,12 +32,12 @@ STEP 2: START PYTHON MEMORY SERVICE (Terminal 2)
 --------------------------------------------------------------------------------
 Open PowerShell Terminal 2 and run:
 
-    cd "c:\Users\DELL\Desktop\Mega Project folder\ReflectWorld\services\mem"
+    cd "c:\Users\DELL\Desktop\Mega Project folder\Cortex\services\mem"
     .\.venv\Scripts\Activate.ps1
     python -m uvicorn src.main:app --host 127.0.0.1 --port 8219
 
 What you will see in the terminal:
- - "Initializing ReflectWorld Memory service"
+ - "Initializing Cortex Memory service"
  - Qdrant collections loading (episodic_trace, semantic_context, etc.)
  - "Uvicorn running on http://127.0.0.1:8219"
  - Keep this terminal open! Live vector operations and LLM memory indexing
@@ -45,17 +45,17 @@ What you will see in the terminal:
 
 
 --------------------------------------------------------------------------------
-STEP 3: START REFLECTWORLD ORCHESTRATOR & DASHBOARD (Terminal 3)
+STEP 3: START CORTEX ORCHESTRATOR & DASHBOARD (Terminal 3)
 --------------------------------------------------------------------------------
 Open PowerShell Terminal 3 and run:
 
-    cd "c:\Users\DELL\Desktop\Mega Project folder\ReflectWorld"
-    node packages/reflectworld/dist/src/cli/index.js start --dev
+    cd "c:\Users\DELL\Desktop\Mega Project folder\Cortex"
+    node packages/cortex/dist/src/cli/index.js start --dev
 
 What you will see in the terminal:
  - System self-check verifying: Gemini VLM, Qdrant, Memory Service, ffmpeg, go2rtc
  - "All services started successfully."
- - "ReflectWorld running at http://localhost:3210"
+ - "Cortex running at http://localhost:3210"
  - Keep this terminal open! Keyframe extractions, scene changes, and Gemini VLM
    responses will stream here in real time.
 

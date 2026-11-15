@@ -1,10 +1,10 @@
 # lmms-memory-plugin: memory_api backend
 
-This is ReflectWorld's custom model backend for `lmms-eval`.
+This is Cortex's custom model backend for `lmms-eval`.
 
 ## Purpose
 
-Native `lmms-eval` assumes that one multimodal model directly handles the input video or frames plus the question. ReflectWorld's architecture is different:
+Native `lmms-eval` assumes that one multimodal model directly handles the input video or frames plus the question. Cortex's architecture is different:
 
 ```text
 long video -> segmented perception -> memory -> agent QA
@@ -16,7 +16,7 @@ This package provides a lightweight bridge:
 lmms-eval
   -> memory_api backend
   -> POST /evaluate
-  -> ReflectWorld eval-server
+  -> Cortex eval-server
 ```
 
 The backend does not run a model directly. It converts an `lmms-eval` sample into an HTTP JSON request.
@@ -24,7 +24,7 @@ The backend does not run a model directly. It converts an `lmms-eval` sample int
 ## Install
 
 ```bash
-cd /path/to/ReflectWorld
+cd /path/to/Cortex
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate lmms-bench
 pip install -e eval/benchmark/lmms/memory_api
@@ -56,7 +56,7 @@ The backend sends this JSON to `endpoint`:
     "sub_category": "Humanity & History",
     "task_type": "Counting Problem"
   },
-  "model": "reflectworld"
+  "model": "cortex"
 }
 ```
 
@@ -109,7 +109,7 @@ Token usage can be included:
 ```bash
 python -m lmms_eval eval \
   --model memory_api \
-  --model_args endpoint=http://127.0.0.1:8501/evaluate,api_key=EMPTY,model_version=reflectworld,num_concurrent=1,timeout=14400,max_retries=2,retry_backoff_s=3 \
+  --model_args endpoint=http://127.0.0.1:8501/evaluate,api_key=EMPTY,model_version=cortex,num_concurrent=1,timeout=14400,max_retries=2,retry_backoff_s=3 \
   --tasks videomme_long \
   --batch_size 1 \
   --offset 0 \
@@ -117,7 +117,7 @@ python -m lmms_eval eval \
   --log_samples
 ```
 
-Recommended usage is to start through the ReflectWorld runner, which manages the eval server, memory service, Qdrant, CUDA environment, and result directories:
+Recommended usage is to start through the Cortex runner, which manages the eval server, memory service, Qdrant, CUDA environment, and result directories:
 
 ```bash
 bash eval/benchmark/run-benchmark-worker.sh \
@@ -130,7 +130,7 @@ bash eval/benchmark/run-benchmark-worker.sh \
 
 ## Important Parameters
 
-`endpoint`: ReflectWorld eval-server endpoint, for example:
+`endpoint`: Cortex eval-server endpoint, for example:
 
 ```text
 http://127.0.0.1:8501/evaluate
@@ -140,13 +140,13 @@ http://127.0.0.1:8501/evaluate
 
 `max_retries`: request retry count.
 
-`num_concurrent`: concurrent requests. ReflectWorld's pipeline is stateful; currently use `1`.
+`num_concurrent`: concurrent requests. Cortex's pipeline is stateful; currently use `1`.
 
-`model_version`: model version label passed to the server, usually `reflectworld`.
+`model_version`: model version label passed to the server, usually `cortex`.
 
 ## Notes
 
 - The backend calls once per question, not once per video with all questions.
 - Multiple questions for the same video produce multiple eval-server requests; eval-server owns pipeline-result caching by video.
 - If eval-server crashes, the backend records connection failure as failed text. Those samples should not be treated as real model answers.
-- Do not vendor a full `lmms-eval` fork into the ReflectWorld repo. Maintain only this backend plugin here.
+- Do not vendor a full `lmms-eval` fork into the Cortex repo. Maintain only this backend plugin here.

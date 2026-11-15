@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ReflectWorld benchmark bootstrap — supplements `npx reflectworld setup`.
-# Run this AFTER: npm install && npm run build && npx reflectworld setup --level 1 --yes --accept-model-licenses
+# Cortex benchmark bootstrap — supplements `npx cortex setup`.
+# Run this AFTER: npm install && npm run build && npx cortex setup --level 1 --yes --accept-model-licenses
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,8 +19,8 @@ ok()   { printf "    ${GRN}OK${RST} %s\n" "$*"; }
 warn() { printf "    ${YLW}WARN${RST} %s\n" "$*"; }
 die()  { printf "${RED}FAILED:${RST} %s\n" "$*" >&2; exit 1; }
 
-REFLECTWORLD_HOME="${REFLECTWORLD_HOME:-$HOME/.reflectworld}"
-MODELS_DIR="$REFLECTWORLD_HOME/models"
+CORTEX_HOME="${CORTEX_HOME:-$HOME/.cortex}"
+MODELS_DIR="$CORTEX_HOME/models"
 DATA_DIR="${BENCH_DATA_DIR:-$HOME/benchmark-data}"
 ENV_FILE="$REPO_ROOT/.env"
 CPU_ONLY=0
@@ -30,9 +30,9 @@ usage() {
   cat <<'EOF'
 Usage: bash eval/benchmark/bootstrap.sh [options]
 
-This script supplements `npx reflectworld setup --level 1 --yes --accept-model-licenses`. It handles
+This script supplements `npx cortex setup --level 1 --yes --accept-model-licenses`. It handles
 benchmark-specific concerns that the CLI does not cover:
-  - prerequisite checks (node, python3, npm, reflectworld CLI)
+  - prerequisite checks (node, python3, npm, cortex CLI)
   - onnxruntime-node native runtime (CPU/CoreML/CUDA)
   - benchmark .env defaults
   - model file validation
@@ -87,10 +87,10 @@ missing_env_value() {
 }
 
 echo ""
-echo "  ReflectWorld Benchmark Bootstrap"
+echo "  Cortex Benchmark Bootstrap"
 echo ""
 echo "  Repo:           $REPO_ROOT"
-echo "  REFLECTWORLD_HOME: $REFLECTWORLD_HOME"
+echo "  CORTEX_HOME: $CORTEX_HOME"
 echo "  Models:         $MODELS_DIR"
 echo "  Data dir:       $DATA_DIR"
 echo "  Env file:       $ENV_FILE"
@@ -105,20 +105,20 @@ require_cmd python3
 NODE_MAJOR="$(node -v | sed -E 's/^v([0-9]+).*/\1/')"
 [ "$NODE_MAJOR" -ge 22 ] || warn "Node.js 22+ recommended; current $(node -v)"
 
-if npx reflectworld --help >/dev/null 2>&1; then
-  ok "npx reflectworld available"
+if npx cortex --help >/dev/null 2>&1; then
+  ok "npx cortex available"
 else
-  die "npx reflectworld not available. Run: npm install && npm run build"
+  die "npx cortex not available. Run: npm install && npm run build"
 fi
 
-if [ -f "$REFLECTWORLD_HOME/.setup.json" ]; then
-  SETUP_LEVEL="$(node -p "JSON.parse(require('fs').readFileSync('$REFLECTWORLD_HOME/.setup.json','utf8')).level" 2>/dev/null || echo "-1")"
+if [ -f "$CORTEX_HOME/.setup.json" ]; then
+  SETUP_LEVEL="$(node -p "JSON.parse(require('fs').readFileSync('$CORTEX_HOME/.setup.json','utf8')).level" 2>/dev/null || echo "-1")"
   if [ "$SETUP_LEVEL" -lt 1 ]; then
-    die "ReflectWorld setup is Level $SETUP_LEVEL. Benchmark needs Level 1. Run: npx reflectworld setup --level 1 --yes --accept-model-licenses"
+    die "Cortex setup is Level $SETUP_LEVEL. Benchmark needs Level 1. Run: npx cortex setup --level 1 --yes --accept-model-licenses"
   fi
-  ok "ReflectWorld setup complete (Level $SETUP_LEVEL)"
+  ok "Cortex setup complete (Level $SETUP_LEVEL)"
 else
-  die "ReflectWorld setup not found. Run: npx reflectworld setup --level 1 --yes --accept-model-licenses"
+  die "Cortex setup not found. Run: npx cortex setup --level 1 --yes --accept-model-licenses"
 fi
 
 ok "node $(node -v), npm $(npm -v), $(python3 --version)"
@@ -162,7 +162,7 @@ else
 fi
 
 ensure_env_value "STUBS_ONLY" "false"
-ensure_env_value "BENCH_REFLECTWORLD_PORT" "18219"
+ensure_env_value "BENCH_CORTEX_PORT" "18219"
 ok "Benchmark defaults present in $ENV_FILE"
 
 # ── Step 4: Model files ──
@@ -179,7 +179,7 @@ for f in yolo26m.onnx retinaface-resnet50.onnx w600k_mbf.onnx; do
 done
 
 if [ "$missing_models" -eq 1 ]; then
-  warn "Required L1 models are missing. Re-run: npx reflectworld setup --level 1 --yes --accept-model-licenses"
+  warn "Required L1 models are missing. Re-run: npx cortex setup --level 1 --yes --accept-model-licenses"
   warn "Or copy model files manually:"
   warn "  rsync -av /path/to/models/ $MODELS_DIR/"
 fi

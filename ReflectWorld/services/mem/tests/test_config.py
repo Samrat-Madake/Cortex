@@ -11,8 +11,8 @@ def test_default_config():
     assert config.qdrant_host == "localhost"
     assert config.qdrant_port == 6333
     assert config.collection_prefix == "visionmem_me_production"
-    assert config.storage_path.endswith(".reflectworld/memory-state")
-    assert config.history_db_path.endswith(".reflectworld/memory-state/mem_op_history.db")
+    assert config.storage_path.endswith(".cortex/memory-state")
+    assert config.history_db_path.endswith(".cortex/memory-state/mem_op_history.db")
     assert config.llm_provider == "openai"
     assert config.llm_model == "gpt-5-mini"
     assert config.embedder_provider == "openai"
@@ -21,7 +21,7 @@ def test_default_config():
 
 def test_custom_config():
     env = {
-        "COLLECTION_PREFIX": "reflectworld_test",
+        "COLLECTION_PREFIX": "cortex_test",
         "PORT": "8220",
         "VLM_PROVIDER": "gemini",
         "VLM_API_KEY": "vlm-key",
@@ -32,7 +32,7 @@ def test_custom_config():
     }
     with patch.dict(os.environ, env):
         config = MemConfig.from_env()
-    assert config.collection_prefix == "reflectworld_test"
+    assert config.collection_prefix == "cortex_test"
     assert config.port == 8220
     assert config.llm_provider == "gemini"
     assert config.llm_model == "gpt-5-mini"

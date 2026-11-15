@@ -1,5 +1,5 @@
 // packages/percept/src/analyzers/detection-analyzer.ts
-import type { Frame } from "@reflectworld/shared";
+import type { Frame } from "@cortex/shared";
 import type { DetectionOutput } from "../types.js";
 import type { ModelRouter } from "../providers/model-router.js";
 import type { InferInput } from "../providers/types.js";

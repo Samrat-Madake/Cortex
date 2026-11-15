@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { CamPipeline } from "../pipeline.js";
 import { FixedWindowSegmenter } from "../segmenter/fixed-window.js";
 import type { FrameResult } from "../types.js";
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 
 function makeFrame(ts = Date.now()): FrameResult {
   return { data: "base64", timestamp: ts, source_name: "test" };

@@ -2,7 +2,7 @@
 import type { ModelProvider, ModelType, ProviderRuntime } from "../types.js";
 import type { ModelManager } from "../../models/model-manager.js";
 import { MODEL_MANIFEST, type ModelId } from "../../models/model-manifest.js";
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 
 /**
  * Base class for all ONNX-builtin providers.

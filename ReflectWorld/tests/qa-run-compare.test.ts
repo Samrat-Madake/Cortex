@@ -42,7 +42,7 @@ describe("QA run comparison helpers", () => {
 
   it("parses eval-server QA result records", () => {
     const parsed = parseQaSample({
-      dataset_name: "reflectworld_videomme_long_subset",
+      dataset_name: "cortex_videomme_long_subset",
       snapshot_version: "snapshot_a",
       qa_run_version: "qa_run_a",
       run_id: "run_a",
@@ -57,7 +57,7 @@ describe("QA run comparison helpers", () => {
       prediction: "D",
       answer: "B",
       correct: false,
-      datasetName: "reflectworld_videomme_long_subset",
+      datasetName: "cortex_videomme_long_subset",
       snapshotVersion: "snapshot_a",
       qaRunVersion: "qa_run_a",
       runId: "run_a",
@@ -203,9 +203,9 @@ describe("QA run comparison helpers", () => {
 
   it("reads sample JSONL files recursively from run directories", () => {
     const root = join(tmpdir(), `qa-run-compare-${process.pid}-${Date.now()}`);
-    const nested = join(root, "out", "results.json", "reflectworld");
+    const nested = join(root, "out", "results.json", "cortex");
     mkdirSync(nested, { recursive: true });
-    const file = join(nested, "20260512_samples_reflectworld_videomme_long_subset.jsonl");
+    const file = join(nested, "20260512_samples_cortex_videomme_long_subset.jsonl");
     writeFileSync(file, `${sample("2-1", "A", "A", 1)}\n`);
 
     expect(findQaSampleFiles(root)).toEqual([file]);
@@ -227,15 +227,15 @@ describe("QA run comparison helpers", () => {
   it("can filter lmms worker sample artifacts by worker metadata QA run version", () => {
     const root = join(tmpdir(), `qa-run-compare-worker-runs-${process.pid}-${Date.now()}`);
     const wantedWorker = join(root, "workers", "worker_a");
-    const wantedOut = join(wantedWorker, "run_a", "out", "results.json", "reflectworld");
+    const wantedOut = join(wantedWorker, "run_a", "out", "results.json", "cortex");
     const otherWorker = join(root, "workers", "worker_b");
-    const otherOut = join(otherWorker, "run_b", "out", "results.json", "reflectworld");
+    const otherOut = join(otherWorker, "run_b", "out", "results.json", "cortex");
     mkdirSync(wantedOut, { recursive: true });
     mkdirSync(otherOut, { recursive: true });
     writeFileSync(join(wantedWorker, "worker_meta.json"), JSON.stringify({ qa_run_version: "wanted" }));
     writeFileSync(join(otherWorker, "worker_meta.json"), JSON.stringify({ qa_run_version: "other" }));
-    writeFileSync(join(wantedOut, "20260513_samples_reflectworld_videomme_long_subset.jsonl"), `${sample("4-1", "A", "A", 1)}\n`);
-    writeFileSync(join(otherOut, "20260513_samples_reflectworld_videomme_long_subset.jsonl"), `${sample("4-2", "B", "B", 1)}\n`);
+    writeFileSync(join(wantedOut, "20260513_samples_cortex_videomme_long_subset.jsonl"), `${sample("4-1", "A", "A", 1)}\n`);
+    writeFileSync(join(otherOut, "20260513_samples_cortex_videomme_long_subset.jsonl"), `${sample("4-2", "B", "B", 1)}\n`);
 
     expect(readQaSamples([root], "wanted").map((row) => row.questionId)).toEqual(["4-1"]);
   });

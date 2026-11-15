@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { MonitorEvent, EntityAlias } from "../types";
 
-const STORAGE_KEY = "reflectworld.entity.aliases.v1";
+const STORAGE_KEY = "cortex.entity.aliases.v1";
 
 type AliasMap = Record<string, { display_name: string; first_seen: number }>;
 

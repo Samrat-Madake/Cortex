@@ -1,10 +1,10 @@
-# @reflectworld mem service
+# @cortex mem service
 
-The mem service is ReflectWorld's multimodal memory service. It is a Python / FastAPI service backed by Qdrant for visual memory storage, semantic search, and ReID vector galleries.
+The mem service is Cortex's multimodal memory service. It is a Python / FastAPI service backed by Qdrant for visual memory storage, semantic search, and ReID vector galleries.
 
-The orchestrator package, `@reflectworld/reflectworld`, normally starts this
-service as a child process. TypeScript callers use the `@reflectworld/mem` HTTP
-client. See the [architecture overview](https://github.com/addxai/ReflectWorld/blob/main/docs/architecture/overview.md)
+The orchestrator package, `@cortex/cortex`, normally starts this
+service as a child process. TypeScript callers use the `@cortex/mem` HTTP
+client. See the [architecture overview](https://github.com/addxai/Cortex/blob/main/docs/architecture/overview.md)
 for the high-level runtime shape.
 
 ## Responsibilities
@@ -59,4 +59,4 @@ Key environment variables. In production, the orchestrator injects these through
 | `GET /health`, `/status` | Health checks. |
 
 The full HTTP contract is documented in the
-[HTTP API reference](https://github.com/addxai/ReflectWorld/blob/main/docs/reference/http-api.md).
+[HTTP API reference](https://github.com/addxai/Cortex/blob/main/docs/reference/http-api.md).

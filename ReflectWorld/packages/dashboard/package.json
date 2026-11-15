@@ -1,5 +1,5 @@
 {
-  "name": "@reflectworld/dashboard",
+  "name": "@cortex/dashboard",
   "version": "0.1.0",
   "private": true,
   "license": "Apache-2.0",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@reflectworld/shared": "^0.1.0",
+    "@cortex/shared": "^0.1.0",
     "motion": "^12.38.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

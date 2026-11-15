@@ -1,4 +1,4 @@
-import type { PerceptionResult, Segment } from "@reflectworld/shared";
+import type { PerceptionResult, Segment } from "@cortex/shared";
 import type {
   VisionControllerConfig,
   FramePolicyOutput,

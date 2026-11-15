@@ -1,8 +1,8 @@
 // SRT subtitle parser and segment slicer for benchmark pipeline.
-// Converts external .srt files into SttOutput compatible with @reflectworld/percept pipeline.
+// Converts external .srt files into SttOutput compatible with @cortex/percept pipeline.
 
 import { readFileSync } from "node:fs";
-import type { SttOutput } from "@reflectworld/percept";
+import type { SttOutput } from "@cortex/percept";
 
 export interface SrtEntry {
   startMs: number;

@@ -1,6 +1,6 @@
 {
-  "id": "reflectworld",
-  "name": "ReflectWorld",
+  "id": "cortex",
+  "name": "Cortex",
   "description": "Visual perception + persistent memory platform for AI agents",
   "version": "0.1.0",
   "skills": ["./skills"],
@@ -10,7 +10,7 @@
     "properties": {
       "cam": {
         "type": "object",
-        "description": "Cam plugin config (video capture). See @reflectworld/cam for fields."
+        "description": "Cam plugin config (video capture). See @cortex/cam for fields."
       },
       "perception": {
         "type": "object",
@@ -30,7 +30,7 @@
           "scene_description": { "type": "string", "description": "Describes the camera's scene for VLM context" },
           "focus_targets": { "type": "string", "description": "Targets to pay extra attention to" },
           "security_rules": { "type": "string", "description": "Custom security criteria" },
-          "reflectworld_endpoint": { "type": "string", "default": "http://localhost:8219", "description": "ReflectWorld API base URL" },
+          "cortex_endpoint": { "type": "string", "default": "http://localhost:8219", "description": "Cortex API base URL" },
           "working_memory_event_timeout_sec": { "type": "number", "default": 30, "description": "Seconds of inactivity before an open event is closed" },
           "working_memory_max_event_segments": { "type": "number", "default": 18, "description": "Maximum segments allowed before an open event is force-rotated" },
           "stubs_only": { "type": "boolean", "default": true, "description": "When true, local detection/ReID analyzers remain as stubs" },
@@ -50,13 +50,13 @@
         "additionalProperties": false,
         "description": "Memory service/client config plus Python mem model credentials.",
         "properties": {
-          "port": { "type": "number", "description": "ReflectWorld Python service port" },
+          "port": { "type": "number", "description": "Cortex Python service port" },
           "qdrant_port": { "type": "number", "description": "Qdrant HTTP port" },
           "qdrant_grpc_port": { "type": "number", "description": "Qdrant gRPC port" },
           "source_dir": { "type": "string", "description": "Python mem service source directory" },
           "storage_path": { "type": "string", "description": "Isolated storage path for Python mem artifacts" },
           "collection_name": { "type": "string", "description": "Base Qdrant collection prefix exposed as pluginConfig memory.collection_name" },
-          "baseUrl": { "type": "string", "description": "ReflectWorld API base URL for the memory client" },
+          "baseUrl": { "type": "string", "description": "Cortex API base URL for the memory client" },
           "timeoutMs": { "type": "number", "description": "Memory client HTTP request timeout in milliseconds" },
           "user_id": { "type": "string", "description": "All-in-one alias for default memory user_id" },
           "defaultCameraId": { "type": "string", "description": "Default camera_id for memory tool requests" },

@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { monitorBus } from "@reflectworld/shared";
-import type { MonitorEvent } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { MonitorEvent } from "@cortex/shared";
 
 describe("Cam monitor events", () => {
   const events: MonitorEvent[] = [];

@@ -25,30 +25,30 @@ export function shouldUseStrictSourceValidation(params: Record<string, unknown>)
     : "";
   if (["local", "local_trusted", "trusted", "off", "false"].includes(requested)) return false;
   if (["strict", "public", "multi_user", "on", "true"].includes(requested)) return true;
-  if (envFlag("REFLECTWORLD_SOURCE_SECURITY_STRICT") || envFlag("REFLECTWORLD_PUBLIC_MODE")) return true;
+  if (envFlag("CORTEX_SOURCE_SECURITY_STRICT") || envFlag("CORTEX_PUBLIC_MODE")) return true;
   return typeof params._dashboardUserId === "string" || typeof params._dashboardSessionId === "string";
 }
 
 export function defaultSourceSecurityOptions(strict: boolean, params: Record<string, unknown>): SourceSecurityOptions {
   return {
     strict,
-    allowHttp: envFlag("REFLECTWORLD_ALLOW_INSECURE_HTTP_SOURCE"),
-    allowLocalSource: params._allowLocalFileSource === true || envFlag("REFLECTWORLD_ALLOW_LOCAL_SOURCE"),
-    allowPrivateNetwork: envFlag("REFLECTWORLD_ALLOW_PRIVATE_SOURCE"),
+    allowHttp: envFlag("CORTEX_ALLOW_INSECURE_HTTP_SOURCE"),
+    allowLocalSource: params._allowLocalFileSource === true || envFlag("CORTEX_ALLOW_LOCAL_SOURCE"),
+    allowPrivateNetwork: envFlag("CORTEX_ALLOW_PRIVATE_SOURCE"),
   };
 }
 
 export function sourceSecurityEnvWarnings(): string[] {
-  if (!envFlag("REFLECTWORLD_PUBLIC_MODE")) return [];
+  if (!envFlag("CORTEX_PUBLIC_MODE")) return [];
   const warnings: string[] = [];
-  if (envFlag("REFLECTWORLD_ALLOW_PRIVATE_SOURCE")) {
+  if (envFlag("CORTEX_ALLOW_PRIVATE_SOURCE")) {
     warnings.push(
-      "REFLECTWORLD_PUBLIC_MODE=true with REFLECTWORLD_ALLOW_PRIVATE_SOURCE=true allows private, loopback, link-local, and reserved source targets. Use only in trusted LAN deployments; do not enable it for public demos.",
+      "CORTEX_PUBLIC_MODE=true with CORTEX_ALLOW_PRIVATE_SOURCE=true allows private, loopback, link-local, and reserved source targets. Use only in trusted LAN deployments; do not enable it for public demos.",
     );
   }
-  if (envFlag("REFLECTWORLD_ALLOW_LOCAL_SOURCE")) {
+  if (envFlag("CORTEX_ALLOW_LOCAL_SOURCE")) {
     warnings.push(
-      "REFLECTWORLD_PUBLIC_MODE=true with REFLECTWORLD_ALLOW_LOCAL_SOURCE=true allows local file paths and local capture devices. Use only for trusted local deployments.",
+      "CORTEX_PUBLIC_MODE=true with CORTEX_ALLOW_LOCAL_SOURCE=true allows local file paths and local capture devices. Use only for trusted local deployments.",
     );
   }
   return warnings;
@@ -165,7 +165,7 @@ export async function validateSourceInputSecurity(
     return { ok: false, code: "file_url_not_allowed", error: "file:// URLs are not allowed in strict source mode" };
   }
   if (scheme === "http" && !options.allowHttp) {
-    return { ok: false, code: "http_not_allowed", error: "http:// sources are disabled in strict source mode; use https/rtsp or set REFLECTWORLD_ALLOW_INSECURE_HTTP_SOURCE=true" };
+    return { ok: false, code: "http_not_allowed", error: "http:// sources are disabled in strict source mode; use https/rtsp or set CORTEX_ALLOW_INSECURE_HTTP_SOURCE=true" };
   }
   if (!["rtsp", "rtsps", "https"].includes(scheme) && !(scheme === "http" && options.allowHttp)) {
     return { ok: false, code: "unsupported_scheme", error: `Source scheme "${scheme}" is not allowed in strict source mode` };

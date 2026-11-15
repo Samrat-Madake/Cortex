@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { analyze, type PipelineDeps } from "../pipeline.js";
 import { WorkingMemoryManager } from "../working-memory.js";
 import { StrategyManager } from "../strategy-manager.js";
-import type { Segment } from "@reflectworld/shared";
+import type { Segment } from "@cortex/shared";
 import type { VlmOutput } from "../types.js";
 
 function makeSegment(overrides?: Partial<Segment>): Segment {

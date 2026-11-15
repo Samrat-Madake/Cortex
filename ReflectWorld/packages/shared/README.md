@@ -1,15 +1,15 @@
-# @reflectworld/shared
+# @cortex/shared
 
-> Core types, constants, and utilities shared across all ReflectWorld packages.
+> Core types, constants, and utilities shared across all Cortex packages.
 
 ## Overview
 
-This package defines the shared data contracts that flow through the ReflectWorld pipeline — from video capture through perception to memory storage. It also provides the `monitorBus` event bus for real-time dashboard communication.
+This package defines the shared data contracts that flow through the Cortex pipeline — from video capture through perception to memory storage. It also provides the `monitorBus` event bus for real-time dashboard communication.
 
 ## Installation
 
 ```bash
-npm install @reflectworld/shared
+npm install @cortex/shared
 ```
 
 ## API
@@ -39,8 +39,8 @@ npm install @reflectworld/shared
 ### Event Bus
 
 ```typescript
-import { monitorBus } from "@reflectworld/shared";
-import type { MonitorEvent, MonitorEventType } from "@reflectworld/shared";
+import { monitorBus } from "@cortex/shared";
+import type { MonitorEvent, MonitorEventType } from "@cortex/shared";
 
 // Publish events (22 event types across cam/perception/memory/system)
 monitorBus.publish("cam:segment_built", { frames: 5 }, "camera_1");

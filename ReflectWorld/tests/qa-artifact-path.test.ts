@@ -6,7 +6,7 @@ import { qaArtifactDirForCheckpoint, qaRunDirForVideo } from "../eval/benchmark/
 
 describe("QA artifact paths", () => {
   it("stores QA run artifacts under the requested artifact directory", () => {
-    const baseDir = join(tmpdir(), `reflectworld-qa-artifacts-${process.pid}-${Date.now()}`);
+    const baseDir = join(tmpdir(), `cortex-qa-artifacts-${process.pid}-${Date.now()}`);
     const qaDir = qaRunDirForVideo(baseDir, "qa_run_a");
 
     expect(qaDir).toBe(join(baseDir, "qa_runs", "qa_run_a"));

@@ -1,4 +1,4 @@
-import { writeStderr } from "@reflectworld/shared";
+import { writeStderr } from "@cortex/shared";
 import { join } from "node:path";
 import { ElevenLabsStt } from "../analyzers/elevenlabs-stt.js";
 import { SttAnalyzer } from "../analyzers/stt-analyzer.js";

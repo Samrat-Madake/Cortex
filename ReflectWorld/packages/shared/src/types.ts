@@ -27,7 +27,7 @@ export interface EntityRecord {
   interaction?: string;
   /** Tracking ID from the local tracker (e.g. "track_1"). */
   track_id?: string;
-  /** ReID entity ID from ReflectWorld (cross-segment face identity). */
+  /** ReID entity ID from Cortex (cross-segment face identity). */
   entity_id?: string;
   /** Stable per-user subject number, used by backend projection for fallback labels. */
   subject_index?: number;
@@ -43,7 +43,7 @@ export interface EntityRecord {
   anonymous_subject_id?: string;
   /** Whether this entity was first seen in this segment. */
   is_new_entity?: boolean;
-  /** Historical behavior from ReflectWorld (injected from prior observations). */
+  /** Historical behavior from Cortex (injected from prior observations). */
   history_behavior?: string;
   /** Per-entity keyframe image path (may differ from segment keyframe). */
   keyframe_path?: string;
@@ -77,7 +77,7 @@ export interface PerceptionMemory {
   segment_policy_exit_met?: boolean;
 }
 
-// ── ReflectWorld API types ──
+// ── Cortex API types ──
 
 export interface MemoryItem {
   id: string;
@@ -123,7 +123,7 @@ export interface AudioData {
 
 // ── Dataflow types: Eye → Perception ──
 
-/** Frame-level detection result from FrameAnalyzer. Canonical definition — re-exported by @reflectworld/cam. */
+/** Frame-level detection result from FrameAnalyzer. Canonical definition — re-exported by @cortex/cam. */
 export interface FrameDetection {
   label: string;
   confidence: number;
@@ -175,7 +175,7 @@ export interface Segment {
   _input_mode?: "local_file" | "live_stream";
 }
 
-// ── Dataflow types: Perception → ReflectWorld / Act ──
+// ── Dataflow types: Perception → Cortex / Act ──
 
 /** Media file paths produced by the pipeline for a segment. */
 export interface MediaUrls {
@@ -211,7 +211,7 @@ export interface PerceptionDialogueLine {
 
 /**
  * Full analysis result produced by the Perception pipeline for one Segment.
- * Sent to both ReflectWorld (for memory storage) and Act (for rule matching).
+ * Sent to both Cortex (for memory storage) and Act (for rule matching).
  */
 export interface PerceptionResult {
   /** Source segment identifier. */

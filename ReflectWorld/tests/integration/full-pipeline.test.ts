@@ -1,7 +1,7 @@
 /**
  * Integration test: Cam → Perception → code-resolved notifications.
  *
- * All external services (Gemini API, ReflectWorld HTTP) are mocked.
+ * All external services (Gemini API, Cortex HTTP) are mocked.
  * Validates that data flows correctly across module boundaries,
  * and that notification logic is deterministic based on structured output.
  */
@@ -10,7 +10,7 @@ import type {
   Segment,
   PerceptionResult,
   Frame,
-} from "@reflectworld/shared";
+} from "@cortex/shared";
 
 // ── Cam ──
 import { CamPipeline } from "../../packages/cam/src/pipeline.js";

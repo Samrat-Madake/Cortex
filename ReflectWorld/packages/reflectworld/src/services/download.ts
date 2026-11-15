@@ -1,6 +1,6 @@
 /**
  * Shared binary download and extraction utilities.
- * Reuses the same pattern as @reflectworld/cam's binary-installer.
+ * Reuses the same pattern as @cortex/cam's binary-installer.
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, chmodSync, createWriteStream, unlinkSync } from "node:fs";

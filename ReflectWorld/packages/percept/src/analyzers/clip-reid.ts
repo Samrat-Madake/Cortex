@@ -2,7 +2,7 @@
 import type { ModelManager } from "../models/model-manager.js";
 import { cropAndResize, normalizeImageToTensor } from "../models/preprocessing.js";
 import { normalizeEmbedding } from "./adaface.js";
-import type { BoundingBox } from "@reflectworld/shared";
+import type { BoundingBox } from "@cortex/shared";
 
 /**
  * CLIP-ReID body ReID extractor.
