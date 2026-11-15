@@ -1,6 +1,6 @@
-# ReflectWorld Documentation Suite & Architecture Center
+# Cortex Documentation Suite & Architecture Center
 
-Welcome to the comprehensive, production-grade documentation portal for **ReflectWorld** — the continuous, local-first visual-spatial memory system for autonomous physical AI agents and personal ambient intelligences.
+Welcome to the comprehensive, production-grade documentation portal for **Cortex** — the continuous, local-first visual-spatial memory system for autonomous physical AI agents and personal ambient intelligences.
 
 This documentation center is organized into four sequential, deep-dive architectural volumes designed for engineers, researchers, and systems architects deploying continuous perception pipelines.
 
@@ -21,7 +21,7 @@ flowchart LR
 ```
 
 ### [Phase 1: Project Overview & Core Philosophy](docs/01_PROJECT_OVERVIEW.md)
-> *Essential reading for understanding why ReflectWorld exists and how it departs from episodic video AI.*
+> *Essential reading for understanding why Cortex exists and how it departs from episodic video AI.*
 - **System Vision**: Continuous spatial-temporal cognitive continuity vs. disconnected one-off video queries.
 - **Level 0 vs. Level 1 Strategy**: Zero-local-weight VLM mode (commodity hardware) vs native ONNX edge pipeline.
 - **Person Re-ID Workflow**: Multi-room and temporal identity tracking across days and weeks.
@@ -42,7 +42,7 @@ flowchart LR
 
 ### [Phase 3: Codebase Architecture & Monorepo Manual](docs/03_CODEBASE_ARCHITECTURE.md)
 > *Monorepo organization, TypeScript/Python hybrid bridges, and environment configuration dictionary.*
-- **Directory Tree & Module Responsibilities**: Explanations of `packages/cam`, `packages/percept`, `services/mem`, `packages/mem`, `packages/reflectworld`, `packages/dashboard`, `packages/host`, and `packages/shared`.
+- **Directory Tree & Module Responsibilities**: Explanations of `packages/cam`, `packages/percept`, `services/mem`, `packages/mem`, `packages/Cortex`, `packages/dashboard`, `packages/host`, and `packages/shared`.
 - **Inter-Process Communication (IPC)**: HTTP REST contracts, payload schemas, and serialization formats between Node.js and FastAPI.
 - **Exhaustive Configuration Dictionary**: Complete field-by-field reference for every variable in `.env` (perception levels, timeouts, Qdrant URLs, model keys).
 - **Build & Verification Lifecycle**: Commands for compilation, typechecking, running single-shot pipeline checks, and local development.
@@ -80,5 +80,5 @@ venv\Scripts\activate
 uvicorn src.main:app --port 8219 --reload
 
 # Terminal 3: Main Node.js Orchestrator & Dashboard (Port 3210)
-node packages/reflectworld/dist/src/cli/index.js start --dev
+node packages/Cortex/dist/src/cli/index.js start --dev
 ```
