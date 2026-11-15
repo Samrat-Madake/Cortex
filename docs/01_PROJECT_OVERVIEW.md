@@ -1,4 +1,4 @@
-# 🌐 ReflectWorld: Project Overview & Vision
+# 🌐 Cortex: Project Overview & Vision
 
 > **Map the Real World into Cyber Memory.**  
 > *A continuous, entity-oriented multimodal memory system for AI agents processing open-ended video streams.*
@@ -7,7 +7,7 @@
 
 ## 📌 Table of Contents
 1. [The Paradigm Shift: From Episodic Vision to World Memory](#-the-paradigm-shift-from-episodic-vision-to-world-memory)
-2. [What is ReflectWorld?](#-what-is-reflectworld)
+2. [What is Cortex?](#-what-is-Cortex)
 3. [Core Capabilities at a Glance](#-core-capabilities-at-a-glance)
 4. [High-Level Architectural Flow](#-high-level-architectural-flow)
 5. [Dual-Tier Perception Philosophy: Level 0 vs. Level 1](#-dual-tier-perception-philosophy-level-0-vs-level-1)
@@ -28,7 +28,7 @@ Traditional Video AI (Episodic):
 [Video Clip 1] ──► VLM Analysis ──► Answers single prompt ──► Context Forgotten ❌
 [Video Clip 2] ──► VLM Analysis ──► Answers single prompt ──► Context Forgotten ❌
 
-ReflectWorld Paradigm (Continuous World Memory):
+Cortex Paradigm (Continuous World Memory):
 [Camera Feed / Video] ──► Segmentation & Perception ──► Hierarchical Vector Memory ──► Persistent Continuity ✅
                                                               ▲
                                                     Agent QA & Reasoning
@@ -39,20 +39,20 @@ ReflectWorld Paradigm (Continuous World Memory):
 - **Context Window Exhaustion:** You cannot pass a 24-hour continuous video stream into an LLM context window without incurring astronomical API costs, latency lag, and context degradation ("lost in the middle").
 - **Isolated Frame Captioning:** Standard video summarizers describe isolated moments ("a person is pouring water") rather than understanding evolving narratives ("the barista is completing the third step of a pour-over brew").
 
-**ReflectWorld solves this by decoupling visual perception from visual memory.** It observes live video feeds, extracts meaningful moments, links recurring entities across time, and commits them to a persistent, queryable vector memory engine.
+**Cortex solves this by decoupling visual perception from visual memory.** It observes live video feeds, extracts meaningful moments, links recurring entities across time, and commits them to a persistent, queryable vector memory engine.
 
 ---
 
-## 🚀 What is ReflectWorld?
+## 🚀 What is Cortex?
 
-**ReflectWorld is an open-source world memory layer for AI agents.**
+**Cortex is an open-source world memory layer for AI agents.**
 
 It converts raw video streams (fixed CCTV cameras, RTSP streams, webcams, smart glasses like Meta Ray-Ban, robot vision, or uploaded MP4 files) into a structured, hierarchical knowledge graph backed by **Qdrant Vector Database**.
 
 Instead of asking:  
 > *"What is happening in this 5-second clip?"*
 
-ReflectWorld allows AI agents and users to ask:  
+Cortex allows AI agents and users to ask:  
 > *"What has this camera seen over the last week?"*  
 > *"Who appeared near the front door today, and did we see them earlier this week?"*  
 > *"Trace the chronological actions of the person in the black jacket."*
@@ -61,7 +61,7 @@ ReflectWorld allows AI agents and users to ask:
 
 ## ⚡ Core Capabilities at a Glance
 
-| Capability | How ReflectWorld Delivers It |
+| Capability | How Cortex Delivers It |
 | :--- | :--- |
 | **Any Video Ingestion** | Connects to RTSP streams, local webcams, live RTMP feeds, and video file uploads via an integrated FFmpeg & `go2rtc` pipeline. |
 | **Active Adaptive Perception** | Rather than uniform frame sampling, it uses composite segmentation (Voice Activity Detection + Motion Energy + Scene Histograms) to only analyze meaningful moments. |
@@ -132,11 +132,11 @@ flowchart TD
 
 ## ⚖️ Dual-Tier Perception Philosophy: Level 0 vs. Level 1
 
-ReflectWorld addresses different deployment environments through two complementary perception modes:
+Cortex addresses different deployment environments through two complementary perception modes:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                        REFLECTWORLD PERCEPTION                         │
+│                        Cortex PERCEPTION                         │
 ├──────────────────────────────────┬─────────────────────────────────────┤
 │      LEVEL 0: Cloud VLM          │     LEVEL 1: Deep Local Perception  │
 ├──────────────────────────────────┼─────────────────────────────────────┤
@@ -162,7 +162,7 @@ Most video AI pipelines generate isolated frame captions:
 > *"A man in a blue shirt walks past the counter."*  
 > *"Someone is sitting at a desk."*
 
-ReflectWorld transforms these into **connected entity narratives**:
+Cortex transforms these into **connected entity narratives**:
 
 ```mermaid
 sequenceDiagram
@@ -197,8 +197,8 @@ By anchoring observations to unique entity signatures, the system builds **accum
 
 ## 🔬 Research Foundation & Benchmark Performance
 
-ReflectWorld is the production implementation of the research paper:  
-📄 **"ReflectWorld-MM: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams"** (*Ma et al., arXiv:2607.09759*).
+Cortex is the production implementation of the research paper:  
+📄 **"Cortex-MM: An Entity-Oriented Multimodal Memory System for Open-Ended Video Streams"** (*Ma et al., arXiv:2607.09759*).
 
 ### Benchmark Provenance (Table 3 from Research Paper)
 
@@ -209,7 +209,7 @@ The system has been evaluated against state-of-the-art multimodal agent benchmar
 | **GPT-4o (Direct Video)** | Single Context Window | 48.2% | 100.0% (raw video) | ~2,400 |
 | **M3-Agent** | Hierarchical Summarization | 54.7% | 34.2% | ~1,150 |
 | **WorldMM** | Dense Video Indexing | 58.1% | 22.8% | ~890 |
-| **ReflectWorld (Ours)** | **Entity-Oriented 9-Tier Memory** | **68.4%** | **4.2%** | **~240** |
+| **Cortex (Ours)** | **Entity-Oriented 9-Tier Memory** | **68.4%** | **4.2%** | **~240** |
 
 ### Key Benchmark Takeaways:
 1. **+20.2% Accuracy Jump over Raw LLMs:** Grounding reasoning in structured memory records eliminates hallucinations common in long-context video feeds.
@@ -222,7 +222,7 @@ The system has been evaluated against state-of-the-art multimodal agent benchmar
 
 ```
                   ┌──────────────────────────────┐
-                  │    REFLECTWORLD USE CASES    │
+                  │    Cortex USE CASES    │
                   └──────────────┬───────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
@@ -249,9 +249,9 @@ The system has been evaluated against state-of-the-art multimodal agent benchmar
 
 ## 🔒 Privacy & Local-First Guarantees
 
-Video streams often capture private homes, offices, family members, and sensitive personal routines. ReflectWorld is architected with a strict **local-first privacy perimeter**:
+Video streams often capture private homes, offices, family members, and sensitive personal routines. Cortex is architected with a strict **local-first privacy perimeter**:
 
-1. **Local Media Retention:** All raw video files, RTSP buffers, frame JPEGs, and audio files remain strictly on your local machine (`~/.reflectworld/`).
+1. **Local Media Retention:** All raw video files, RTSP buffers, frame JPEGs, and audio files remain strictly on your local machine (`~/.Cortex/`).
 2. **On-Premise Identity Data:** Facial vectors, body Re-ID descriptors, and identity galleries are indexed locally in your own Qdrant database—never sent to cloud providers.
 3. **Selective Cloud Offloading:** External APIs (such as Gemini or OpenAI) only receive individual stripped keyframe images at segment boundaries if Level 0 is enabled.
 
@@ -263,5 +263,5 @@ Explore the full documentation suite:
 
 * 📖 **[Phase 1: Project Overview & Vision](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/docs/01_PROJECT_OVERVIEW.md)** *(You are here)*
 * 🏗️ **[Phase 2: High-Level Design & System Architecture](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/docs/02_HIGH_LEVEL_DESIGN.md)** — Detailed 11-block HLD breakdown, sequence diagrams, and Qdrant storage schemas.
-* 💻 **[Phase 3: Codebase & Monorepo Architecture](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/docs/03_CODEBASE_ARCHITECTURE.md)** — Package breakdown (`cam`, `percept`, `mem`, `reflectworld`, `dashboard`), file roles, and environment reference.
+* 💻 **[Phase 3: Codebase & Monorepo Architecture](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/docs/03_CODEBASE_ARCHITECTURE.md)** — Package breakdown (`cam`, `percept`, `mem`, `Cortex`, `dashboard`), file roles, and environment reference.
 * 🔍 **[Phase 4: Feature-Wise Working & Code Walkthrough](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/docs/04_FEATURE_DEEP_DIVE.md)** — In-depth algorithmic walkthrough of VAD, optical flow cuts, Re-ID matching, and memory retrieval.
