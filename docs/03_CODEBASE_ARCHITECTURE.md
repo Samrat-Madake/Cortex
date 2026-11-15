@@ -1,4 +1,4 @@
-# 💻 ReflectWorld: Codebase Architecture & Monorepo Guide
+# 💻 Cortex: Codebase Architecture & Monorepo Guide
 
 > **An Exhaustive Code-Level Reference Guide Covering Monorepo Topology, Package Boundaries, Inter-Process Communication, and Environment Configuration.**
 
@@ -12,7 +12,7 @@
    - [`packages/percept` — Dual-Tier Perception & Identity Resolution](#2-packagespercept--dual-tier-perception--identity-resolution)
    - [`services/mem` (Python) — Vector Memory Microservice](#3-servicesmem-python--vector-memory-microservice)
    - [`packages/mem` (TypeScript) — Node.js Client & Type Contracts](#4-packagesmem-typescript--nodejs-client--type-contracts)
-   - [`packages/reflectworld` — Core CLI & Orchestrator](#5-packagesreflectworld--core-cli--orchestrator)
+   - [`packages/Cortex` — Core CLI & Orchestrator](#5-packagesCortex--core-cli--orchestrator)
    - [`packages/dashboard` — React 19 Frontend Workspace](#6-packagesdashboard--react-19-frontend-workspace)
    - [`packages/host` — Standalone Demo & Static Servers](#7-packageshost--standalone-demo--static-servers)
    - [`packages/shared` — Common Types, Events & Utilities](#8-packagesshared--common-types-events--utilities)
@@ -25,17 +25,17 @@
 
 ## 🏗️ Monorepo Architecture Overview
 
-ReflectWorld is organized as a **hybrid TypeScript + Python monorepo**. It pairs TypeScript's robust type safety and asynchronous event loop for media streaming with Python's deep-learning and vector mathematics ecosystem:
+Cortex is organized as a **hybrid TypeScript + Python monorepo**. It pairs TypeScript's robust type safety and asynchronous event loop for media streaming with Python's deep-learning and vector mathematics ecosystem:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                      REFLECTWORLD MONOREPO ECOSYSTEM                   │
+│                      Cortex MONOREPO ECOSYSTEM                   │
 ├────────────────────────────────────────────────────────────────────────┤
 │  TYPESCRIPT WORKSPACE (npm workspaces / Node.js >= 22)                 │
 │  ├── packages/cam         ──► Ingestion, FFmpeg & Silero VAD           │
 │  ├── packages/percept     ──► Dual-tier VLM + ONNX Detection Pipeline  │
 │  ├── packages/mem         ──► TypeScript SDK for Memory Microservice   │
-│  ├── packages/reflectworld──► Core Orchestrator, CLI & Self-Check      │
+│  ├── packages/Cortex──► Core Orchestrator, CLI & Self-Check      │
 │  ├── packages/dashboard   ──► React 19 + Vite Interactive Web App      │
 │  ├── packages/host        ──► Standalone Demo Host & Mock Servers      │
 │  └── packages/shared      ──► Cross-package Event Bus & Type Contracts │
@@ -45,7 +45,7 @@ ReflectWorld is organized as a **hybrid TypeScript + Python monorepo**. It pairs
 ├────────────────────────────────────────────────────────────────────────┤
 │  NATIVE RUNTIMES & ASSETS                                              │
 │  ├── C:\qdrant\qdrant.exe ──► High-performance Vector Store (Port 6333)│
-│  └── ~/.reflectworld/bin/ ──► Local FFmpeg, ffprobe, go2rtc binaries   │
+│  └── ~/.Cortex/bin/ ──► Local FFmpeg, ffprobe, go2rtc binaries   │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -54,7 +54,7 @@ ReflectWorld is organized as a **hybrid TypeScript + Python monorepo**. It pairs
 ## 📂 Root Directory & Workspace Layout
 
 ```
-ReflectWorld/
+Cortex/
 ├── .env                       # Local configuration (API keys, ports, model names)
 ├── .env.example               # Template environment variables
 ├── package.json               # Root workspace manager & build scripts
@@ -71,7 +71,7 @@ ReflectWorld/
 │   ├── cam/                   # Media capture & segmentation
 │   ├── percept/               # AI perception & entity resolution
 │   ├── mem/                   # Memory client bindings
-│   ├── reflectworld/          # CLI, orchestrator & VisionController
+│   ├── Cortex/          # CLI, orchestrator & VisionController
 │   ├── dashboard/             # React 19 frontend
 │   ├── host/                  # Demo server & mock harness
 │   └── shared/                # Shared interfaces, events & loggers
@@ -182,7 +182,7 @@ services/mem/
 
 ---
 
-### 5. `packages/reflectworld` — Core CLI & Orchestrator
+### 5. `packages/Cortex` — Core CLI & Orchestrator
 * **Role:** The central system daemon and command-line interface. Coordinates all other packages, launches background services, and manages lifecycle events.
 * **Core Files:**
   - `src/cli/index.ts`: CLI entry point (`start`, `setup`, `enable-level1`).
@@ -229,19 +229,19 @@ packages/dashboard/src/
 * **Core Files:**
   - `types.ts`: Global data models (`Segment`, `PerceptionMemory`, `EntityRecord`, `VideoFrame`).
   - `events.ts`: Event definitions emitted over the internal event bus and WebSocket.
-  - `paths.ts`: Cross-platform filesystem path resolver (`~/.reflectworld/`).
+  - `paths.ts`: Cross-platform filesystem path resolver (`~/.Cortex/`).
 
 ---
 
 ## 🔌 Inter-Process Communication (IPC) & Communication Matrix
 
-The table below outlines how data flows across process boundaries in ReflectWorld:
+The table below outlines how data flows across process boundaries in Cortex:
 
 ```mermaid
 graph LR
     CAM["packages/cam<br/>(Node.js)"]
     PERCEPT["packages/percept<br/>(Node.js)"]
-    CORE["packages/reflectworld<br/>(Node.js Port 3210)"]
+    CORE["packages/Cortex<br/>(Node.js Port 3210)"]
     PY_MEM["services/mem<br/>(Python Port 8219)"]
     QDRANT["Qdrant Engine<br/>(Rust Port 6333)"]
     UI["packages/dashboard<br/>(Browser)"]
@@ -264,13 +264,13 @@ graph LR
 | `packages/percept` | Gemini / OpenAI | HTTPS REST | External 443 | Compressed base64 keyframes $\rightarrow$ Structured JSON summaries |
 | `packages/percept` | `services/mem` | HTTP REST | Port `8219` | Memory write requests (`POST /memories`, `POST /reid/search`) |
 | `services/mem` | Qdrant Database | HTTP REST / gRPC | Port `6333` / `6334` | Vector upserts, scroll queries, and payload filters |
-| `packages/reflectworld` | Browser Dashboard | HTTP & WebSocket | Port `3210` | Static Vite bundle, REST endpoints, real-time event updates |
+| `packages/Cortex` | Browser Dashboard | HTTP & WebSocket | Port `3210` | Static Vite bundle, REST endpoints, real-time event updates |
 
 ---
 
 ## ⚙️ Complete Environment Configuration Dictionary (`.env`)
 
-Below is the definitive reference for all configuration options supported by ReflectWorld:
+Below is the definitive reference for all configuration options supported by Cortex:
 
 ### 1. Vision & Foundation Model (VLM / LLM) Settings
 | Variable | Allowed Values | Default | Description |
@@ -289,8 +289,8 @@ Below is the definitive reference for all configuration options supported by Ref
 | Variable | Allowed Values | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `PORT` | integer | `3210` | HTTP port for the Host daemon and React Dashboard. |
-| `REFLECTWORLD_ENDPOINT` | URL | `http://127.0.0.1:8219` | Network address of the Python memory service. |
-| `REFLECTWORLD_MEM_PORT`| integer | `8219` | Port on which the Python FastAPI service listens. |
+| `Cortex_ENDPOINT` | URL | `http://127.0.0.1:8219` | Network address of the Python memory service. |
+| `Cortex_MEM_PORT`| integer | `8219` | Port on which the Python FastAPI service listens. |
 | `QDRANT_HOST` | string | `127.0.0.1` | Hostname/IP address of the Qdrant vector database. |
 | `QDRANT_PORT` | integer | `6333` | REST HTTP port for Qdrant. |
 | `QDRANT_URL` | URL | `""` | Optional: Full URL for Qdrant Cloud clusters. |
@@ -315,8 +315,8 @@ Below is the definitive reference for all configuration options supported by Ref
 ### 1. Initial Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/ReflectWorld.git
-cd ReflectWorld
+git clone https://github.com/your-username/Cortex.git
+cd Cortex
 
 # Install root dependencies and link monorepo workspaces
 npm install
