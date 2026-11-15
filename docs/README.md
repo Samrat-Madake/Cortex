@@ -20,7 +20,7 @@ flowchart LR
     style Phase4 fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#fff
 ```
 
-### [Phase 1: Project Overview & Core Philosophy](file:///c:/Users/DELL/Desktop/Mega Project folder/docs/01_PROJECT_OVERVIEW.md)
+### [Phase 1: Project Overview & Core Philosophy](docs/01_PROJECT_OVERVIEW.md)
 > *Essential reading for understanding why ReflectWorld exists and how it departs from episodic video AI.*
 - **System Vision**: Continuous spatial-temporal cognitive continuity vs. disconnected one-off video queries.
 - **Level 0 vs. Level 1 Strategy**: Zero-local-weight VLM mode (commodity hardware) vs native ONNX edge pipeline.
@@ -30,7 +30,7 @@ flowchart LR
 
 ---
 
-### [Phase 2: High-Level Design (HLD) & Subsystem Architecture](file:///c:/Users/DELL/Desktop/Mega Project folder/docs/02_HIGH_LEVEL_DESIGN.md)
+### [Phase 2: High-Level Design (HLD) & Subsystem Architecture](docs/02_HIGH_LEVEL_DESIGN.md)
 > *System topology, end-to-end dataflows, and Qdrant vector database schema specifications.*
 - **Master 11-Block Architecture Diagram**: Microservice topology from camera capture to agent memory recall.
 - **Subsystem Deep Dives**: Breakdown of Ingestion, Segmentation, Whisper, Perception, IPC Client, Python FastAPI, Qdrant, Consolidation, Retrieval, and Dashboard.
@@ -40,7 +40,7 @@ flowchart LR
 
 ---
 
-### [Phase 3: Codebase Architecture & Monorepo Manual](file:///c:/Users/DELL/Desktop/Mega Project folder/docs/03_CODEBASE_ARCHITECTURE.md)
+### [Phase 3: Codebase Architecture & Monorepo Manual](docs/03_CODEBASE_ARCHITECTURE.md)
 > *Monorepo organization, TypeScript/Python hybrid bridges, and environment configuration dictionary.*
 - **Directory Tree & Module Responsibilities**: Explanations of `packages/cam`, `packages/percept`, `services/mem`, `packages/mem`, `packages/reflectworld`, `packages/dashboard`, `packages/host`, and `packages/shared`.
 - **Inter-Process Communication (IPC)**: HTTP REST contracts, payload schemas, and serialization formats between Node.js and FastAPI.
@@ -49,7 +49,7 @@ flowchart LR
 
 ---
 
-### [Phase 4: Feature Deep Dive & Implementation Manual](file:///c:/Users/DELL/Desktop/Mega Project folder/docs/04_FEATURE_DEEP_DIVE.md)
+### [Phase 4: Feature Deep Dive & Implementation Manual](docs/04_FEATURE_DEEP_DIVE.md)
 > *Mathematical formulations, algorithmic descriptions, and source code references for core features.*
 - **Adaptive Segmentation & Keyframes**: Silero VAD pause arbitration, motion energy deltas, color histogram difference formulas, and tri-keyframe picking.
 - **Dual-Tier Perception Engine**: Detailed execution paths for Level 0 (Gemini 3.1 Flash Lite JSON extraction) vs Level 1 (YOLO26m, RetinaFace, ArcFace, RTMPose).
@@ -60,7 +60,7 @@ flowchart LR
 
 ---
 
-### [New Machine Setup & Getting Started Guide](file:///c:/Users/DELL/Desktop/Mega Project folder/docs/05_GETTING_STARTED_NEW_SETUP.md)
+### [New Machine Setup & Getting Started Guide](docs/05_GETTING_STARTED_NEW_SETUP.md)
 > *Zero-to-running onboarding handbook for fresh clone on any Windows, macOS, or Linux machine.*
 - **Level 0 (Zero-GPU Cloud VLM)**: Complete installation and running instructions across 3 monitoring terminals.
 - **Level 1 (Local Edge ONNX Inference)**: CUDA, ONNX models download, and native runtime acceleration setup.
