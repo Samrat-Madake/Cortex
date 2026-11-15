@@ -1,6 +1,6 @@
 # New Machine Setup & Getting Started Guide (Level 0 & Level 1)
 
-This comprehensive guide takes you step-by-step from cloning the repository on a fresh PC or laptop (Windows, macOS, or Linux) to successfully launching and running **ReflectWorld** in either **Level 0 (Cloud VLM / Lightweight Mode)** or **Level 1 (Local Edge ONNX Inference Mode)**.
+This comprehensive guide takes you step-by-step from cloning the repository on a fresh PC or laptop (Windows, macOS, or Linux) to successfully launching and running **Cortex** in either **Level 0 (Cloud VLM / Lightweight Mode)** or **Level 1 (Local Edge ONNX Inference Mode)**.
 
 ---
 
@@ -44,7 +44,7 @@ Before running any setup scripts, ensure the following tools are installed on yo
   ```
 
 ### 2.4 FFmpeg
-ReflectWorld uses FFmpeg for video demuxing, audio track splitting, and keyframe extraction.
+Cortex uses FFmpeg for video demuxing, audio track splitting, and keyframe extraction.
 - **Windows**:
   - Download from [gyan.dev/ffmpeg/builds](https://www.gyan.dev/ffmpeg/builds/) or install via winget:
     ```powershell
@@ -74,15 +74,15 @@ cd Cortex
 ```
 
 ### 3.2 Configure the Root `.env`
-Navigate to the `ReflectWorld` subfolder and create your environment configuration:
+Navigate to the `Cortex` subfolder and create your environment configuration:
 
 ```bash
-cd ReflectWorld
+cd Cortex
 cp .env.example .env
 ```
 *(On Windows PowerShell, use: `Copy-Item .env.example .env`)*
 
-Now open `ReflectWorld/.env` in your text editor and configure:
+Now open `Cortex/.env` in your text editor and configure:
 
 ```env
 # 1. API Keys (Required for Level 0, Optional for pure Level 1)
@@ -109,15 +109,15 @@ HOST=0.0.0.0
 
 ## 4. Install Monorepo & Python Dependencies
 
-From the repository root or `ReflectWorld` directory:
+From the repository root or `Cortex` directory:
 
 ### 4.1 Install Node Monorepo Packages
 ```bash
-cd ReflectWorld
+cd Cortex
 npm install
 npm run build
 ```
-This builds all TypeScript workspaces (`packages/shared`, `packages/cam`, `packages/percept`, `packages/mem`, `packages/reflectworld`, `packages/dashboard`, `packages/host`).
+This builds all TypeScript workspaces (`packages/shared`, `packages/cam`, `packages/percept`, `packages/mem`, `packages/Cortex`, `packages/dashboard`, `packages/host`).
 
 ### 4.2 Set Up Python Memory Service Virtual Environment
 The memory service manages Qdrant collections, FastEmbed dense vectors, and temporal schema consolidation.
@@ -143,7 +143,7 @@ pip install uvicorn fastapi qdrant-client fastembed python-dotenv pydantic reque
 
 ## 5. Setup Qdrant Vector Database
 
-ReflectWorld stores memories across 9 vector collections in Qdrant. You can run Qdrant either via Docker or as a standalone binary:
+Cortex stores memories across 9 vector collections in Qdrant. You can run Qdrant either via Docker or as a standalone binary:
 
 ### Option A: Standalone Binary (Recommended for Windows / Quick Setup)
 1. Download the latest Qdrant release from [Qdrant GitHub Releases](https://github.com/qdrant/qdrant/releases).
@@ -179,25 +179,25 @@ cd C:\qdrant
 ### Terminal 2: Python Memory Service
 ```powershell
 # Windows:
-cd ReflectWorld\services\mem
+cd Cortex\services\mem
 .\.venv\Scripts\Activate.ps1
 python -m uvicorn src.main:app --host 127.0.0.1 --port 8219
 
 # Linux / macOS:
-cd ReflectWorld/services/mem
+cd Cortex/services/mem
 source .venv/bin/activate
 python -m uvicorn src.main:app --host 127.0.0.1 --port 8219
 ```
 *Expected output: `Uvicorn running on http://127.0.0.1:8219` and 9 Qdrant collections initialized.*
 
-### Terminal 3: Main ReflectWorld Orchestrator & Dashboard
+### Terminal 3: Main Cortex Orchestrator & Dashboard
 ```powershell
-cd ReflectWorld
-node packages/reflectworld/dist/src/cli/index.js start --dev
+cd Cortex
+node packages/Cortex/dist/src/cli/index.js start --dev
 ```
 *Expected output:*
 - Automatic self-check verifies Qdrant, Python Memory Service, FFmpeg, and Gemini API.
-- `ReflectWorld running at http://localhost:3210`
+- `Cortex running at http://localhost:3210`
 
 ### Testing Your Video:
 1. Open your browser at **`http://localhost:3210`**.
@@ -220,8 +220,8 @@ Level 1 replaces Cloud VLM API calls with high-performance local edge computer v
 
 ### 7.2 Download ONNX Model Weights
 Place the required `.onnx` models into your system model directory:
-- Windows: `C:\Users\<YOUR_USERNAME>\.reflectworld\models\`
-- Linux/macOS: `~/.reflectworld/models/`
+- Windows: `C:\Users\<YOUR_USERNAME>\.Cortex\models\`
+- Linux/macOS: `~/.Cortex/models/`
 
 Required model files:
 1. `yolo26m.onnx` (Object detection & spatial reasoning)
@@ -230,7 +230,7 @@ Required model files:
 4. `rtmpose-m.onnx` (17-keypoint skeleton pose estimation)
 
 ### 7.3 Configure `.env` for Level 1
-In `ReflectWorld/.env`, update:
+In `Cortex/.env`, update:
 ```env
 # Switch perception level to 1
 PERCEPTION_LEVEL=1
@@ -249,14 +249,14 @@ ONNX_EXECUTION_PROVIDER=cuda
 Re-launch the 3 terminals:
 1. **Terminal 1**: Qdrant (`.\qdrant.exe` on port 6333)
 2. **Terminal 2**: Python Memory Service (`uvicorn src.main:app --port 8219`)
-3. **Terminal 3**: Orchestrator (`node packages/reflectworld/dist/src/cli/index.js start --dev`)
+3. **Terminal 3**: Orchestrator (`node packages/Cortex/dist/src/cli/index.js start --dev`)
 
 The startup self-check will report:
 ```
 [MODEL INFO] Provider "yolo26m-builtin" enabled (CUDAExecutionProvider).
 [MODEL INFO] Provider "retinaface-builtin" enabled.
 [MODEL INFO] Provider "adaface-builtin" enabled.
-[reflectworld] Local edge inference pipeline ACTIVE.
+[Cortex] Local edge inference pipeline ACTIVE.
 ```
 
 ---
@@ -269,7 +269,7 @@ The startup self-check will report:
 
 ### 2. Gemini 404 / 503 Errors
 - **Cause**: Using retired model names (`gemini-1.5-flash`) or heavily saturated endpoints (`gemini-3.8-flash`).
-- **Fix**: Set `GEMINI_MODEL=gemini-3.1-flash-lite` in `ReflectWorld/.env`.
+- **Fix**: Set `GEMINI_MODEL=gemini-3.1-flash-lite` in `Cortex/.env`.
 
 ### 3. Port Conflicts (`EADDRINUSE: 3210`, `8219`, `6333`)
 - **Fix**: Terminate old background processes:
