@@ -1,4 +1,4 @@
-# 🏛️ ReflectWorld: High-Level Design (HLD) & Architecture
+# 🏛️ Cortex: High-Level Design (HLD) & Architecture
 
 > **A Comprehensive Engineering Specification of the 11 Architectural Blocks, Multi-Tier Processing Pipelines, and Hierarchical Memory Topology.**
 
@@ -29,7 +29,7 @@
 
 ## 🌐 End-to-End System Topology
 
-The diagram below presents the authoritative High-Level Design (HLD) of ReflectWorld, detailing the interactions between ingestion, local models, Python memory microservices, and external foundation models:
+The diagram below presents the authoritative High-Level Design (HLD) of Cortex, detailing the interactions between ingestion, local models, Python memory microservices, and external foundation models:
 
 ```mermaid
 graph TB
@@ -39,7 +39,7 @@ graph TB
     end
     
     subgraph B2 ["Block 2: Capture & Ingestion Engine"]
-        CAM["@reflectworld/cam<br/>Ingestion Coordinator"]
+        CAM["@Cortex/cam<br/>Ingestion Coordinator"]
         FFM["FFmpeg Runtime<br/>(1 FPS Sampling / MJPEG Pipe)"]
         G2R["go2rtc Engine<br/>(RTSP WebRTC Bridge)"]
     end
@@ -59,7 +59,7 @@ graph TB
     end
 
     subgraph B5 ["Block 5: Perception Engine"]
-        PERCEPT["@reflectworld/percept Orchestrator"]
+        PERCEPT["@Cortex/percept Orchestrator"]
         subgraph L0 ["Level 0: Fast VLM"]
             VLM0["VLM Analyzer<br/>(Gemini / OpenAI Keyframe Reasoning)"]
         end
@@ -81,7 +81,7 @@ graph TB
     end
 
     subgraph B7 ["Block 7: Hierarchical Memory Engine"]
-        MEM_ADAPTER["@reflectworld/mem<br/>(Node.js Client Adapter)"]
+        MEM_ADAPTER["@Cortex/mem<br/>(Node.js Client Adapter)"]
         subgraph PY_MEM ["Python Memory Microservice (Port 8219)"]
             MEM_CORE["Memory Manager<br/>(FastAPI CRUD Engine)"]
             CONSOLIDATE["Consolidation Engine<br/>(Episodic ➔ Semantic Extraction)"]
@@ -183,20 +183,20 @@ graph TB
 ## 🧩 The 11 Architectural Blocks Breakdown
 
 ### Block 1: Input Layer
-The entry interface for visual and auditory streams. ReflectWorld abstracts varied media inputs into a unified stream format:
+The entry interface for visual and auditory streams. Cortex abstracts varied media inputs into a unified stream format:
 * **Pre-recorded Local Files:** `.mp4`, `.mkv`, `.avi` uploaded via the dashboard or queued via CLI.
 * **Live Network Streams:** RTSP cameras (Hikvision, Dahua, Axis), RTMP, and HLS broadcast links.
 * **Physical Hardware:** Direct USB webcams, camera mounts, and wearable recording glasses (Meta Ray-Ban).
 * **Audio Transports:** Synchronized PCM/AAC tracks extracted simultaneously with video frames.
 
 ### Block 2: Capture & Ingestion Engine
-Located in [`packages/cam`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/ReflectWorld/packages/cam):
+Located in [`packages/cam`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/Cortex/packages/cam):
 * **FFmpeg Process Pipeline:** Spawns isolated worker processes to sample streams at a deterministic 1 FPS rate without unneeded re-encoding.
 * **Modern Framerate Control:** Uses `-fps_mode vfr` and image-to-pipe stream multiplexing to prevent frame duplication.
 * **`go2rtc` RTSP Gateway:** An ultra-low-latency WebRTC/RTSP relay that restructures live camera feeds for browser playback while multiplexing raw frame delivery to the segmenter.
 
 ### Block 3: Composite Segmentation Pipeline
-Rather than dividing video blindly by fixed time intervals (e.g. every 10 seconds), ReflectWorld cuts video at **natural event boundaries**:
+Rather than dividing video blindly by fixed time intervals (e.g. every 10 seconds), Cortex cuts video at **natural event boundaries**:
 * **Voice Activity Detection (Silero VAD):** Tracks speech intervals. A voice pause ($\ge 350\text{ ms}$) triggers an adaptive split (`voice_pause_adaptive`).
 * **Visual Scene Cut (Histogram Differencing):** Evaluates color channel distribution changes across frames to detect camera switches or lighting changes.
 * **Motion Energy Delta (Optical Flow):** Analyzes pixel vector velocity. When a sudden physical action ends, a segment boundary is declared.
@@ -212,7 +212,7 @@ Maintains live operational state before committing long-term vector records:
 * **Procedural Rules:** Injects user-specified guidelines (e.g. *"Alert if an unknown person remains in the room for > 5 minutes"*).
 
 ### Block 5: Dual-Tier Perception Engine
-Located in [`packages/percept`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/ReflectWorld/packages/percept):
+Located in [`packages/percept`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/Cortex/packages/percept):
 * **Level 0 (Cloud VLM Inference):**
   - Sends extracted keyframes directly to a Vision-Language Model (Gemini 3.1 Flash / GPT-4o-mini).
   - Prompts are dynamically structured using `prompt-builder.ts` to output clean JSON schemas containing moment titles, visual summaries, observed objects, and implied actions.
@@ -224,14 +224,14 @@ Located in [`packages/percept`](file:///c:/Users/DELL/Desktop/Mega%20Project%20f
   - **Moonshine / ElevenLabs STT:** Transcribes spoken audio, providing synchronized dialogue transcripts.
 
 ### Block 6: Entity Resolution & Re-Identification
-Located in [`packages/percept/src/identity-resolver.ts`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/ReflectWorld/packages/percept/src/identity-resolver.ts):
+Located in [`packages/percept/src/identity-resolver.ts`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/Cortex/packages/percept/src/identity-resolver.ts):
 * **Face Embedding Matching:** Compares incoming face vectors against Qdrant's `reid_face` collection using Cosine Similarity ($\text{threshold} \ge 0.65$).
 * **Appearance Continuity:** When faces are occluded or turned, body descriptors (`CLIP-ReID`) maintain identity continuity.
 * **Temporal Association:** Resolves ambiguous sightings by evaluating spatial proximity and appearance consistency across consecutive segments.
 * **Identity Clustering:** Merges anonymous observations into persistent profiles (`person_1`, `person_2`), recording historical sighting counts, timestamps, and locations.
 
 ### Block 7: Hierarchical Vector Memory System
-Located in [`services/mem`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/ReflectWorld/services/mem):
+Located in [`services/mem`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folder/Cortex/services/mem):
 * Implemented as an independent, high-performance Python FastAPI service communicating over HTTP port `8219`.
 * Manages **9 distinct Qdrant vector collections**, separating high-frequency raw moment observations from consolidated long-term facts.
 * Contains a background **Consolidation Engine**: When multiple episodic sightings occur for an entity, it summarizes raw sightings into permanent semantic traits (e.g., *"Person 1 visits daily between 9 AM and 10 AM"*).
@@ -256,13 +256,13 @@ Located in [`services/mem`](file:///c:/Users/DELL/Desktop/Mega%20Project%20folde
 
 ### Block 11: End Users & Autonomous Agents
 * **Human Operators:** Review live premises, audit memory summaries, edit entity nicknames, and chat with historical video memory.
-* **Autonomous Agents:** Use ReflectWorld as their persistent visual cortex to reason about the physical world.
+* **Autonomous Agents:** Use Cortex as their persistent visual cortex to reason about the physical world.
 
 ---
 
 ## 🗄️ The 9 Qdrant Memory Collections Specification
 
-ReflectWorld structures its memory hierarchy across 9 specialized collections in Qdrant:
+Cortex structures its memory hierarchy across 9 specialized collections in Qdrant:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
