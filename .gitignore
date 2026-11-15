@@ -43,8 +43,8 @@ htmlcov/
 logs/
 *.log
 results/
-.reflectworld.pids
-.reflectworld-state/
+.cortex.pids
+.cortex-state/
 .qdrant-initialized
 storage/
 
@@ -74,8 +74,8 @@ CLAUDE.md
 internal/
 internal-notes/
 _reference/
-packages/reflectworld/publish/
-packages/reflectworld/bundled-monitor/
+packages/cortex/publish/
+packages/cortex/bundled-monitor/
 
 # Large Test / Fixture media
 eval/fixtures/videos/*.mp4

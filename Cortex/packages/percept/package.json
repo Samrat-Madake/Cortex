@@ -1,0 +1,59 @@
+{
+  "name": "@cortex/percept",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/addxai/Cortex.git",
+    "directory": "packages/percept"
+  },
+  "homepage": "https://github.com/addxai/Cortex",
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": ["cortex", "vision", "perception", "ai-agent", "openclaw", "memory"],
+  "bin": {
+    "install-models": "./dist/src/bin/install-models.js"
+  },
+  "dependencies": {
+    "@cortex/shared": "^0.1.0",
+    "@sinclair/typebox": "^0.34.48",
+    "zod": "^3.24.0"
+  },
+  "peerDependencies": {
+    "onnxruntime-node": "^1.24.3",
+    "sharp": "^0.34.5"
+  },
+  "peerDependenciesMeta": {
+    "onnxruntime-node": {
+      "optional": true
+    },
+    "sharp": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "onnxruntime-node": "^1.24.3",
+    "sharp": "^0.34.5"
+  },
+  "openclaw": {
+    "extensions": [
+      "./dist/index.js"
+    ],
+    "install": {
+      "npmSpec": "@cortex/percept",
+      "localPath": "extensions/cortex-percept"
+    }
+  }
+}

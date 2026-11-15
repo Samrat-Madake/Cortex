@@ -1,0 +1,65 @@
+node_modules/
+dist/
+.env
+*.tsbuildinfo
+logs/
+results/
+.cortex.pids
+.internal-webhook-token
+.venv
+__pycache__/
+*.pyc
+.pytest_cache/
+.claude/
+*.so
+.DS_Store
+packages/cam/bin/
+packages/cam/go2rtc.yaml
+services/mem/.venv/
+*.pt
+*.pth
+*.onnx
+*.egg-info/
+.team/
+.superpowers/
+.worktrees/
+
+# Eval fixtures (videos, results, golden data)
+eval/fixtures/videos/*.mp4
+eval/fixtures/videos/*.mp4.bak
+eval/fixtures/videos/*.mov
+eval/fixtures/videos/*.avi
+eval/fixtures/videos/*.mkv
+eval/fixtures/videos/*.webm
+eval/video-runner/fixtures/videos/*.mp4
+eval/video-runner/fixtures/videos/*.mov
+eval/video-runner/fixtures/videos/*.avi
+eval/video-runner/fixtures/videos/*.mkv
+eval/video-runner/fixtures/videos/*.webm
+eval/benchmark/fixtures/**/*.mp4
+eval/benchmark/fixtures/**/*.mov
+eval/benchmark/fixtures/**/*.avi
+eval/benchmark/fixtures/**/*.mkv
+eval/benchmark/fixtures/**/*.webm
+eval/fixtures/vision-controller-results/
+eval/video-runner/fixtures/e2e-report.md
+_reference/
+eval/fixtures/mem-golden/
+tests/fixtures/videos/
+tests/fixtures/mem-golden/
+.qdrant-initialized
+.cortex-state/
+packages/cortex/publish/
+
+# Local env copies / build artifacts / unrelated locks (not for VCS)
+.env copy
+packages/cortex/bundled-monitor/
+
+# AI assistant local context (not for VCS)
+CLAUDE.md
+.codex/
+
+# Maintainer-private assets and runtime data (never for public repo)
+internal/
+internal-notes/
+storage/

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cortex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg-page:#f5f4f3;--bg-surface:#ffffff;--bg-elevated:#fafaf9;--bg-hover:#f0efee;--bg-inset:#f7f6f5;
+  --text-primary:#1d1c1b;--text-secondary:#5c5b59;--text-muted:#9c9b99;--text-faint:#c4c3c1;
+  --accent:#6366f1;--accent-soft:rgba(99,102,241,0.08);--accent-border:rgba(99,102,241,0.25);
+  --green:#22c55e;--amber:#f59e0b;--amber-soft:rgba(245,158,11,0.1);--red:#ef4444;
+  --purple:#8b5cf6;--purple-soft:rgba(139,92,246,0.08);
+  --shadow-border:0 0 0 1px rgba(0,0,0,0.06);
+  --shadow-card:0 0 0 1px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04),0 4px 8px -4px rgba(0,0,0,0.04);
+  --shadow-elevated:0 0 0 1px rgba(0,0,0,0.06),0 4px 6px rgba(0,0,0,0.04),0 12px 24px -8px rgba(0,0,0,0.06);
+  --shadow-selected:0 0 0 2px var(--accent),0 4px 12px rgba(99,102,241,0.15);
+  --r-sm:6px;--r-md:10px;--r-lg:14px;--r-pill:999px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --cam5-color:#9c9b99;--cam2-color:#6b9e6b;
+}
+body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);-webkit-font-smoothing:antialiased;overflow:hidden;height:100vh;}
+
+/* LAYOUT */
+.app{display:flex;flex-direction:column;height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:var(--bg-surface);box-shadow:0 1px 0 rgba(0,0,0,0.05);flex-shrink:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(99,102,241,0.25);}
+.logo-mark svg{width:18px;height:18px;fill:#fff;}
+.logo-text{font-size:16px;font-weight:600;letter-spacing:-0.3px;}
+.icon-btn{width:36px;height:36px;background:var(--bg-elevated);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-border);transition:background 0.15s;border:none;}
+.icon-btn:hover{background:var(--bg-hover);}
+.icon-btn svg{width:18px;height:18px;fill:var(--text-muted);}
+
+.main-row{flex:1;display:flex;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:360px;flex-shrink:0;background:var(--bg-surface);box-shadow:1px 0 0 rgba(0,0,0,0.05);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.vid-wrap{border-radius:var(--r-lg);overflow:hidden;background:#0f0f10;position:relative;cursor:pointer;}
+.vid-frame{width:100%;aspect-ratio:16/10;background:#1a1a2e;display:flex;align-items:center;justify-content:center;}
+.vid-top{position:absolute;top:0;left:0;right:0;z-index:1;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;}
+.badge-live{display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,0.15);color:var(--green);padding:3px 10px;border-radius:var(--r-pill);font-size:11px;font-weight:500;backdrop-filter:blur(12px);}
+.badge-cam{background:rgba(0,0,0,0.45);color:rgba(255,255,255,0.85);padding:3px 10px;border-radius:var(--r-pill);font-size:11px;font-weight:500;backdrop-filter:blur(12px);}
+.expand-h{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.45);color:rgba(255,255,255,0.7);padding:2px 8px;border-radius:var(--r-sm);font-size:9px;opacity:0;transition:opacity 0.2s;}
+.vid-wrap:hover .expand-h,.scene-box:hover .expand-h{opacity:1;}
+.vid-summary{font-size:11px;color:var(--text-secondary);line-height:1.5;font-style:italic;padding:2px 2px 0;}
+.cam-row{display:flex;gap:6px;flex-wrap:wrap;}
+.cam-chip{padding:5px 12px;border-radius:var(--r-pill);font-size:11px;font-weight:500;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s;}
+.cam-chip.active{background:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(99,102,241,0.3);}
+.cam-chip:not(.active){background:var(--bg-elevated);color:var(--text-secondary);box-shadow:var(--shadow-border);}
+.upload-row{display:flex;gap:6px;}
+.upload-btn{flex:1;height:36px;background:var(--bg-elevated);border:1.5px dashed var(--text-faint);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:var(--font);}
+.upload-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.upload-btn svg{width:14px;height:14px;fill:currentColor;}
+.scene-label{font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:0.02em;margin:8px 0 6px;display:flex;align-items:center;gap:6px;}
+.scene-label svg{width:16px;height:16px;fill:var(--text-muted);}
+.scene-box{height:200px;background:var(--bg-elevated);border-radius:var(--r-lg);box-shadow:var(--shadow-border);position:relative;overflow:hidden;cursor:pointer;}
+.scene-legend{position:absolute;top:6px;left:8px;display:flex;gap:8px;font-size:8px;color:var(--text-muted);font-weight:500;}
+
+/* CENTER — segments area */
+.center{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:16px 20px;transition:all 0.3s;min-width:0;}
+.center-header{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-shrink:0;}
+.center-header-title{font-size:14px;font-weight:600;color:var(--text-primary);letter-spacing:-0.2px;display:flex;align-items:center;gap:8px;}
+.center-header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.col-count{font-size:11px;font-weight:500;color:var(--text-muted);background:var(--bg-inset);padding:2px 10px;border-radius:var(--r-pill);}
+.filter-bar{display:flex;align-items:center;gap:8px;min-height:24px;flex-shrink:0;}
+.filter-bar.hidden{visibility:hidden;}
+.filter-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r-pill);font-size:11px;font-weight:500;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);}
+.filter-x{font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;border:none;background:none;font-family:var(--font);}
+/* Toggle entity panel button */
+.ent-toggle{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);font-size:11px;font-weight:500;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s;background:var(--bg-inset);color:var(--text-secondary);}
+.ent-toggle:hover{background:var(--bg-hover);}
+.ent-toggle.active{background:var(--accent-soft);color:var(--accent);}
+.ent-toggle svg{width:14px;height:14px;fill:currentColor;}
+
+/* Segment scroll area — with optional timeline */
+.seg-area{flex:1;overflow-y:auto;padding:4px 2px;}
+
+/* Timeline mode: each seg row is a grid with timeline column */
+.seg-area.tl-mode .seg-row{display:grid;grid-template-columns:56px 1fr;align-items:start;}
+.seg-area.tl-mode .seg-list-wrap{max-width:560px;margin:0 auto;}
+.seg-area:not(.tl-mode) .tl-cell{display:none;}
+
+/* Timeline cell */
+.tl-cell{display:flex;flex-direction:column;align-items:center;position:relative;padding-top:14px;}
+.tl-cell::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--bg-inset);transform:translateX(-50%);}
+.tl-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg-surface);position:relative;z-index:1;flex-shrink:0;}
+.tl-dot.cam5{background:var(--cam5-color);}
+.tl-dot.cam2{background:var(--cam2-color);}
+.tl-dot.static-d{background:transparent;border:2px solid var(--text-faint);}
+.tl-dot.rule-d{background:var(--purple);box-shadow:0 0 0 3px var(--purple-soft);}
+.tl-time{font-size:11px;color:var(--text-muted);white-space:nowrap;margin-top:4px;font-weight:500;}
+.tl-date-sep{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:8px 0;margin:4px 0;}
+.tl-date-sep .tl-date-line{flex:1;height:1px;background:var(--text-faint);opacity:0.3;}
+.tl-date-sep .tl-date-text{font-size:11px;font-weight:600;color:var(--text-muted);white-space:nowrap;padding:2px 10px;background:var(--bg-inset);border-radius:var(--r-pill);}
+
+/* Seg list */
+.seg-list-wrap{flex:1;min-width:0;}
+
+/* Segment card */
+.seg{background:var(--bg-surface);border-radius:var(--r-lg);margin-bottom:8px;box-shadow:var(--shadow-card);cursor:pointer;transition:all 0.2s;overflow:hidden;}
+.seg:hover{box-shadow:var(--shadow-elevated);transform:translateY(-1px);}
+.seg.selected{box-shadow:var(--shadow-selected);transform:none;}
+.seg.dimmed{opacity:0.2;transform:none;pointer-events:none;}
+.seg.static{opacity:0.4;}
+.seg-body{display:flex;gap:10px;padding:10px 12px;}
+.seg-thumb{width:110px;height:68px;border-radius:var(--r-sm);background:#e8e6e3;flex-shrink:0;overflow:hidden;position:relative;}
+.gif-strip{display:flex;width:300%;height:100%;animation:gifScroll 3s steps(3) infinite;}
+.gif-frame{width:33.33%;height:100%;flex-shrink:0;}
+@keyframes gifScroll{0%{transform:translateX(0);}33%{transform:translateX(-33.33%);}66%{transform:translateX(-66.66%);}100%{transform:translateX(0);}}
+.gif-badge{position:absolute;bottom:3px;left:3px;font-size:8px;font-weight:600;color:#fff;background:rgba(0,0,0,0.5);padding:1px 5px;border-radius:3px;}
+.seg-info{flex:1;min-width:0;display:flex;flex-direction:column;}
+.seg-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.seg-time{font-size:11px;color:var(--text-muted);}
+.seg-cam{font-size:10px;color:var(--text-muted);font-weight:500;background:var(--bg-inset);padding:2px 6px;border-radius:var(--r-sm);}
+.seg-sum{font-size:12px;color:var(--text-secondary);line-height:1.5;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.seg-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.stag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:var(--r-pill);font-size:9px;font-weight:500;background:var(--bg-inset);color:var(--text-muted);}
+.stag svg{width:11px;height:11px;fill:currentColor;}
+.proc-trigger{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:600;color:#7c3aed;background:rgba(139,92,246,0.1);padding:2px 7px;border-radius:var(--r-pill);border:1px solid rgba(139,92,246,0.2);}
+.proc-trigger svg{width:9px;height:9px;fill:#7c3aed;}
+.sp-badge{font-size:9px;font-weight:600;color:#92400e;background:#fef3c7;padding:2px 7px;border-radius:var(--r-pill);}
+
+/* Seg detail */
+.seg-det{display:none;padding:10px 12px;border-top:1px solid rgba(0,0,0,0.05);}
+.seg.expanded .seg-det{display:block;}
+.seg-det-top{display:flex;gap:12px;margin-bottom:10px;}
+.seg-det-vid{width:200px;height:124px;border-radius:var(--r-md);background:#1a1a2e;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;cursor:pointer;}
+.seg-det-vid:hover .vid-expand{opacity:1;}
+.vid-expand{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;opacity:0;transition:opacity 0.15s;}
+.seg-det-vid .play-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);}
+.seg-det-vid .play-icon svg{width:32px;height:32px;fill:#fff;}
+.seg-det-sum{font-size:12px;color:var(--text-secondary);line-height:1.6;}
+.det-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.03em;margin:8px 0 6px;}
+.trow{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:var(--r-md);margin-bottom:4px;}
+.trow.id{background:var(--accent-soft);}
+.trow.an{background:var(--bg-inset);}
+.tthumb{width:42px;height:42px;border-radius:var(--r-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.tthumb.face-bg{background:linear-gradient(135deg,#e8e5f5,#ddd8f0);}
+.tthumb.face-bg svg{width:20px;height:20px;fill:var(--accent);}
+.tthumb.anon-bg{background:#e8e6e3;}
+.tthumb.anon-bg svg{width:18px;height:18px;fill:var(--text-faint);}
+.tinfo{flex:1;min-width:0;}
+.tname{font-size:12px;font-weight:500;}
+.tname.id-c{color:var(--accent);}
+.tname.an-c{color:var(--text-muted);}
+.tdesc{font-size:11px;color:var(--text-muted);line-height:1.4;margin-top:1px;}
+.sp-block{margin-top:6px;padding:6px 10px;background:var(--amber-soft);border-radius:var(--r-md);}
+.sp-items{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;font-weight:500;}
+.sp-items .moved{color:var(--amber);}
+.proc-detail{margin-top:6px;padding:6px 10px;background:var(--purple-soft);border-radius:var(--r-md);font-size:11px;color:#7c3aed;line-height:1.5;display:flex;align-items:flex-start;gap:6px;}
+.proc-detail svg{width:14px;height:14px;fill:#7c3aed;flex-shrink:0;margin-top:1px;}
+
+/* ENTITY PANEL — right sidebar, collapsible, equal width with center */
+.ent-panel{flex:1;flex-shrink:0;background:var(--bg-surface);box-shadow:-1px 0 0 rgba(0,0,0,0.05);overflow-y:auto;padding:16px;display:flex;flex-direction:column;transition:flex 0.3s,padding 0.3s,opacity 0.3s;}
+.ent-panel.collapsed{flex:0;width:0;padding:0;opacity:0;overflow:hidden;}
+.ent-panel-header{font-size:14px;font-weight:600;color:var(--text-primary);letter-spacing:-0.2px;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.ent-panel-scroll{flex:1;overflow-y:auto;padding:4px 6px 4px 4px;margin:-4px -6px -4px -4px;}
+
+/* Entity card */
+.ent{background:var(--bg-surface);border-radius:var(--r-lg);margin-bottom:10px;box-shadow:var(--shadow-card);cursor:pointer;transition:all 0.2s;overflow:hidden;}
+.ent:hover{box-shadow:var(--shadow-elevated);transform:translateY(-1px);}
+.ent.selected{box-shadow:var(--shadow-selected);transform:none;}
+.ent.dimmed{opacity:0.2;transform:none;pointer-events:none;}
+.ent-body{display:flex;gap:12px;padding:12px;}
+.ent-photo{width:56px;height:56px;border-radius:var(--r-md);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.ent-photo.face{background:linear-gradient(135deg,#e8e5f5,#ddd8f0);}
+.ent-photo.face svg{width:28px;height:28px;fill:var(--accent);}
+.ent-right{flex:1;min-width:0;}
+.ent-name{font-size:14px;font-weight:600;letter-spacing:-0.2px;}
+.ent-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.ent-pill{font-size:10px;font-weight:500;color:var(--text-muted);background:var(--bg-inset);padding:1px 7px;border-radius:var(--r-pill);}
+.ent-cam{font-size:9px;font-weight:500;color:var(--text-faint);background:var(--bg-inset);padding:1px 6px;border-radius:var(--r-pill);}
+.ent-recent{margin-top:8px;display:flex;flex-direction:column;gap:3px;}
+.ent-beh-preview{font-size:11px;color:var(--text-muted);display:flex;gap:6px;align-items:center;}
+.ent-beh-preview .t{font-size:10px;color:var(--text-faint);min-width:44px;}
+.ent-det{display:none;padding:12px;border-top:1px solid rgba(0,0,0,0.05);}
+.ent.expanded .ent-det{display:block;}
+.sem-label{font-size:11px;font-weight:600;color:var(--purple);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.sem-label .m{font-size:10px;color:var(--text-muted);font-weight:400;margin-left:auto;}
+.sem-body{font-size:12px;color:var(--text-secondary);line-height:1.6;background:var(--bg-inset);padding:10px 12px;border-radius:var(--r-md);margin-bottom:6px;}
+.sight-gallery{display:flex;gap:6px;overflow-x:auto;padding:4px 0;}
+.sight-item{width:64px;flex-shrink:0;text-align:center;}
+.sight-img{width:64px;height:64px;border-radius:var(--r-sm);background:linear-gradient(135deg,#e8e6e3,#d4d0cb);display:flex;align-items:center;justify-content:center;margin-bottom:3px;}
+.sight-img svg{width:24px;height:24px;fill:var(--text-faint);}
+.sight-time{font-size:9px;color:var(--text-faint);}
+.sight-cam{font-size:8px;color:var(--text-faint);background:var(--bg-inset);padding:0 4px;border-radius:2px;}
+.beh{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:12px;color:var(--text-secondary);border-bottom:1px solid rgba(0,0,0,0.03);}
+.beh:last-child{border-bottom:none;}
+.beh-t{font-size:10px;color:var(--text-muted);white-space:nowrap;min-width:52px;}
+.beh-cam{font-size:9px;color:var(--text-faint);background:var(--bg-inset);padding:1px 5px;border-radius:var(--r-sm);white-space:nowrap;}
+
+/* BOTTOMBAR */
+.bottombar{background:var(--bg-surface);box-shadow:0 -1px 0 rgba(0,0,0,0.05);padding:0 24px;flex-shrink:0;z-index:90;}
+.bottombar-main{display:flex;align-items:center;gap:20px;height:42px;}
+.bottombar-left{display:flex;align-items:center;gap:12px;}
+.bottombar-right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+.bb-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:var(--r-pill);font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s;position:relative;background:var(--bg-inset);color:var(--text-secondary);}
+.bb-btn:hover{background:var(--bg-hover);}
+.bb-btn.active{background:var(--accent-soft);color:var(--accent);}
+.bb-btn svg{width:14px;height:14px;fill:currentColor;}
+.bb-btn .bb-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+.bb-popover{display:none;position:absolute;bottom:calc(100% + 8px);left:0;min-width:240px;background:var(--bg-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-elevated),0 16px 40px rgba(0,0,0,0.1);padding:12px;z-index:300;}
+.bb-popover.open{display:block;}
+.bb-pop-title{font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;}
+.bb-svc-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--text-secondary);}
+.bb-svc-row .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.bb-svc-row .dot.ok{background:var(--green);}
+.bb-svc-row .svc-name{flex:1;}
+.bb-svc-row .svc-lat{font-size:10px;color:var(--text-faint);}
+.bb-model-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--text-secondary);}
+.bb-model-row .ms{font-size:10px;font-weight:500;padding:1px 6px;border-radius:var(--r-pill);}
+.bb-model-row .ms.on{background:rgba(34,197,94,0.1);color:var(--green);}
+.bb-model-row .ms.off{background:var(--bg-inset);color:var(--text-faint);}
+
+/* PROCEDURAL */
+.proc-topbtn{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--r-pill);font-size:12px;font-weight:500;color:var(--purple);background:var(--purple-soft);border:1px solid rgba(139,92,246,0.15);cursor:pointer;font-family:var(--font);transition:all 0.15s;position:relative;}
+.proc-topbtn:hover{background:rgba(139,92,246,0.12);}
+.proc-topbtn.active{border-color:var(--purple);box-shadow:0 2px 8px rgba(139,92,246,0.15);}
+.proc-topbtn svg{width:14px;height:14px;fill:var(--purple);}
+.proc-topbtn .badge{font-size:10px;font-weight:600;background:var(--purple);color:#fff;padding:0 6px;border-radius:var(--r-pill);}
+.proc-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;width:380px;background:var(--bg-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-elevated),0 20px 40px rgba(0,0,0,0.08);padding:12px;z-index:300;}
+.proc-dropdown.open{display:block;}
+.proc-dropdown-title{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.proc-dropdown-title svg{width:16px;height:16px;fill:var(--purple);}
+.proc-rule-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r-md);cursor:pointer;transition:all 0.15s;margin-bottom:4px;border:1px solid transparent;}
+.proc-rule-item:hover{background:var(--bg-hover);}
+.proc-rule-item.active{background:var(--purple-soft);border-color:rgba(139,92,246,0.2);}
+.proc-rule-icon{width:32px;height:32px;border-radius:var(--r-sm);background:var(--purple-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.proc-rule-icon svg{width:16px;height:16px;fill:var(--purple);}
+.proc-rule-text{font-size:12px;color:var(--text-secondary);line-height:1.5;flex:1;}
+.proc-rule-count{font-size:10px;font-weight:600;color:var(--purple);background:rgba(139,92,246,0.1);padding:2px 8px;border-radius:var(--r-pill);white-space:nowrap;align-self:center;}
+
+/* FLOATING CHAT */
+.chat-fab{position:fixed;bottom:60px;right:28px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(99,102,241,0.35);z-index:150;border:none;transition:transform 0.2s;}
+.chat-fab:hover{transform:scale(1.08);}
+.chat-fab svg{width:24px;height:24px;fill:#fff;}
+.chat-panel{position:fixed;bottom:120px;right:28px;width:380px;max-height:480px;background:var(--bg-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-elevated),0 20px 50px rgba(0,0,0,0.12);z-index:150;display:none;flex-direction:column;overflow:hidden;}
+.chat-panel.open{display:flex;}
+.chat-panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(0,0,0,0.05);}
+.chat-panel-title{font-size:14px;font-weight:600;}
+.chat-panel-close{border:none;background:none;cursor:pointer;font-size:16px;color:var(--text-muted);padding:4px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
+.chat-msg{padding:8px 12px;border-radius:var(--r-md);font-size:13px;line-height:1.5;max-width:85%;}
+.chat-msg.u{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.chat-msg.a{background:var(--bg-inset);color:var(--text-secondary);align-self:flex-start;border-bottom-left-radius:4px;}
+.chat-input-row{display:flex;align-items:center;gap:6px;padding:10px 12px;border-top:1px solid rgba(0,0,0,0.05);}
+.chat-input-row input{flex:1;border:none;background:var(--bg-inset);font-size:13px;font-family:var(--font);color:var(--text-primary);outline:none;padding:8px 12px;border-radius:var(--r-md);}
+.chat-input-row input::placeholder{color:var(--text-faint);}
+.chat-btn{width:34px;height:34px;border:none;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;background:none;color:var(--text-muted);}
+.chat-btn:hover{background:var(--bg-hover);color:var(--accent);}
+.chat-btn.send{background:var(--accent);color:#fff;}
+.chat-btn svg{width:16px;height:16px;fill:currentColor;}
+
+/* SETTINGS */
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.settings-overlay.open{display:flex;}
+.settings-panel{background:var(--bg-surface);border-radius:var(--r-lg);padding:24px;width:440px;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow-elevated);}
+.settings-title{font-size:16px;font-weight:600;margin-bottom:20px;display:flex;justify-content:space-between;}
+.settings-close{border:none;background:none;font-size:18px;cursor:pointer;color:var(--text-muted);}
+.settings-group{margin-bottom:18px;}
+.settings-group-label{font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;}
+.settings-options{display:flex;gap:6px;flex-wrap:wrap;}
+.settings-opt{padding:7px 16px;border-radius:var(--r-pill);font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s;}
+.settings-opt.active{background:var(--accent);color:#fff;}
+.settings-opt:not(.active){background:var(--bg-inset);color:var(--text-secondary);box-shadow:var(--shadow-border);}
+
+.exp-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);}
+.exp-overlay.open{display:flex;}
+.exp-inner{width:80vw;max-width:900px;max-height:80vh;border-radius:var(--r-lg);overflow:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.1);border-radius:2px;}
+</style>
+</head>
+<body>
+<svg style="display:none">
+  <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></symbol>
+  <symbol id="ic-gear" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></symbol>
+  <symbol id="ic-person" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+  <symbol id="ic-person-o" viewBox="0 0 24 24"><path d="M12 6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m0-2c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 10c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm6 4H6v-.01c.2-.71 3.3-2 6-2 2.69 0 5.78 1.28 6 2v.01z"/></symbol>
+  <symbol id="ic-pet" viewBox="0 0 24 24"><path d="M4.5 9.5m-2.5 0a2.5 2.5 0 105 0 2.5 2.5 0 10-5 0M9 5.5m-2.5 0a2.5 2.5 0 105 0 2.5 2.5 0 10-5 0M15 5.5m-2.5 0a2.5 2.5 0 105 0 2.5 2.5 0 10-5 0M19.5 9.5m-2.5 0a2.5 2.5 0 105 0 2.5 2.5 0 10-5 0M17.34 14.86c-.87-1.02-1.6-1.89-2.48-2.91-.46-.54-1.17-.95-1.87-.95s-1.41.41-1.87.95c-.87 1.02-1.6 1.89-2.48 2.91-1.31 1.31-2.92 2.76-2.62 4.79.29 1.02 1.02 2.0 2.09 2.35 1.97.4 4.17-.97 5.89-.97s3.92 1.37 5.89.97c1.07-.35 1.8-1.33 2.09-2.35.3-2.03-1.31-3.48-2.64-4.79z"/></symbol>
+  <symbol id="ic-car" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></symbol>
+  <symbol id="ic-cube" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.36.2-.8.2-1.14 0l-7.9-4.44A.99.99 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.36-.2.8-.2 1.14 0l7.9 4.44c.32.17.53.5.53.88v9zM12 4.15L5 8.09v7.82l7 3.94 7-3.94V8.09l-7-3.94z"/></symbol>
+  <symbol id="ic-mic" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></symbol>
+  <symbol id="ic-upload" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></symbol>
+  <symbol id="ic-link" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></symbol>
+  <symbol id="ic-film" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></symbol>
+  <symbol id="ic-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+  <symbol id="ic-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></symbol>
+  <symbol id="ic-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="ic-img" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></symbol>
+  <symbol id="ic-sidebar" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H10V6h10v12z"/></symbol>
+</svg>
+
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left"><img src="logo.png" alt="Cortex" style="width:28px;height:28px;"><span class="logo-text">Cortex</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:6px;"><span style="width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--green);box-shadow:0 0 6px rgba(34,197,94,0.4);"></span><span style="font-size:13px;color:var(--text-muted);">206 events</span></div>
+    <div style="position:relative;" id="procWrap">
+      <button class="proc-topbtn" id="procTopBtn" onclick="toggleProcDD(event)"><svg><use href="#ic-cube"/></svg> Rules <span class="badge">3</span></button>
+      <div class="proc-dropdown" id="procDD">
+        <div class="proc-dropdown-title"><svg><use href="#ic-cube"/></svg> Procedural Rules</div>
+        <div class="proc-rule-item" data-rule="r1" onclick="clickRule(event,'r1')"><div class="proc-rule-icon"><svg><use href="#ic-pet"/></svg></div><div class="proc-rule-text">Notify Alex if any animals or pets appear.</div><div class="proc-rule-count">1 fired</div></div>
+        <div class="proc-rule-item" data-rule="r2" onclick="clickRule(event,'r2')"><div class="proc-rule-icon"><svg><use href="#ic-cube"/></svg></div><div class="proc-rule-text">Log object movements and displacement.</div><div class="proc-rule-count">1 fired</div></div>
+        <div class="proc-rule-item" data-rule="r3" onclick="clickRule(event,'r3')"><div class="proc-rule-icon"><svg><use href="#ic-person"/></svg></div><div class="proc-rule-text">When Person A leaves (cam_2), increase cam_5 to 2fps.</div><div class="proc-rule-count">2 fired</div></div>
+      </div>
+    </div>
+    <button class="icon-btn" onclick="openSettings()"><svg><use href="#ic-gear"/></svg></button>
+  </div>
+</div>
+
+<!-- MAIN ROW -->
+<div class="main-row">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="vid-wrap" onclick="expandVideo()"><div class="vid-top"><div class="badge-live"><span style="width:5px;height:5px;background:var(--green);border-radius:50%;display:inline-block;"></span> Live</div><div class="badge-cam">cam_5</div></div><div class="vid-frame"><span style="color:#444;font-size:12px;">Office — 5 people</span></div><div class="expand-h">Click to expand</div></div>
+    <div class="vid-summary">Person A seated with headphones. Others static at desks.</div>
+    <div class="cam-row"><button class="cam-chip active">cam_5</button><button class="cam-chip">cam_2</button><button class="cam-chip">cam_8</button></div>
+    <div class="upload-row"><button class="upload-btn"><svg><use href="#ic-upload"/></svg> Upload video</button><button class="upload-btn"><svg><use href="#ic-link"/></svg> Stream URL</button></div>
+    <div class="scene-label"><svg><use href="#ic-cube"/></svg> 3D Scene</div>
+    <div class="scene-box" onclick="expand3D()">
+      <svg width="100%" height="100%" viewBox="0 0 320 190" style="position:absolute;top:0;left:0;"><g opacity="0.18"><circle cx="40" cy="145" r="1" fill="var(--accent)"/><circle cx="65" cy="143" r="1.2" fill="var(--accent)"/><circle cx="90" cy="147" r="1" fill="var(--accent)"/><circle cx="115" cy="142" r="1.1" fill="var(--accent)"/><circle cx="140" cy="146" r="1.3" fill="var(--accent)"/><circle cx="165" cy="144" r="1" fill="var(--accent)"/><circle cx="190" cy="148" r="1.2" fill="var(--accent)"/><circle cx="215" cy="143" r="1" fill="var(--accent)"/><circle cx="240" cy="147" r="1.1" fill="var(--accent)"/><circle cx="265" cy="145" r="1.3" fill="var(--accent)"/><circle cx="290" cy="142" r="1" fill="var(--accent)"/><circle cx="30" cy="50" r="1" fill="#a78bfa"/><circle cx="33" cy="65" r="1.1" fill="#a78bfa"/><circle cx="28" cy="80" r="1" fill="#a78bfa"/><circle cx="295" cy="55" r="1" fill="#a78bfa"/><circle cx="292" cy="70" r="1.1" fill="#a78bfa"/><circle cx="100" cy="78" r="1" fill="#a78bfa"/><circle cx="120" cy="76" r="1.1" fill="#a78bfa"/><circle cx="150" cy="80" r="1" fill="#a78bfa"/><circle cx="190" cy="77" r="1.2" fill="#a78bfa"/><circle cx="230" cy="78" r="1" fill="#a78bfa"/></g><rect x="140" y="50" width="26" height="32" rx="4" fill="none" stroke="var(--accent)" stroke-width="1.5"/><text x="153" y="93" font-size="7" fill="var(--accent)" text-anchor="middle" font-family="Inter" font-weight="600">A</text><rect x="180" y="65" width="14" height="14" rx="3" fill="none" stroke="var(--amber)" stroke-width="1.2"/><rect x="65" y="55" width="22" height="28" rx="3" fill="none" stroke="var(--accent)" stroke-width="1"/><text x="76" y="93" font-size="7" fill="var(--accent)" text-anchor="middle" font-family="Inter" font-weight="600">B</text><rect x="100" y="58" width="18" height="24" rx="3" fill="none" stroke="var(--text-faint)" stroke-width="0.8" stroke-dasharray="3,2"/><rect x="215" y="60" width="18" height="24" rx="3" fill="none" stroke="var(--text-faint)" stroke-width="0.8" stroke-dasharray="3,2"/><rect x="250" y="62" width="18" height="24" rx="3" fill="none" stroke="var(--text-faint)" stroke-width="0.8" stroke-dasharray="3,2"/><polygon points="160,175 80,128 240,128" fill="rgba(99,102,241,0.04)" stroke="var(--accent)" stroke-width="0.4" stroke-dasharray="3,3"/><circle cx="160" cy="175" r="3" fill="var(--accent)"/></svg>
+      <div class="scene-legend"><span>● identified</span><span style="opacity:0.5">○ anon</span><span style="color:var(--amber)">● moved</span></div>
+      <div class="expand-h">Click to expand</div>
+    </div>
+  </div>
+
+  <!-- CENTER — Segments -->
+  <div class="center" id="centerArea">
+    <div class="center-header">
+      <div class="center-header-title"><svg style="width:16px;height:16px;fill:var(--text-muted);"><use href="#ic-film"/></svg> Segments <span class="col-count" id="segCount">6</span></div>
+      <div class="center-header-right">
+        <button class="ent-toggle active" id="entToggle" onclick="toggleEntPanel()"><svg><use href="#ic-sidebar"/></svg> Entities</button>
+      </div>
+    </div>
+    <div class="filter-bar hidden" id="segFilter"><span class="filter-pill" id="segFilterLabel"></span><button class="filter-x" onclick="clearFilter()">✕ Clear</button></div>
+
+    <div class="seg-area" id="segArea">
+      <div class="seg-list-wrap" id="segList">
+        <!-- S1 -->
+        <div class="seg-row"><div class="tl-cell"><div class="tl-dot cam5 rule-d"></div><div class="tl-time">15:30</div></div>
+        <div class="seg" data-seg="s1" data-entities="pA,pB" data-rules="r3" onclick="clickSeg(this)">
+          <div class="seg-body">
+            <div class="seg-thumb"><div class="gif-strip"><div class="gif-frame" style="background:#d4d0cb;"></div><div class="gif-frame" style="background:#ccc8c3;"></div><div class="gif-frame" style="background:#d8d4cf;"></div></div><span class="gif-badge">GIF</span></div>
+            <div class="seg-info"><div class="seg-meta"><span class="seg-time">15:30:07 · 3s</span><span class="seg-cam">cam_5</span></div><div class="seg-sum">Person A exhibits a subtle head shift. Others remain static at desks.</div><div class="seg-tags"><span class="stag"><svg><use href="#ic-person"/></svg> ×5</span><span class="proc-trigger"><svg><use href="#ic-cube"/></svg> Rule</span></div></div>
+          </div>
+          <div class="seg-det"><div class="seg-det-top"><div class="seg-det-vid" onclick="event.stopPropagation();expandSegVid()"><div class="play-icon"><svg><use href="#ic-play"/></svg></div><div class="vid-expand">Expand</div></div><div class="seg-det-sum">Person A exhibits a subtle head shift while seated. All five individuals in the office remain at their desks.</div></div><div class="det-label">Detected Targets</div><div class="trow id"><div class="tthumb face-bg"><svg><use href="#ic-person"/></svg></div><div class="tinfo"><div class="tname id-c">Person A</div><div class="tdesc">Subtle head shift. Black hooded jacket, grey headphones.</div></div></div><div class="trow id"><div class="tthumb face-bg"><svg><use href="#ic-person"/></svg></div><div class="tinfo"><div class="tname id-c">Person B</div><div class="tdesc">Static, left background. Dark puffer jacket.</div></div></div><div class="trow an"><div class="tthumb anon-bg"><svg><use href="#ic-person-o"/></svg></div><div class="tinfo"><div class="tname an-c">Unknown</div><div class="tdesc">Dark jacket, middle-left.</div></div></div><div class="trow an"><div class="tthumb anon-bg"><svg><use href="#ic-person-o"/></svg></div><div class="tinfo"><div class="tname an-c">Unknown</div><div class="tdesc">Middle background, static.</div></div></div><div class="trow an"><div class="tthumb anon-bg"><svg><use href="#ic-person-o"/></svg></div><div class="tinfo"><div class="tname an-c">Unknown</div><div class="tdesc">Grey jacket, far left desk.</div></div></div><div class="proc-detail"><svg><use href="#ic-cube"/></svg><span>Rule: <b>"Person A returned"</b> — cam_5 restored to 1fps.</span></div></div>
+        </div>
+        </div><!-- /seg-row S1 -->
+        <!-- S2 object movement -->
+        <div class="seg-row"><div class="tl-cell"><div class="tl-dot cam5 rule-d"></div><div class="tl-time"></div></div>
+        <div class="seg" data-seg="s2" data-entities="pA" data-rules="r2" onclick="clickSeg(this)">
+          <div class="seg-body">
+            <div class="seg-thumb"><div class="gif-strip"><div class="gif-frame" style="background:#d4d0cb;"></div><div class="gif-frame" style="background:#d0ccc7;"></div><div class="gif-frame" style="background:#d8d4cf;"></div></div><span class="gif-badge">GIF</span></div>
+            <div class="seg-info"><div class="seg-meta"><span class="seg-time">15:29:50 · 5s</span><span class="sp-badge">Scene changed</span></div><div class="seg-sum">Person A moved a cup to the right and shifted papers.</div><div class="seg-tags"><span class="stag"><svg><use href="#ic-person"/></svg> ×1</span><span class="proc-trigger"><svg><use href="#ic-cube"/></svg> Rule</span></div></div>
+          </div>
+          <div class="seg-det"><div class="seg-det-top"><div class="seg-det-vid" onclick="event.stopPropagation();expandSegVid()"><div class="play-icon"><svg><use href="#ic-play"/></svg></div><div class="vid-expand">Expand</div></div><div class="seg-det-sum">Person A reached across desk. Cup moved ~0.4m right, papers shifted.</div></div><div class="det-label">Detected Targets</div><div class="trow id"><div class="tthumb face-bg"><svg><use href="#ic-person"/></svg></div><div class="tinfo"><div class="tname id-c">Person A</div><div class="tdesc">Reaching, hand manipulation. Moved cup.</div></div></div><div class="sp-block"><div class="sp-items"><span class="moved">☕ cup → moved 0.4m</span><span class="moved">📄 papers → shifted</span></div></div><div class="proc-detail"><svg><use href="#ic-cube"/></svg><span>Rule: <b>"Log object movements"</b> — recorded.</span></div></div>
+        </div>
+        </div><!-- /seg-row S2 -->
+        <!-- S3 -->
+        <div class="seg-row"><div class="tl-cell"><div class="tl-dot cam5"></div><div class="tl-time">15:29</div></div>
+        <div class="seg" data-seg="s3" data-entities="pA,pB" onclick="clickSeg(this)">
+          <div class="seg-body">
+            <div class="seg-thumb"><div class="gif-strip"><div class="gif-frame" style="background:#d4d0cb;"></div><div class="gif-frame" style="background:#cec9c4;"></div><div class="gif-frame" style="background:#d6d2cd;"></div></div><span class="gif-badge">GIF</span></div>
+            <div class="seg-info"><div class="seg-meta"><span class="seg-time">15:29:28 · 11s</span><span class="seg-cam">cam_5</span></div><div class="seg-sum">Person A head and eye movements. Others static.</div><div class="seg-tags"><span class="stag"><svg><use href="#ic-person"/></svg> ×5</span></div></div>
+          </div>
+          <div class="seg-det"><div class="seg-det-top"><div class="seg-det-vid" onclick="event.stopPropagation();expandSegVid()"><div class="play-icon"><svg><use href="#ic-play"/></svg></div><div class="vid-expand">Expand</div></div><div class="seg-det-sum">Person A subtle head and eye movements at foreground desk. Four others static.</div></div><div class="det-label">Detected Targets</div><div class="trow id"><div class="tthumb face-bg"><svg><use href="#ic-person"/></svg></div><div class="tinfo"><div class="tname id-c">Person A</div><div class="tdesc">Head and eye movements.</div></div></div><div class="trow id"><div class="tthumb face-bg"><svg><use href="#ic-person"/></svg></div><div class="tinfo"><div class="tname id-c">Person B</div><div class="tdesc">Static, left background.</div></div></div><div class="trow an"><div class="tthumb anon-bg"><svg><use href="#ic-person-o"/></svg></div><div class="tinfo"><div class="tname an-c">Unknown ×3</div><div class="tdesc">Seated at various desks, static.</div></div></div></div>
+        </div>
+        </div><!-- /seg-row S3 -->
+        <!-- S4 static -->
+        <div class="seg-row"><div class="tl-cell"><div class="tl-dot static-d"></div><div class="tl-time"></div></div>
+        <div class="seg static" data-seg="s4" data-entities="">
+          <div class="seg-body"><div class="seg-info" style="width:100%;"><div class="seg-meta"><span class="seg-time">15:29:10 ~ 15:29:25 · ×3 merged</span></div><div class="seg-sum">Static scene — no activity detected.</div></div></div>
+        </div>
+        </div><!-- /seg-row S4 -->
+        <!-- S5 dog -->
+        <div class="seg-row"><div class="tl-cell"><div class="tl-dot cam2 rule-d"></div><div class="tl-time">15:28</div></div>
+        <div class="seg" data-seg="s5" data-entities="" data-rules="r1" onclick="clickSeg(this)">
+          <div class="seg-body">
+            <div class="seg-thumb"><div class="gif-strip"><div class="gif-frame" style="background:#c8dbc4;"></div><div class="gif-frame" style="background:#b8cbb4;"></div><div class="gif-frame" style="background:#c2d5be;"></div></div><span class="gif-badge">GIF</span></div>
+            <div class="seg-info"><div class="seg-meta"><span class="seg-time">15:28:45 · 8s</span><span class="seg-cam">cam_2</span></div><div class="seg-sum">Dog running across yard. Delivery van parked briefly.</div><div class="seg-tags"><span class="stag"><svg><use href="#ic-pet"/></svg> ×1</span><span class="stag"><svg><use href="#ic-car"/></svg> ×1</span><span class="proc-trigger"><svg><use href="#ic-cube"/></svg> Rule</span></div></div>
+          </div>
+          <div class="seg-det"><div class="seg-det-top"><div class="seg-det-vid" style="background:#2a3a2e;" onclick="event.stopPropagation();expandSegVid()"><div class="play-icon"><svg><use href="#ic-play"/></svg></div><div class="vid-expand">Expand</div></div><div class="seg-det-sum">Medium-sized brown dog running across front yard. White delivery van parked ~5s.</div></div><div class="det-label">Detected Targets</div><div class="trow an"><div class="tthumb anon-bg"><svg><use href="#ic-pet"/></svg></div><div class="tinfo"><div class="tname an-c">Dog</div><div class="tdesc">Brown fur, running left-to-right.</div></div></div><div class="trow an"><div class="tthumb anon-bg"><svg><use href="#ic-car"/></svg></div><div class="tinfo"><div class="tname an-c">Vehicle</div><div class="tdesc">White delivery van, parked briefly.</div></div></div><div class="proc-detail"><svg><use href="#ic-cube"/></svg><span>Rule: <b>"Notify Alex if animals"</b> — sent 15:28:46.</span></div></div>
+        </div>
+        </div><!-- /seg-row S5 -->
+        <!-- S6 -->
+        <div class="seg-row"><div class="tl-cell"><div class="tl-dot cam2 rule-d"></div><div class="tl-time"></div></div>
+        <div class="seg" data-seg="s6" data-entities="pA" data-rules="r3" onclick="clickSeg(this)">
+          <div class="seg-body">
+            <div class="seg-thumb"><div class="gif-strip"><div class="gif-frame" style="background:#c8dbc4;"></div><div class="gif-frame" style="background:#bfd1ba;"></div><div class="gif-frame" style="background:#c2d5be;"></div></div><span class="gif-badge">GIF</span></div>
+            <div class="seg-info"><div class="seg-meta"><span class="seg-time">15:28:10 · 12s</span><span class="seg-cam">cam_2</span></div><div class="seg-sum">Person A walked out front door, stood in yard, returned.</div><div class="seg-tags"><span class="stag"><svg><use href="#ic-person"/></svg> ×2</span><span class="proc-trigger"><svg><use href="#ic-cube"/></svg> Rule</span></div></div>
+          </div>
+          <div class="seg-det"><div class="seg-det-top"><div class="seg-det-vid" style="background:#2a3a2e;" onclick="event.stopPropagation();expandSegVid()"><div class="play-icon"><svg><use href="#ic-play"/></svg></div><div class="vid-expand">Expand</div></div><div class="seg-det-sum">Person A walked out, stood in yard ~8s, returned. Unknown person on sidewalk.</div></div><div class="det-label">Detected Targets</div><div class="trow id"><div class="tthumb face-bg"><svg><use href="#ic-person"/></svg></div><div class="tinfo"><div class="tname id-c">Person A</div><div class="tdesc">Walked out, stood 8s, returned.</div></div></div><div class="trow an"><div class="tthumb anon-bg"><svg><use href="#ic-person-o"/></svg></div><div class="tinfo"><div class="tname an-c">Unknown</div><div class="tdesc">Passed on sidewalk.</div></div></div><div class="proc-detail"><svg><use href="#ic-cube"/></svg><span>Rule: <b>"Person A leaves"</b> — cam_5 set 2fps.</span></div></div>
+        </div>
+        </div><!-- /seg-row S6 -->
+
+        <!-- Date separator -->
+        <div class="tl-date-sep">
+          <div class="tl-date-line"></div>
+          <div class="tl-date-text">Apr 15</div>
+          <div class="tl-date-line"></div>
+        </div>
+
+        <!-- S7: yesterday evening -->
+        <div class="seg-row"><div class="tl-cell"><div class="tl-dot cam5"></div><div class="tl-time">23:45</div></div>
+        <div class="seg" data-seg="s7" data-entities="pA" onclick="clickSeg(this)">
+          <div class="seg-body">
+            <div class="seg-thumb"><div class="gif-strip"><div class="gif-frame" style="background:#2a2a30;"></div><div class="gif-frame" style="background:#252530;"></div><div class="gif-frame" style="background:#2e2e35;"></div></div><span class="gif-badge">GIF</span></div>
+            <div class="seg-info"><div class="seg-meta"><span class="seg-time">23:45:12 · 6s</span><span class="seg-cam">cam_5</span></div><div class="seg-sum">Person A packing up laptop, preparing to leave the office.</div><div class="seg-tags"><span class="stag"><svg><use href="#ic-person"/></svg> ×1</span></div></div>
+          </div>
+          <div class="seg-det"><div class="seg-det-top"><div class="seg-det-vid" onclick="event.stopPropagation();expandSegVid()"><div class="play-icon"><svg><use href="#ic-play"/></svg></div><div class="vid-expand">Expand</div></div><div class="seg-det-sum">Person A standing up from desk, closing laptop and putting items into a bag. Office otherwise empty.</div></div><div class="det-label">Detected Targets</div><div class="trow id"><div class="tthumb face-bg"><svg><use href="#ic-person"/></svg></div><div class="tinfo"><div class="tname id-c">Person A</div><div class="tdesc">Packing up, preparing to leave.</div></div></div></div>
+        </div>
+        </div><!-- /seg-row S7 -->
+
+        <!-- S8: yesterday -->
+        <div class="seg-row"><div class="tl-cell"><div class="tl-dot cam2"></div><div class="tl-time">23:46</div></div>
+        <div class="seg" data-seg="s8" data-entities="pA" onclick="clickSeg(this)">
+          <div class="seg-body">
+            <div class="seg-thumb"><div class="gif-strip"><div class="gif-frame" style="background:#1e2e1e;"></div><div class="gif-frame" style="background:#1a2a1a;"></div><div class="gif-frame" style="background:#202e20;"></div></div><span class="gif-badge">GIF</span></div>
+            <div class="seg-info"><div class="seg-meta"><span class="seg-time">23:46:30 · 15s</span><span class="seg-cam">cam_2</span></div><div class="seg-sum">Person A exited through front door, walked to parked car, and drove away.</div><div class="seg-tags"><span class="stag"><svg><use href="#ic-person"/></svg> ×1</span><span class="stag"><svg><use href="#ic-car"/></svg> ×1</span></div></div>
+          </div>
+          <div class="seg-det"><div class="seg-det-top"><div class="seg-det-vid" style="background:#1a2a1a;" onclick="event.stopPropagation();expandSegVid()"><div class="play-icon"><svg><use href="#ic-play"/></svg></div><div class="vid-expand">Expand</div></div><div class="seg-det-sum">Person A exited front door, walked across yard to parked sedan, got in and drove away. Night scene, porch light on.</div></div><div class="det-label">Detected Targets</div><div class="trow id"><div class="tthumb face-bg"><svg><use href="#ic-person"/></svg></div><div class="tinfo"><div class="tname id-c">Person A</div><div class="tdesc">Exited, walked to car, drove away.</div></div></div><div class="trow an"><div class="tthumb anon-bg"><svg><use href="#ic-car"/></svg></div><div class="tinfo"><div class="tname an-c">Vehicle</div><div class="tdesc">Dark sedan, parked in driveway.</div></div></div></div>
+        </div>
+        </div><!-- /seg-row S8 -->
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT — Entity Panel (collapsible) -->
+  <div class="ent-panel" id="entPanel">
+    <div class="ent-panel-header"><svg style="width:16px;height:16px;fill:var(--text-muted);"><use href="#ic-users"/></svg> Entities <span class="col-count" id="entCount">2</span></div>
+    <div class="filter-bar hidden" id="entFilter"><span class="filter-pill" id="entFilterLabel"></span><button class="filter-x" onclick="clearFilter()">✕ Clear</button></div>
+    <div class="ent-panel-scroll" id="entList">
+      <!-- Person A -->
+      <div class="ent" data-entity="pA" onclick="clickEnt(this)">
+        <div class="ent-body"><div class="ent-photo face"><svg><use href="#ic-person"/></svg></div><div class="ent-right"><div style="display:flex;align-items:center;gap:6px;"><span class="ent-name">Person A</span><span class="ent-pill">×10</span><span class="ent-cam">cam_5 · cam_2</span></div><div class="ent-meta">Short dark hair · grey headphones · black hooded jacket</div><div class="ent-recent"><div class="ent-beh-preview"><span class="t">15:30</span> Subtle head shift</div><div class="ent-beh-preview"><span class="t">15:29</span> Moved cup and papers</div><div class="ent-beh-preview"><span class="t">15:28</span> Walked to front yard</div></div></div></div>
+        <div class="ent-det"><div class="sem-label">🧠 Semantic Memory <span class="m">3 entries</span></div><div class="sem-body">Consistently observed sitting at desk wearing black hooded jacket and grey headphones. Minimal movement, occasionally adjusts hand position.</div><div class="sem-body">Also observed in front yard via cam_2, stepping outside briefly.</div><div class="sem-body">Moved objects on desk (cup, papers) at 15:29 — only person with active manipulation.</div><div class="det-label">Sightings</div><div class="sight-gallery"><div class="sight-item"><div class="sight-img"><svg><use href="#ic-img"/></svg></div><div class="sight-time">15:30</div><div class="sight-cam">cam_5</div></div><div class="sight-item"><div class="sight-img"><svg><use href="#ic-img"/></svg></div><div class="sight-time">15:29</div><div class="sight-cam">cam_5</div></div><div class="sight-item"><div class="sight-img" style="background:linear-gradient(135deg,#c8dbc4,#b8cbb4);"><svg><use href="#ic-img"/></svg></div><div class="sight-time">15:28</div><div class="sight-cam">cam_2</div></div><div class="sight-item"><div class="sight-img"><svg><use href="#ic-img"/></svg></div><div class="sight-time">15:25</div><div class="sight-cam">cam_5</div></div><div class="sight-item"><div class="sight-img"><svg><use href="#ic-img"/></svg></div><div class="sight-time">15:20</div><div class="sight-cam">cam_5</div></div></div><div class="det-label">Recent Activity</div><div class="beh"><span class="beh-t">15:30:07</span><span class="beh-cam">cam_5</span><span>Subtle head shift</span></div><div class="beh"><span class="beh-t">15:29:50</span><span class="beh-cam">cam_5</span><span>Moved cup 0.4m, shifted papers</span></div><div class="beh"><span class="beh-t">15:29:28</span><span class="beh-cam">cam_5</span><span>Head and eye movements</span></div><div class="beh"><span class="beh-t">15:28:10</span><span class="beh-cam">cam_2</span><span>Walked to yard, returned</span></div></div>
+      </div>
+      <!-- Person B -->
+      <div class="ent" data-entity="pB" onclick="clickEnt(this)">
+        <div class="ent-body"><div class="ent-photo face"><svg><use href="#ic-person"/></svg></div><div class="ent-right"><div style="display:flex;align-items:center;gap:6px;"><span class="ent-name">Person B</span><span class="ent-pill">×8</span><span class="ent-cam">cam_5</span></div><div class="ent-meta">Dark puffer jacket · left background</div><div class="ent-recent"><div class="ent-beh-preview"><span class="t">15:30</span> Static, seated</div><div class="ent-beh-preview"><span class="t">15:29</span> Static, seated</div></div></div></div>
+        <div class="ent-det"><div class="sem-label">🧠 Semantic Memory <span class="m">2 entries</span></div><div class="sem-body">Consistently remains static and seated in left background, wearing dark puffer jacket.</div><div class="sem-body">No interactions with others observed.</div><div class="det-label">Sightings</div><div class="sight-gallery"><div class="sight-item"><div class="sight-img"><svg><use href="#ic-img"/></svg></div><div class="sight-time">15:30</div><div class="sight-cam">cam_5</div></div><div class="sight-item"><div class="sight-img"><svg><use href="#ic-img"/></svg></div><div class="sight-time">15:29</div><div class="sight-cam">cam_5</div></div><div class="sight-item"><div class="sight-img"><svg><use href="#ic-img"/></svg></div><div class="sight-time">15:25</div><div class="sight-cam">cam_5</div></div></div><div class="det-label">Recent Activity</div><div class="beh"><span class="beh-t">15:30:07</span><span class="beh-cam">cam_5</span><span>Static, seated</span></div><div class="beh"><span class="beh-t">15:29:28</span><span class="beh-cam">cam_5</span><span>Static, seated</span></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottombar">
+  <div class="bottombar-main">
+    <div class="bottombar-left">
+      <div style="position:relative;" id="svcWrap"><button class="bb-btn" id="svcBtn" onclick="toggleBBPop(event,'svcPop','svcBtn')"><span class="bb-dot"></span> Services <span style="font-size:11px;color:var(--text-faint);">4/4</span></button><div class="bb-popover" id="svcPop"><div class="bb-pop-title">Service Status</div><div class="bb-svc-row"><span class="dot ok"></span><span class="svc-name">Cortex</span><span class="svc-lat">port 8219</span></div><div class="bb-svc-row"><span class="dot ok"></span><span class="svc-name">Qdrant</span><span class="svc-lat">port 6333</span></div><div class="bb-svc-row"><span class="dot ok"></span><span class="svc-name">Go2RTC</span><span class="svc-lat">port 1984</span></div><div class="bb-svc-row"><span class="dot ok"></span><span class="svc-name">Monitor</span><span class="svc-lat">port 3210</span></div></div></div>
+      <div style="position:relative;" id="modelWrap"><button class="bb-btn" id="modelBtn" onclick="toggleBBPop(event,'modelPop','modelBtn')"><svg><use href="#ic-cube"/></svg> Models <span style="font-size:11px;color:var(--text-faint);">5 active</span></button><div class="bb-popover" id="modelPop"><div class="bb-pop-title">Active Models</div><div class="bb-model-row"><span class="svc-name">VLM Analysis</span><span class="ms on">Qwen3.5-9B</span></div><div class="bb-model-row"><span class="svc-name">Object Detection</span><span class="ms on">YOLO26m</span></div><div class="bb-model-row"><span class="svc-name">Face Detection</span><span class="ms on">RetinaFace</span></div><div class="bb-model-row"><span class="svc-name">Face ReID</span><span class="ms on">ArcFace MBF</span></div><div class="bb-model-row"><span class="svc-name">Body ReID</span><span class="ms on">CLIP-ReID</span></div><div class="bb-model-row"><span class="svc-name">Audio</span><span class="ms off">off</span></div></div></div>
+    </div>
+    <div class="bottombar-right"><span style="font-size:12px;color:var(--text-muted);">9.3s latency · 8 seg/min · 36 memories</span></div>
+  </div>
+</div>
+
+</div>
+
+<!-- FLOATING CHAT -->
+<button class="chat-fab" onclick="toggleChat()"><svg><use href="#ic-chat"/></svg></button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-panel-header"><span class="chat-panel-title">Chat</span><button class="chat-panel-close" onclick="toggleChat()">✕</button></div>
+  <div class="chat-msgs"><div class="chat-msg u">Who is Person A?</div><div class="chat-msg a">Person A is observed 10 times across cam_5 and cam_2. They sit at the foreground desk wearing a black hooded jacket and grey headphones.</div><div class="chat-msg u">Has anything changed?</div><div class="chat-msg a">At 15:29:50, Person A moved a cup ~0.4m right and shifted papers. No other object movements were observed.</div><div class="chat-msg u">Any animals today?</div><div class="chat-msg a">Yes — a dog on cam_2 at 15:28:45. Per your rule, Alex was notified.</div></div>
+  <div class="chat-input-row"><input type="text" placeholder="Ask about the scene..."><button class="chat-btn" title="Voice"><svg><use href="#ic-mic"/></svg></button><button class="chat-btn send" title="Send"><svg style="fill:#fff"><use href="#ic-send"/></svg></button></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"><div class="settings-panel" onclick="event.stopPropagation()"><div class="settings-title">Settings <button class="settings-close" onclick="closeSettings()">✕</button></div><div class="settings-group"><div class="settings-group-label">Vision Language Model</div><div class="settings-options"><button class="settings-opt active" onclick="pickOpt(this)">Qwen3.5-9B</button><button class="settings-opt" onclick="pickOpt(this)">Gemini Flash</button><button class="settings-opt" onclick="pickOpt(this)">GPT-4o</button></div></div><div class="settings-group"><div class="settings-group-label">Analysis Level</div><div class="settings-options"><button class="settings-opt" onclick="pickOpt(this)">L0 — VLM only</button><button class="settings-opt active" onclick="pickOpt(this)">L1 — + Detection</button></div></div><div class="settings-group"><div class="settings-group-label">Audio Model</div><div class="settings-options"><button class="settings-opt active" onclick="pickOpt(this)">None</button><button class="settings-opt" onclick="pickOpt(this)">Whisper</button><button class="settings-opt" onclick="pickOpt(this)">Gemini Audio</button></div></div><div class="settings-group"><div class="settings-group-label">Capture Mode</div><div class="settings-options"><button class="settings-opt active" onclick="pickOpt(this)">Event</button><button class="settings-opt" onclick="pickOpt(this)">Stream</button><button class="settings-opt" onclick="pickOpt(this)">Snapshot</button></div></div><div class="settings-group"><div class="settings-group-label">Sampling Rate</div><div class="settings-options"><button class="settings-opt" onclick="pickOpt(this)">0.5 fps</button><button class="settings-opt active" onclick="pickOpt(this)">1 fps</button><button class="settings-opt" onclick="pickOpt(this)">2 fps</button><button class="settings-opt" onclick="pickOpt(this)">5 fps</button></div></div></div></div>
+
+<div class="exp-overlay" id="expOverlay" onclick="closeExp()"><div class="exp-inner" id="expInner" onclick="event.stopPropagation()"></div></div>
+
+<script>
+let activeFilter=null,activeRule=null,entVisible=true;
+
+// Save original DOM order so we can restore after filter reorder
+let segOrigOrder=[],entOrigOrder=[];
+(function(){
+  // Run immediately since DOM is already parsed at script position
+  segOrigOrder=[...document.getElementById('segList').children];
+  entOrigOrder=[...document.getElementById('entList').children];
+})();
+function restoreSegOrder(){
+  const list=document.getElementById('segList');
+  segOrigOrder.forEach(el=>list.appendChild(el));
+}
+function restoreEntOrder(){
+  const list=document.getElementById('entList');
+  entOrigOrder.forEach(el=>list.appendChild(el));
+}
+
+// Toggle entity panel
+function toggleEntPanel(){
+  // Always clear filter and restore order first
+  clearFilter();
+  entVisible=!entVisible;
+  const panel=document.getElementById('entPanel');
+  const toggle=document.getElementById('entToggle');
+  const segArea=document.getElementById('segArea');
+  if(entVisible){
+    panel.classList.remove('collapsed');
+    toggle.classList.add('active');
+    segArea.classList.remove('tl-mode');
+  }else{
+    panel.classList.add('collapsed');
+    toggle.classList.remove('active');
+    segArea.classList.add('tl-mode');
+  }
+}
+
+function clickSeg(el){
+  const id=el.dataset.seg,was=el.classList.contains('selected');
+  document.querySelectorAll('.seg.expanded').forEach(c=>c.classList.remove('expanded'));
+  if(was){clearFilter();return;}
+  el.classList.add('expanded');
+  if(!entVisible) return; // no entity filtering when panel hidden
+  const segEnts=(el.dataset.entities||'').split(',').filter(Boolean);
+  activeFilter={type:'seg',id};activeRule=null;
+  document.querySelectorAll('.seg').forEach(c=>{c.classList.remove('selected','dimmed');if(c.dataset.seg===id)c.classList.add('selected');});
+  const entList=document.getElementById('entList'),cards=[...entList.querySelectorAll('.ent')],match=[],dim=[];
+  cards.forEach(c=>{c.classList.remove('selected','dimmed','expanded');if(segEnts.includes(c.dataset.entity))match.push(c);else{c.classList.add('dimmed');dim.push(c);}});
+  match.forEach(c=>entList.appendChild(c));dim.forEach(c=>entList.appendChild(c));
+  document.getElementById('entFilter').classList.remove('hidden');
+  document.getElementById('entFilterLabel').textContent='Segment — '+(segEnts.length?match.length:'0')+' of '+cards.length;
+  document.getElementById('segFilter').classList.add('hidden');
+  document.getElementById('entCount').textContent=(segEnts.length?match.length:'0')+' of '+cards.length;
+  document.querySelectorAll('.proc-rule-item').forEach(r=>r.classList.remove('active'));
+}
+function clickEnt(el){
+  const id=el.dataset.entity,was=el.classList.contains('selected');
+  document.querySelectorAll('.ent.expanded').forEach(c=>c.classList.remove('expanded'));
+  if(was){clearFilter();return;}
+  el.classList.add('expanded');
+  const name=el.querySelector('.ent-name').textContent;
+  activeFilter={type:'entity',id};activeRule=null;
+  document.querySelectorAll('.ent').forEach(c=>{c.classList.remove('selected','dimmed');if(c.dataset.entity===id)c.classList.add('selected');});
+  const segList=document.getElementById('segList'),cards=[...segList.querySelectorAll('.seg')],match=[],dim=[];
+  cards.forEach(c=>{c.classList.remove('selected','dimmed','expanded');const ents=(c.dataset.entities||'').split(',');if(ents.includes(id)){match.push(c);}else{c.classList.add('dimmed');dim.push(c);}});
+  // Reorder seg-rows (parent of .seg)
+  const allRows=[...segList.querySelectorAll('.seg-row, .tl-date-sep')];
+  const matchRows=match.map(c=>c.closest('.seg-row')).filter(Boolean);
+  const dimRows=dim.map(c=>c.closest('.seg-row')).filter(Boolean);
+  const dateSeps=[...segList.querySelectorAll('.tl-date-sep')];
+  matchRows.forEach(r=>segList.appendChild(r));
+  dimRows.forEach(r=>segList.appendChild(r));
+  dateSeps.forEach(d=>segList.appendChild(d)); // push date seps to end when filtered
+  document.getElementById('segFilter').classList.remove('hidden');
+  document.getElementById('segFilterLabel').textContent=name+' — '+match.length+' of '+cards.length;
+  document.getElementById('entFilter').classList.add('hidden');
+  document.getElementById('segCount').textContent=match.length+' of '+cards.length;
+  document.querySelectorAll('.proc-rule-item').forEach(r=>r.classList.remove('active'));
+}
+function clearFilter(){
+  activeFilter=null;activeRule=null;
+  document.querySelectorAll('.seg,.ent').forEach(c=>c.classList.remove('selected','dimmed','expanded'));
+  document.querySelectorAll('.proc-rule-item').forEach(r=>r.classList.remove('active'));
+  // Restore original order
+  restoreSegOrder();
+  restoreEntOrder();
+  document.getElementById('segFilter').classList.add('hidden');
+  document.getElementById('entFilter').classList.add('hidden');
+  document.getElementById('segCount').textContent=document.querySelectorAll('.seg').length;
+  document.getElementById('entCount').textContent=document.querySelectorAll('.ent').length;
+}
+function toggleProcDD(e){e.stopPropagation();document.getElementById('procDD').classList.toggle('open');document.getElementById('procTopBtn').classList.toggle('active');}
+document.addEventListener('click',function(e){
+  if(!document.getElementById('procWrap').contains(e.target)){document.getElementById('procDD').classList.remove('open');document.getElementById('procTopBtn').classList.remove('active');}
+  if(!e.target.closest('#svcWrap')&&!e.target.closest('#modelWrap')){document.querySelectorAll('.bb-popover').forEach(p=>p.classList.remove('open'));document.querySelectorAll('.bb-btn').forEach(b=>b.classList.remove('active'));}
+});
+function clickRule(e,ruleId){
+  e.stopPropagation();
+  if(activeRule===ruleId){activeRule=null;clearFilter();document.querySelectorAll('.proc-rule-item').forEach(r=>r.classList.remove('active'));return;}
+  activeRule=ruleId;clearFilter();activeRule=ruleId;
+  document.querySelectorAll('.proc-rule-item').forEach(r=>r.classList.toggle('active',r.dataset.rule===ruleId));
+  const segList=document.getElementById('segList'),segs=[...segList.querySelectorAll('.seg')],matched=[],dimmed=[];
+  segs.forEach(s=>{s.classList.remove('selected','dimmed','expanded');const rules=(s.dataset.rules||'').split(',');if(rules.includes(ruleId)){s.classList.add('selected','expanded');matched.push(s);}else{s.classList.add('dimmed');dimmed.push(s);}});
+  const matchRows=matched.map(c=>c.closest('.seg-row')).filter(Boolean);
+  const dimRows=dimmed.map(c=>c.closest('.seg-row')).filter(Boolean);
+  const dateSeps=[...segList.querySelectorAll('.tl-date-sep')];
+  matchRows.forEach(r=>segList.appendChild(r));
+  dimRows.forEach(r=>segList.appendChild(r));
+  dateSeps.forEach(d=>segList.appendChild(d));
+  document.getElementById('segFilter').classList.remove('hidden');
+  document.getElementById('segFilterLabel').textContent='Rule — '+matched.length+' segments';
+  document.getElementById('segCount').textContent=matched.length+' of '+segs.length;
+  document.getElementById('entFilter').classList.add('hidden');
+  document.querySelectorAll('.ent').forEach(c=>c.classList.remove('selected','dimmed','expanded'));
+  document.getElementById('entCount').textContent=document.querySelectorAll('.ent').length;
+  document.getElementById('procDD').classList.remove('open');document.getElementById('procTopBtn').classList.remove('active');
+}
+function toggleBBPop(e,popId,btnId){
+  e.stopPropagation();document.querySelectorAll('.bb-popover').forEach(p=>{if(p.id!==popId)p.classList.remove('open');});document.querySelectorAll('.bb-btn').forEach(b=>{if(b.id!==btnId)b.classList.remove('active');});
+  document.getElementById(popId).classList.toggle('open');document.getElementById(btnId).classList.toggle('active');
+}
+function toggleChat(){document.getElementById('chatPanel').classList.toggle('open');}
+function openSettings(){document.getElementById('settingsOverlay').classList.add('open');}
+function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');}
+function pickOpt(el){el.parentElement.querySelectorAll('.settings-opt').forEach(o=>o.classList.remove('active'));el.classList.add('active');}
+function expandVideo(){const o=document.getElementById('expOverlay'),i=document.getElementById('expInner');i.innerHTML='<div style="background:#0f0f10;width:100%;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;border-radius:14px;"><span style="color:#666;font-size:16px;">Expanded Video — cam_5</span></div>';o.classList.add('open');}
+function expand3D(){const o=document.getElementById('expOverlay'),i=document.getElementById('expInner');i.innerHTML='<div style="background:var(--bg-elevated);width:100%;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;border-radius:14px;box-shadow:var(--shadow-elevated);"><span style="color:var(--text-muted);font-size:16px;">Expanded 3D Scene — Three.js</span></div>';o.classList.add('open');}
+function expandSegVid(){const o=document.getElementById('expOverlay'),i=document.getElementById('expInner');i.innerHTML='<div style="background:#0f0f10;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;border-radius:14px;position:relative;"><span style="color:#666;font-size:16px;">Segment Video Player</span><div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;"><div style="width:200px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;"><div style="width:35%;height:100%;background:var(--accent);border-radius:2px;"></div></div><span style="font-size:11px;color:rgba(255,255,255,0.5);">0:03 / 0:08</span></div></div>';o.classList.add('open');}
+function closeExp(){document.getElementById('expOverlay').classList.remove('open');}
+</script>
+</body>
+</html>
